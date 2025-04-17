@@ -1,0 +1,1 @@
+//the page where a user sets up basic info about their game. leads to GameProgress
