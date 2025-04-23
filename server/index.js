@@ -7,7 +7,7 @@ import userRoutes from './routes/userRoutes.js';
 import promptRoutes from './routes/promptRoutes.js';
 import gameRoutes from './routes/gameRoutes.js';
 import statsRoutes from './routes/statRoutes.js';
-import projectRoutes from './routes/projectRoutes.js';
+// import projectRoutes from './routes/projectRoutes.js';
 
 dotenv.config();
 
@@ -21,6 +21,6 @@ app.use('/users', userRoutes);
 app.use('/prompts', promptRoutes);
 app.use('/games', gameRoutes);
 app.use('/stats', statsRoutes);
-app.use('/projects', projectRoutes);
+// app.use('/projects', projectRoutes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
