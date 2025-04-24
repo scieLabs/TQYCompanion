@@ -4,7 +4,8 @@ const promptSchema = new mongoose.Schema({
   season: { type: String, required: true },
   prompt_title: { type: String, required: true },
   prompt: { type: String, required: true },
-  isSpecial: { type: Boolean },
+  isDiscussion: { type: Boolean },
+  isDiscovery: { type: Boolean },
   isProject: { type: Boolean }
 });
 

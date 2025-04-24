@@ -1,27 +1,27 @@
-import Game from '../models/gameSchema.js';
+import Stats from '../models/gameSchema.js';
 
-export const getAllGames = async (req, res) => {
-  const games = await Game.find();
-  res.json(games);
+export const getAllStats = async (req, res) => {
+  const stats = await Stats.find();
+  res.json(stats);
 };
 
-export const createGame = async (req, res) => {
-  const newGame = new Game(req.body);
-  await newGame.save();
-  res.json(newGame);
+export const createStats = async (req, res) => {
+  const newStats = new Stats(req.body);
+  await newStats.save();
+  res.json(newStats);
 };
 
-export const getGameById = async (req, res) => {
-  const game = await Game.findById(req.params.id);
-  res.json(game);
+export const getStatsById = async (req, res) => {
+  const stats = await Stats.findById(req.params.id);
+  res.json(stats);
 };
 
-export const updateGame = async (req, res) => {
-  const updatedGame = await Game.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(updatedGame);
+export const updateStats = async (req, res) => {
+  const updatedStats = await Stats.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(updatedStats);
 };
 
-export const deleteGame = async (req, res) => {
-  await Game.findByIdAndDelete(req.params.id);
-  res.json({ message: 'Game deleted' });
+export const deleteStats = async (req, res) => {
+  await Stats.findByIdAndDelete(req.params.id);
+  res.json({ message: 'Stats entry deleted' });
 };
