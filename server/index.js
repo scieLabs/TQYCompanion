@@ -1,27 +1,22 @@
 import express from 'express';
+import './db/db.js'; 
 import cors from 'cors';
 import dotenv from 'dotenv';
-import './db/db.js';
+
 import userRoutes from './routes/userRoutes.js';
+import promptRoutes from './routes/promptRoutes.js';
+import gameRoutes from './routes/gameRoutes.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
-const MODE = process.env.MODE;
+const PORT = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(express.json());
-app.use(`/api/v1/users`, userRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Server is running');
-});
+app.use('/users', userRoutes);
+app.use('/prompts', promptRoutes);
+app.use('/games', gameRoutes);
 
-app.get(/.*/, (req, res) => {
-  res.status(404).send("Page doesn't exist");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is 🏃 in ${MODE} mode on ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
