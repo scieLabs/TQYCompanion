@@ -1,0 +1,199 @@
+import { useState } from 'react';
+
+export default function PromptModal({ prompt, formData, setFormData }) {
+  const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+  const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
+
+  const renderActionForm = () => {
+    return (
+      <div className="space-y-4">
+        <div>
+          <label className="block font-bold">Discover something new</label>
+          <textarea
+            className="textarea textarea-bordered w-full"
+            value={formData.discovery || ''}
+            onChange={(e) => updateField('discovery', e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="block font-bold">Hold a discussion</label>
+          <textarea
+            className="textarea textarea-bordered w-full"
+            value={formData.discussion || ''}
+            onChange={(e) => updateField('discussion', e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="block font-bold">Start a project</label>
+          <input
+            className="input input-bordered w-full"
+            placeholder="Title"
+            value={formData.project_title || ''}
+            onChange={(e) => updateField('project_title', e.target.value)}
+          />
+          <textarea
+            className="textarea textarea-bordered w-full mt-2"
+            placeholder="Description"
+            value={formData.project_desc || ''}
+            onChange={(e) => updateField('project_desc', e.target.value)}
+          />
+          <div className="flex items-center space-x-2 mt-2">
+            <span className="font-bold">Weeks:</span>
+            <button className="btn btn-sm" onClick={() => updateField('project_weeks', Math.max(1, (formData.project_weeks || 1) - 1))}>-</button>
+            <span>{formData.project_weeks || 1}</span>
+            <button className="btn btn-sm" onClick={() => updateField('project_weeks', Math.min(6, (formData.project_weeks || 1) + 1))}>+</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (prompt._id === GAME_OVER_PROMPT_ID) {
+    return (
+      <div>
+        <label className="block font-bold">Enter Epilogue</label>
+        <textarea
+          className="textarea textarea-bordered w-full"
+          value={formData.end || ''}
+          onChange={(e) => updateField('end', e.target.value)}
+        />
+        <button className="btn btn-error mt-2" 
+        // onClick={() => navigate("/summary")}
+        >Game Over</button>
+      </div>
+    );
+  }
+
+//   return (
+//     <div>
+//       {renderActionForm()}
+//       {prompt.isDiscussion && (
+//         <div className="mt-4">
+//           <label className="block font-bold">Prompt Discussion</label>
+//           <textarea
+//             className="textarea textarea-bordered w-full"
+//             value={formData.p_discussion || ''}
+//             onChange={(e) => updateField('p_discussion', e.target.value)}
+//           />
+//         </div>
+//       )}
+//       {prompt.isDiscovery && (
+//         <div className="mt-4">
+//           <label className="block font-bold">Prompt Discovery</label>
+//           <textarea
+//             className="textarea textarea-bordered w-full"
+//             value={formData.p_discovery || ''}
+//             onChange={(e) => updateField('p_discovery', e.target.value)}
+//           />
+//         </div>
+//       )}
+//       {prompt.isProject && (
+//         <div className="mt-4">
+//           <label className="block font-bold">Prompt Project</label>
+//           <input
+//             className="input input-bordered w-full"
+//             placeholder="Title"
+//             value={formData.pp_title || ''}
+//             onChange={(e) => updateField('pp_title', e.target.value)}
+//           />
+//           <textarea
+//             className="textarea textarea-bordered w-full mt-2"
+//             placeholder="Description"
+//             value={formData.pp_desc || ''}
+//             onChange={(e) => updateField('pp_desc', e.target.value)}
+//           />
+//           <div className="flex items-center space-x-2 mt-2">
+//             <span className="font-bold">Weeks:</span>
+//             <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.max(1, (formData.pp_weeks || 1) - 1))}>-</button>
+//             <span>{formData.pp_weeks || 1}</span>
+//             <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.min(6, (formData.pp_weeks || 1) + 1))}>+</button>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+  return (
+    <div>
+      {/* Render always visible action form */}
+      {renderActionForm()}
+
+      {/* Conditionally show the modal buttons */}
+      {prompt.isDiscussion && (
+        <button
+          className="btn btn-sm mt-4"
+          onClick={() => setFormData(prev => ({ ...prev, showDiscussionModal: true }))}
+        >
+          Open Discussion Modal
+        </button>
+      )}
+      {prompt.isDiscovery && (
+        <button
+          className="btn btn-sm mt-4"
+          onClick={() => setFormData(prev => ({ ...prev, showDiscoveryModal: true }))}
+        >
+          Open Discovery Modal
+        </button>
+      )}
+      {prompt.isProject && (
+        <button
+          className="btn btn-sm mt-4"
+          onClick={() => setFormData(prev => ({ ...prev, showProjectModal: true }))}
+        >
+          Open Project Modal
+        </button>
+      )}
+
+      {/* Modal rendering logic will go here */}
+      {formData.showDiscussionModal && prompt.isDiscussion && (
+        <div className="modal modal-open mt-4">
+          {/* Render modal content for discussion */}
+          <label className="block font-bold">Prompt Discussion</label>
+          <textarea
+            className="textarea textarea-bordered w-full"
+            value={formData.p_discussion || ''}
+            onChange={(e) => updateField('p_discussion', e.target.value)}
+          />
+        </div>
+      )}
+
+      {formData.showDiscoveryModal && prompt.isDiscovery && (
+        <div className="modal modal-open mt-4">
+          {/* Render modal content for discovery */}
+          <label className="block font-bold">Prompt Discovery</label>
+          <textarea
+            className="textarea textarea-bordered w-full"
+            value={formData.p_discovery || ''}
+            onChange={(e) => updateField('p_discovery', e.target.value)}
+          />
+        </div>
+      )}
+
+      {formData.showProjectModal && prompt.isProject && (
+        <div className="modal modal-open mt-4">
+          {/* Render modal content for project */}
+          <label className="block font-bold">Prompt Project</label>
+          <input
+            className="input input-bordered w-full"
+            placeholder="Title"
+            value={formData.pp_title || ''}
+            onChange={(e) => updateField('pp_title', e.target.value)}
+          />
+          <textarea
+            className="textarea textarea-bordered w-full mt-2"
+            placeholder="Description"
+            value={formData.pp_desc || ''}
+            onChange={(e) => updateField('pp_desc', e.target.value)}
+          />
+          <div className="flex items-center space-x-2 mt-2">
+            <span className="font-bold">Weeks:</span>
+            <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.max(1, (formData.pp_weeks || 1) - 1))}>-</button>
+            <span>{formData.pp_weeks || 1}</span>
+            <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.min(6, (formData.pp_weeks || 1) + 1))}>+</button>
+            </div>
+        </div>
+      )}
+    </div>
+  );
+}

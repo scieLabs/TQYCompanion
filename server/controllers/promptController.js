@@ -1,27 +1,70 @@
 import Prompt from '../models/promptSchema.js';
+import Game from '../models/gameSchema.js';
 
 export const getAllPrompts = async (req, res) => {
-  const prompts = await Prompt.find();
-  res.json(prompts);
-};
-
-export const createPrompt = async (req, res) => {
-  const newPrompt = new Prompt(req.body);
-  await newPrompt.save();
-  res.json(newPrompt);
+  try {
+    const prompts = await Prompt.find();
+    res.json(prompts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 export const getPromptById = async (req, res) => {
-  const prompt = await Prompt.findById(req.params.id);
-  res.json(prompt);
+  try {
+    const prompt = await Prompt.findById(req.params.id);
+    if (!prompt) return res.status(404).json({ message: 'Prompt not found' });
+    res.json(prompt);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const createPrompt = async (req, res) => {
+  try {
+    const newPrompt = new Prompt(req.body);
+    await newPrompt.save();
+    res.status(201).json(newPrompt);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
 export const updatePrompt = async (req, res) => {
-  const updatedPrompt = await Prompt.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(updatedPrompt);
+  try {
+    const updated = await Prompt.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ message: 'Prompt not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
 export const deletePrompt = async (req, res) => {
-  await Prompt.findByIdAndDelete(req.params.id);
-  res.json({ message: 'Prompt deleted' });
+  try {
+    const deleted = await Prompt.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Prompt not found' });
+    res.json({ message: 'Prompt deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getNextPrompt = async (req, res) => {
+  try {
+    const week = parseInt(req.query.week);
+    const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+    const season = seasons[Math.min(Math.floor((week - 1) / 13), 3)];
+
+    const usedPromptIds = (await Game.find()).flatMap(game =>
+      game.prompts.map(p => p.prompt_id.toString())
+    );
+
+    const prompt = await Prompt.findOne({ season, _id: { $nin: usedPromptIds } });
+
+    if (!prompt) return res.status(404).json({ message: 'No more prompts in this season' });
+    res.json(prompt);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
