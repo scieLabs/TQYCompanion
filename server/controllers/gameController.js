@@ -23,7 +23,7 @@ export const getLatestGame = async (req, res) => {
   const { user_id, title } = req.query;
   try {
     const latestGame = await Game.findOne({ user_id, title }).sort({ week: -1 });
-    if (!latestGame) return res.status(404).send('No games found for this user and title');
+    if (!latestGame) return res.status(404).json({message: 'No games found for this user and title'});
     res.json(latestGame);
   } catch (err) {
     res.status(500).send('Error fetching latest game');
