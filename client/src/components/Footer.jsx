@@ -8,11 +8,11 @@ const Footer = () => {
       </div>
       <div className="flex space-x-4 text-sm">
         <p>A project by:</p>
-        <div className="text-xs">
+        <ul className="text-xs">
           <li><a href="https://www.youtube.com/watch?v=B0idb_caIIo&ab_channel=Vetondd" className="hover:text-white">Ema Bícová</a></li>
           <li><a href="https://random.dog/" className="hover:text-white">Fernanda Wynter</a></li>
           <li><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" className="hover:text-white">Ulf Schnoor</a></li>
-        </div>
+        </ul>
 
       </div>
     </footer>

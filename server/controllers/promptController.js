@@ -52,7 +52,7 @@ export const deletePrompt = async (req, res) => {
 
 export const getNextPrompt = async (req, res) => {
   try {
-    const week = parseInt(req.query.week);
+    const week = parseInt(req.query.week, 10); // Extract week from query parameters
     const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
     const season = seasons[Math.min(Math.floor((week - 1) / 13), 3)];
 
