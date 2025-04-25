@@ -19,7 +19,7 @@ const router = express.Router();
 router.get('/latest', getLatestGame); // Fetch the latest game
 router.get('/title/:title/week/:week', getGameByTitleAndWeek); // Fetch by title and week
 router.get('/title/:title', getGameByTitle); // Fetch by title
-router.post('/title/:title/prompts', savePromptData); // Save prompts by title
+router.post('/title/:title/week/:week', savePromptData); // Save prompts by title and week
 router.put('/title/:title', updateGameByTitle); // Update by title
 router.delete('/title/:title', deleteGameByTitle); // Delete by title
 

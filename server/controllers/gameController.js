@@ -76,6 +76,8 @@ export const createGameEntry = async (req, res) => {
 
 export const savePromptData = async (req, res) => {
   const { title, week } = req.params; // Extract title and week from the route parameters
+    if (!week)
+      return res.status(400).json({ error: 'Week parameter is required' }); // Validate week
   const promptData = req.body; // Extract the data to be saved
 
   try {
