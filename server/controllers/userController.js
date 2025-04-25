@@ -1,11 +1,11 @@
 import User from '../models/userSchema.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { CustomError } from '../utils/customError.js';
+import { CustomError } from '../utils/errorHandler.js';
 import asyncHandler from '../utils/asyncHandler.js';
 
 // Get all users
-export const getUsers = asyncHandler(async (req, res, next) => {
+export const getAllUsers = asyncHandler(async (req, res, next) => {
   const users = await User.find();
   res.status(200).json(users);
 });
