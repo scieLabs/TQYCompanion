@@ -34,7 +34,7 @@ export const getGameByTitleAndWeek = async (req, res) => {
   const { title, week } = req.params;
   try {
     const game = await Game.findOne({ title, week });
-    if (!game) return res.status(404).send('Game not found');
+    if (!game) return res.status(404).json({message: 'Game not found'});
     res.json(game);
   } catch (err) {
     res.status(500).json({message: 'Error fetching game data'});
@@ -56,7 +56,7 @@ export const getGameByTitle = async (req, res) => {
   const { title } = req.params;
   try {
     const game = await Game.findOne({ title });
-    if (!game) return res.status(404).send('Game not found');
+    if (!game) return res.status(404).json({message: 'Game not found'});
     res.json(game);
   } catch (err) {
     res.status(500).json({message: 'Error fetching game by title'});
@@ -108,7 +108,7 @@ export const updateGameByWeek = async (req, res) => {
 
   try {
     const game = await Game.findOneAndUpdate({ title, week }, updates, { new: true });
-    if (!game) return res.status(404).send('Game not found');
+    if (!game) return res.status(404).json({message: 'Game not found'});
     res.json(game);
   } catch (err) {
     res.status(500).json({message: 'Error updating game by week'});
@@ -121,7 +121,7 @@ export const updateGameByTitle = async (req, res) => {
 
   try {
     const game = await Game.findOneAndUpdate({ title }, updates, { new: true });
-    if (!game) return res.status(404).send('Game not found');
+    if (!game) return res.status(404).json({message: 'Game not found'});
     res.json(game);
   } catch (err) {
     res.status(500).json({message: 'Error updating game by title'});
@@ -143,8 +143,8 @@ export const deleteGameByTitle = async (req, res) => {
   const { title } = req.params;
   try {
     const game = await Game.findOneAndDelete({ title });
-    if (!game) return res.status(404).send('Game not found');
-    res.send('Game deleted successfully');
+    if (!game) return res.status(404).json({message: 'Game not found'});
+    res.json({message: 'Game deleted successfully'});
   } catch (err) {
     res.status(500).json({message: 'Error deleting game by title'});
   }

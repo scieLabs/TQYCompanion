@@ -88,7 +88,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
     );
   };
 
-  if (prompt._id === GAME_OVER_PROMPT_ID) {
+  if (prompt._id.toString() === GAME_OVER_PROMPT_ID) {
     return (
       <div>
         <label className="block font-bold">Enter Epilogue</label>

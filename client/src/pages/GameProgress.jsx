@@ -182,7 +182,7 @@ export default function GameProgress() {
                 // Pass the prompt, form data, and seasonal theme to PromptModal
                 />
               <button className="btn btn-primary mt-6" onClick={handleNextWeek}>
-                {prompt._id === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
+                {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
               </button>
             </div>
           )}
