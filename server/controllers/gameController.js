@@ -65,7 +65,8 @@ export const getGameByTitle = async (req, res) => {
 
 export const createGameEntry = async (req, res) => {
   try {
-    const newGame = new Game(req.body);
+    const { prompt_id, ...gameData } = req.body; // Exclude prompt_id
+    const newGame = new Game(gameData);
     await newGame.save();
     res.status(201).json(newGame);
   } catch (err) {

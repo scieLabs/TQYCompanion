@@ -56,10 +56,10 @@ export const getNextPrompt = async (req, res) => {
     const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
     const season = seasons[Math.min(Math.floor((week - 1) / 13), 3)];
 
-    const usedPromptIds = (await Game.find()).flatMap(game =>
-      game.prompts.map(p => p.prompt_id.toString())
-    );
+    // Fetch all used prompt IDs from the Game model
+    const usedPromptIds = (await Game.find()).map(game => game.prompt_id.toString());
 
+    // Find the next available prompt for the current season
     const prompt = await Prompt.findOne({ season, _id: { $nin: usedPromptIds } });
 
     if (!prompt) return res.status(404).json({ message: 'No more prompts in this season' });

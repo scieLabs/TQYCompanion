@@ -42,7 +42,7 @@ export default function GameProgress() {
   // Fetch the current game state and prompts
   const fetchCurrentGameState = async () => {
     try {
-      const res = await getLatestGame(user._id); // Fetch the latest game for the user
+      const res = await getLatestGame(user._id, gameTitle); // Fetch the latest game for the user and title
       const game = res.data;
       setGameTitle(game.title);
       const week = res.data.week;
@@ -100,7 +100,15 @@ export default function GameProgress() {
   const handleNextWeek = async () => {
     try {
         // Save data into the current week
-        await saveGameData(gameTitle, currentWeek, formData); // Save the current week's game data
+        await saveGameData(gameTitle, currentWeek, {
+          ...formData,
+          prompt_id: prompt._id, // Include the prompt_id for the current week
+          discovery: formData.discovery, // Save discovery field
+          discussion: formData.discussion, // Save discussion field
+          project_title: formData.project_title, // Save project title
+          project_desc: formData.project_desc, // Save project description
+          project_weeks: formData.project_weeks, // Save project weeks
+        });
         await savePromptData(gameTitle, currentWeek, formData); // Save the current week's prompt data
 
         // Create a new game entry for the next week

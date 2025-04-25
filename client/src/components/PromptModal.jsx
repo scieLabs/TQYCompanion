@@ -11,7 +11,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle }
       await promptApi.post(`/game/title/${gameTitle}/week/${week}/prompts`, formData);
       // Save the current prompt data for the given gameTitle and week.
     } catch (error) {
-        handleApiError(error, 'savePromptData');;
+        handleApiError(error, 'savePromptData');
     }
   };
 
@@ -26,6 +26,14 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle }
             value={formData.discovery || ''}
             onChange={(e) => updateField('discovery', e.target.value)}
           />
+            {/* <button
+                className="btn btn-primary mt-4"
+                onClick={() =>
+                savePromptData(gameTitle, currentWeek, { discovery: formData.discovery })
+                }
+            >
+                Save Discovery
+            </button> */}
         </div>
         <div>
           <label className="block font-bold">Hold a discussion</label>
@@ -34,6 +42,14 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle }
             value={formData.discussion || ''}
             onChange={(e) => updateField('discussion', e.target.value)}
           />
+            {/* <button
+                className="btn btn-primary mt-4"
+                onClick={() =>
+                savePromptData(gameTitle, currentWeek, { discussion: formData.discussion })
+                }
+            >
+                Save Discussion
+            </button> */}
         </div>
         <div>
           <label className="block font-bold">Start a project</label>
@@ -55,6 +71,18 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle }
             <span>{formData.project_weeks || 1}</span>
             <button className="btn btn-sm" onClick={() => updateField('project_weeks', Math.min(6, (formData.project_weeks || 1) + 1))}>+</button>
           </div>
+          {/* <button
+                className="btn btn-primary mt-4"
+                onClick={() =>
+                savePromptData(gameTitle, currentWeek, {
+                    project_title: formData.project_title,
+                    project_desc: formData.project_desc,
+                    project_weeks: formData.project_weeks,
+                })
+                }
+            >
+                Save Project
+            </button> */}
         </div>
       </div>
     );
@@ -167,8 +195,13 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle }
             onChange={(e) => updateField('p_discussion', e.target.value)}
           />
             <div>
-                <button className="btn btn-primary mt-4" onClick={savePromptData}>
-                Save Prompt Data
+                <button
+                    className="btn btn-primary mt-4"
+                    onClick={() =>
+                        savePromptData(gameTitle, currentWeek, { p_discussion: formData.p_discussion })
+                    }
+                    >
+                    Save Prompt Discussion
                 </button>
             </div>
         </div>
@@ -183,8 +216,13 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle }
             onChange={(e) => updateField('p_discovery', e.target.value)}
           />
         <div>
-            <button className="btn btn-primary mt-4" onClick={savePromptData}>
-                Save Prompt Data
+            <button
+                className="btn btn-primary mt-4"
+                onClick={() =>
+                    savePromptData(gameTitle, currentWeek, { p_discovery: formData.p_discovery })
+                }
+                >
+                Save Prompt Discovery
             </button>
         </div>
         </div>
@@ -212,11 +250,19 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle }
             <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.min(6, (formData.pp_weeks || 1) + 1))}>+</button>
             </div>
             <div>
-                <button className="btn btn-primary mt-4" onClick={savePromptData}>
-                Save Prompt Data
+                <button
+                    className="btn btn-primary mt-4"
+                    onClick={() =>
+                        savePromptData(gameTitle, currentWeek, {
+                        pp_title: formData.pp_title,
+                        pp_desc: formData.pp_desc,
+                        pp_weeks: formData.pp_weeks,
+                        })
+                    }
+                    >
+                    Save Prompt Project
                 </button>
             </div>
-
         </div>
       )}
     </div>
