@@ -1,13 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import PromptModal from '../components/PromptModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { useNavigate } from 'react-router-dom';
 import { getLatestGame, createGame } from '../api/gameApi.js';
 import { getNextPrompt } from '../api/promptApi.js';
+import { authContext } from '../context/authContext.jsx'; //adjust if needed
+import { handleApiError } from '../utils/errorHandler.js';
   
 
 export default function GameProgress() {
+  const { user } = useContext(authContext); // get the logged-in user
+  const [gameTitle, setGameTitle] = useState(null);
   const [prompt, setPrompt] = useState(null);
   const [formData, setFormData] = useState({
     discussion: '',
@@ -38,12 +42,14 @@ export default function GameProgress() {
   // Fetch the current game state and prompts
   const fetchCurrentGameState = async () => {
     try {
-      const res = await getLatestGame();
-      const week = res.data.week + 1;
+      const res = await getLatestGame(user._id); // Fetch the latest game for the user
+      const game = res.data;
+      setGameTitle(game.title);
+      const week = res.data.week;
       setCurrentWeek(week);
-      fetchPrompt(week, season); // Fetch prompt based on the current season
+      fetchPrompt(week, game.season || 'Spring'); // Fetch prompt based on the current season
     } catch (err) {
-      console.error(err);
+      handleApiError(error, 'fetchCurrentGameState');
     }
   };
   
@@ -75,29 +81,41 @@ export default function GameProgress() {
 
       // Set the prompt for this week
       setPrompt(availablePrompts[0]);
-      setSeason(season); // Set the current season
+      setSeason(season); // update the current season
       setShownPrompts(prev => [...prev, availablePrompts[0]._id]); // Track shown prompt IDs
       setSeasonPrompts(availablePrompts); // Store the list of available prompts for the season
     } catch (err) {
-      console.error(err);
+      handleApiError(error, 'fetchPrompt');
     }
   };
 
   // Switch to the next season once all prompts for the current season have been exhausted
   const switchSeason = () => {
     const currentSeasonIndex = seasons.indexOf(season);
-    const nextSeason = seasons[(currentSeasonIndex + 1) % seasons.length]; // Loop back to Spring after Winter
-    setSeason(nextSeason);
+    const nextSeason = seasons[(currentSeasonIndex + 1) % seasons.length]; // determine the next season; Loop back to Spring after Winter
+    setSeason(nextSeason); //update season again
     fetchPrompt(currentWeek, nextSeason); // Fetch prompts for the next season
   };
   
   const handleNextWeek = async () => {
     try {
-      await createGame({
-        week: currentWeek,
-        ...formData,
-        prompts: [{ prompt_id: prompt._id }],
-      });
+        // Save data into the current week
+        await saveGameData(gameTitle, currentWeek, formData); // Save the current week's game data
+        await savePromptData(gameTitle, currentWeek, formData); // Save the current week's prompt data
+
+        // Create a new game entry for the next week
+        const nextWeek = currentWeek + 1; // Increment the week number
+        await createGame({
+          user_id: user._id, // Copy user_id
+          title: gameTitle, // Copy game title
+          description: formData.description || 'No description provided.', // Copy game description
+          week: nextWeek, // Set the next week
+          abundance: formData.abundance || '', // Copy abundance
+          scarcity: formData.scarcity || '', // Copy scarcity
+          contempt: formData.contempt || 0, // Copy contempt
+        });      
+
+      //reset form data for new week
       setFormData({
         discussion: '',
         discovery: '',
@@ -108,13 +126,17 @@ export default function GameProgress() {
         showDiscoveryModal: false,
         showProjectModal: false,
       });
-      fetchCurrentGameState();
+
+      // Update the current week state
+      setCurrentWeek(nextWeek);
+
+      fetchCurrentGameState(); //refresh game state
     } catch (err) {
-      console.error(err);
+      handleApiError(error, 'handleNextWeek');
     }
   };
   
-
+// define colour themes for each season, idk if I'm doing it right
   const seasonThemes = {
     Spring: 'bg-green-100 text-green-900',
     Summer: 'bg-yellow-100 text-yellow-900',
@@ -129,7 +151,12 @@ export default function GameProgress() {
     <div className={`min-h-screen p-4 ${theme}`}>
       <div className={`flex ${theme}`}>
         <div className={`w-1/4 pr-4 ${theme}`}>
-          <GameStats formData={formData} setFormData={setFormData} />
+          <GameStats 
+            formData={formData} 
+            setFormData={setFormData}
+            gameTitle={gameTitle} 
+              //pass the dynamic game title and data to GameStats
+            />
         </div>
         <div className={`w-3/4 ${theme}`}>
           <h2 className="text-2xl font-bold mb-2">Week {currentWeek}, {season}</h2>
@@ -137,7 +164,13 @@ export default function GameProgress() {
             <div>
               <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
               <p className="mb-4">{prompt.prompt}</p>
-              <PromptModal prompt={prompt} formData={formData} setFormData={setFormData} seasonTheme={seasonThemes[season]} />
+              <PromptModal 
+                prompt={prompt} 
+                formData={formData} 
+                setFormData={setFormData} 
+                seasonTheme={seasonThemes[season]} 
+                // Pass the prompt, form data, and seasonal theme to PromptModal
+                />
               <button className="btn btn-primary mt-6" onClick={handleNextWeek}>
                 {prompt._id === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
               </button>

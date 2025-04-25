@@ -1,10 +1,22 @@
 import { useState } from 'react';
+import promptApi from '../api/promptApi.js';
+import { handleApiError } from '../utils/errorHandler.js';
 
-export default function PromptModal({ prompt, formData, setFormData }) {
+export default function PromptModal({ prompt, formData, setFormData, gameTitle }) {
   const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
+  const savePromptData = async (gameTitle, week, formData) => {
+    try {
+      await promptApi.post(`/game/title/${gameTitle}/week/${week}/prompts`, formData);
+      // Save the current prompt data for the given gameTitle and week.
+    } catch (error) {
+        handleApiError(error, 'savePromptData');;
+    }
+  };
+
   const renderActionForm = () => {
+    //displays individual actions
     return (
       <div className="space-y-4">
         <div>
@@ -148,31 +160,38 @@ export default function PromptModal({ prompt, formData, setFormData }) {
       {/* Modal rendering logic will go here */}
       {formData.showDiscussionModal && prompt.isDiscussion && (
         <div className="modal modal-open mt-4">
-          {/* Render modal content for discussion */}
           <label className="block font-bold">Prompt Discussion</label>
           <textarea
             className="textarea textarea-bordered w-full"
             value={formData.p_discussion || ''}
             onChange={(e) => updateField('p_discussion', e.target.value)}
           />
+            <div>
+                <button className="btn btn-primary mt-4" onClick={savePromptData}>
+                Save Prompt Data
+                </button>
+            </div>
         </div>
       )}
 
       {formData.showDiscoveryModal && prompt.isDiscovery && (
         <div className="modal modal-open mt-4">
-          {/* Render modal content for discovery */}
           <label className="block font-bold">Prompt Discovery</label>
           <textarea
             className="textarea textarea-bordered w-full"
             value={formData.p_discovery || ''}
             onChange={(e) => updateField('p_discovery', e.target.value)}
           />
+        <div>
+            <button className="btn btn-primary mt-4" onClick={savePromptData}>
+                Save Prompt Data
+            </button>
+        </div>
         </div>
       )}
 
       {formData.showProjectModal && prompt.isProject && (
         <div className="modal modal-open mt-4">
-          {/* Render modal content for project */}
           <label className="block font-bold">Prompt Project</label>
           <input
             className="input input-bordered w-full"
@@ -192,6 +211,12 @@ export default function PromptModal({ prompt, formData, setFormData }) {
             <span>{formData.pp_weeks || 1}</span>
             <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.min(6, (formData.pp_weeks || 1) + 1))}>+</button>
             </div>
+            <div>
+                <button className="btn btn-primary mt-4" onClick={savePromptData}>
+                Save Prompt Data
+                </button>
+            </div>
+
         </div>
       )}
     </div>

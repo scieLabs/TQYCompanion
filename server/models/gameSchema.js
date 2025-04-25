@@ -29,7 +29,9 @@ const gameSchema = new mongoose.Schema({
   p_discussion: { type: String },
   p_discovery: { type: String },
   end: { type: String }
-});
+}, { timestamps: true });
+
+gameSchema.index({ title: 1, week: 1 }, { unique: true }); // Ensure unique combination of title and week
 
 const Game = mongoose.model('Stats', gameSchema);
 export default Game;
