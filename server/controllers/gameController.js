@@ -26,7 +26,7 @@ export const getLatestGame = async (req, res) => {
     if (!latestGame) return res.status(404).json({message: 'No games found for this user and title'});
     res.json(latestGame);
   } catch (err) {
-    res.status(500).send('Error fetching latest game');
+    res.status(500).json({message: 'Error fetching latest game'});
   }
 };
 
@@ -37,7 +37,7 @@ export const getGameByTitleAndWeek = async (req, res) => {
     if (!game) return res.status(404).send('Game not found');
     res.json(game);
   } catch (err) {
-    res.status(500).send('Error fetching game data');
+    res.status(500).json({message: 'Error fetching game data'});
   }
 };
 
@@ -59,7 +59,7 @@ export const getGameByTitle = async (req, res) => {
     if (!game) return res.status(404).send('Game not found');
     res.json(game);
   } catch (err) {
-    res.status(500).send('Error fetching game by title');
+    res.status(500).json({message: 'Error fetching game by title'});
   }
 };
 
@@ -111,7 +111,7 @@ export const updateGameByWeek = async (req, res) => {
     if (!game) return res.status(404).send('Game not found');
     res.json(game);
   } catch (err) {
-    res.status(500).send('Error updating game by week');
+    res.status(500).json({message: 'Error updating game by week'});
   }
 };
 
@@ -124,7 +124,7 @@ export const updateGameByTitle = async (req, res) => {
     if (!game) return res.status(404).send('Game not found');
     res.json(game);
   } catch (err) {
-    res.status(500).send('Error updating game by title');
+    res.status(500).json({message: 'Error updating game by title'});
   }
 };
 
@@ -146,7 +146,7 @@ export const deleteGameByTitle = async (req, res) => {
     if (!game) return res.status(404).send('Game not found');
     res.send('Game deleted successfully');
   } catch (err) {
-    res.status(500).send('Error deleting game by title');
+    res.status(500).json({message: 'Error deleting game by title'});
   }
 };
 
