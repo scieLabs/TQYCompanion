@@ -3,7 +3,12 @@ import {
   getAllGames,
   getLatestGame,
   getGameById,
+  getGameByTitle,
+  getGameByTitleAndWeek,
   createGameEntry,
+  savePromptData,
+  updateGameByTitle,
+  deleteGameByTitle,
   updateGameEntry,
   deleteGameEntry
 } from '../controllers/gameController.js';
@@ -19,7 +24,9 @@ router.post('/', createGameEntry);
 router.post('/title/:title/prompts', savePromptData); // New route for saving prompts by title
 router.put('/:id', updateGameEntry);
 router.put('/title/:title', updateGameByTitle); // New route for updating by title
+
 router.delete('/title/:title', deleteGameByTitle); // New route for deleting by title
 router.delete('/:id', deleteGameEntry);
+
 
 export default router;

@@ -3,8 +3,8 @@ import axios from 'axios';
 import PromptModal from '../components/PromptModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { useNavigate } from 'react-router-dom';
-import { getLatestGame, createGame } from '../api/gameApi.js';
-import { getNextPrompt } from '../api/promptApi.js';
+import { getLatestGame, createGame, saveGameData, getAllGames, getGameByTitleAndWeek } from '../api/gameApi.js';
+import { getNextPrompt, savePromptData, createPrompt } from '../api/promptApi.js';
 import { authContext } from '../context/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
   
@@ -177,6 +177,8 @@ export default function GameProgress() {
                 formData={formData} 
                 setFormData={setFormData} 
                 seasonTheme={seasonThemes[season]} 
+                currentWeek={currentWeek} // Pass currentWeek as a prop
+                gameTitle={gameTitle} // Pass gameTitle as a prop
                 // Pass the prompt, form data, and seasonal theme to PromptModal
                 />
               <button className="btn btn-primary mt-6" onClick={handleNextWeek}>

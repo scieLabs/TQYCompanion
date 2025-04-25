@@ -105,6 +105,19 @@ export const updateGameByWeek = async (req, res) => {
   }
 };
 
+export const updateGameByTitle = async (req, res) => {
+  const { title } = req.params;
+  const updates = req.body;
+
+  try {
+    const game = await Game.findOneAndUpdate({ title }, updates, { new: true });
+    if (!game) return res.status(404).send('Game not found');
+    res.json(game);
+  } catch (err) {
+    res.status(500).send('Error updating game by title');
+  }
+};
+
 export const updateGameEntry = async (req, res) => {
   try {
     const updated = await Game.findByIdAndUpdate(req.params.id, req.body, { new: true });
