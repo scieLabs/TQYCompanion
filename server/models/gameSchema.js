@@ -33,5 +33,5 @@ const gameSchema = new mongoose.Schema({
 
 gameSchema.index({ title: 1, week: 1 }, { unique: true }); // Ensure unique combination of title and week
 
-const Game = mongoose.model('Stats', gameSchema);
+const Game = mongoose.model('Game', gameSchema);
 export default Game;
