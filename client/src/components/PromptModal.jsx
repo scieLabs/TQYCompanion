@@ -2,7 +2,7 @@ import { useState } from 'react';
 import promptApi from '../api/promptApi.js';
 import { handleApiError } from '../utils/errorHandler.js';
 
-export default function PromptModal({ prompt, formData, setFormData, gameTitle }) {
+export default function PromptModal({ prompt, formData, setFormData, gameTitle, currentWeek }) {
   const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 

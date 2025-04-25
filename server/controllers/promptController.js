@@ -68,3 +68,21 @@ export const getNextPrompt = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getPromptsBySeason = async (req, res) => {
+  try {
+    const { season } = req.params; // Extract the season from the route parameters
+    const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+
+    // Validate the season parameter
+    if (!validSeasons.includes(season)) {
+      return res.status(400).json({ message: 'Invalid season. Valid seasons are Spring, Summer, Autumn, and Winter.' });
+    }
+
+    // Fetch prompts for the specified season
+    const prompts = await Prompt.find({ season });
+    res.json(prompts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

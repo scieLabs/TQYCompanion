@@ -75,19 +75,27 @@ export const createGameEntry = async (req, res) => {
 };
 
 export const savePromptData = async (req, res) => {
-  const { title, week } = req.params;
-  const promptData = req.body;
+  const { title, week } = req.params; // Extract title and week from the route parameters
+  const promptData = req.body; // Extract the data to be saved
 
   try {
-    const game = await Game.findOne({ title, week }); // Find the specific week's entry
-    if (!game) return res.status(404).send('Game not found');
+    // Find the specific game entry by title and week
+    const game = await Game.findOne({ title, week });
+    if (!game) return res.status(404).json({ message: 'Game not found' });
 
-    game.prompts.push(promptData); // Add the prompt data to the week's prompts
+    // Update the relevant fields in the game document
+    if (promptData.p_discussion) game.p_discussion = promptData.p_discussion;
+    if (promptData.p_discovery) game.p_discovery = promptData.p_discovery;
+    if (promptData.pp_title) game.pp_title = promptData.pp_title;
+    if (promptData.pp_desc) game.pp_desc = promptData.pp_desc;
+    if (promptData.pp_weeks) game.pp_weeks = promptData.pp_weeks;
+
+    // Save the updated game document
     await game.save();
 
-    res.status(201).send('Prompt data saved successfully');
+    res.status(200).json({ message: 'Prompt data saved successfully', game });
   } catch (err) {
-    res.status(500).send('Error saving prompt data');
+    res.status(500).json({ error: err.message });
   }
 };
 

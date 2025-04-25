@@ -15,18 +15,21 @@ import {
 
 const router = express.Router();
 
-router.get('/', getAllGames);
-router.get('/latest', getLatestGame);
-router.get('/:id', getGameById);
-router.get('/title/:title', getGameByTitle); // New route for fetching by title
-router.get('/title/:title/week/:week', getGameByTitleAndWeek);
-router.post('/', createGameEntry);
-router.post('/title/:title/prompts', savePromptData); // New route for saving prompts by title
-router.put('/:id', updateGameEntry);
-router.put('/title/:title', updateGameByTitle); // New route for updating by title
+// Static and more specific routes first
+router.get('/latest', getLatestGame); // Fetch the latest game
+router.get('/title/:title/week/:week', getGameByTitleAndWeek); // Fetch by title and week
+router.get('/title/:title', getGameByTitle); // Fetch by title
+router.post('/title/:title/prompts', savePromptData); // Save prompts by title
+router.put('/title/:title', updateGameByTitle); // Update by title
+router.delete('/title/:title', deleteGameByTitle); // Delete by title
 
-router.delete('/title/:title', deleteGameByTitle); // New route for deleting by title
-router.delete('/:id', deleteGameEntry);
+// Dynamic routes last
+router.get('/:id', getGameById); // Fetch by ID
+router.put('/:id', updateGameEntry); // Update by ID
+router.delete('/:id', deleteGameEntry); // Delete by ID
 
+// General routes
+router.get('/', getAllGames); // Fetch all games
+router.post('/', createGameEntry); // Create a new game
 
 export default router;
