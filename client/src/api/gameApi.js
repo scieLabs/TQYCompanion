@@ -43,6 +43,15 @@ export const saveGameData = async (gameTitle, week, data) => {
   }
 };
 
+export const savePromptData = async (gameTitle, week, data) => {
+  try {
+    await gameAPI.post(`/game/title/${gameTitle}/week/${week}`, data); // Removed '/prompts'
+  } catch (error) {
+    handleApiError(error, 'savePromptData');
+    throw error;
+  }
+};
+
 // Delete a game by its ID
 export const deleteGame = (id) => gameAPI.delete(`/game/${id}`);
 

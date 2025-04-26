@@ -3,8 +3,8 @@ import axios from 'axios';
 import PromptModal from '../components/PromptModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { useNavigate } from 'react-router-dom';
-import { getLatestGame, createGame, saveGameData, getAllGames, getGameByTitleAndWeek } from '../api/gameApi.js';
-import { getNextPrompt, savePromptData, createPrompt } from '../api/promptApi.js';
+import { getLatestGame, createGame, saveGameData, savePromptData, getAllGames, getGameByTitleAndWeek } from '../api/gameApi.js';
+import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 import { authContext } from '../context/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
   
@@ -101,8 +101,8 @@ export default function GameProgress() {
     try {
         // Save data into the current week
         await saveGameData(gameTitle, currentWeek, {
-          ...formData,
-          prompt_id: prompt._id, // Include the prompt_id for the current week
+          // ...formData, --- to avoid overwriting
+          prompt_id: prompt._id.toString(), // Include the prompt_id for the current week
           discovery: formData.discovery, // Save discovery field
           discussion: formData.discussion, // Save discussion field
           project_title: formData.project_title, // Save project title

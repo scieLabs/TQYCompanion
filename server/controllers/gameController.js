@@ -86,11 +86,20 @@ export const savePromptData = async (req, res) => {
     if (!game) return res.status(404).json({ message: 'Game not found' });
 
     // Update the relevant fields in the game document
+    // prompt specific
     if (promptData.p_discussion) game.p_discussion = promptData.p_discussion;
     if (promptData.p_discovery) game.p_discovery = promptData.p_discovery;
     if (promptData.pp_title) game.pp_title = promptData.pp_title;
     if (promptData.pp_desc) game.pp_desc = promptData.pp_desc;
     if (promptData.pp_weeks) game.pp_weeks = promptData.pp_weeks;
+
+    // General game action fields
+    if (promptData.discussion) game.discussion = promptData.discussion;
+    if (promptData.discovery) game.discovery = promptData.discovery;
+    if (promptData.project_title) game.project_title = promptData.project_title;
+    if (promptData.project_desc) game.project_desc = promptData.project_desc;
+    if (promptData.project_weeks) game.project_weeks = promptData.project_weeks;
+    
 
     // Save the updated game document
     await game.save();
