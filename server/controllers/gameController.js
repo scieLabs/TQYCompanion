@@ -112,15 +112,22 @@ export const savePromptData = async (req, res) => {
 
 // Update a game by week
 export const updateGameByWeek = async (req, res) => {
-  const { title, week } = req.params;
+  const { title } = req.params;
+  let { week } = req.params; // Extract week as a string
   const updates = req.body;
+
+  // Parse week to a number
+  week = Number(week);
+  if (isNaN(week)) {
+    return res.status(400).json({ error: 'Invalid week parameter. It must be a number.' });
+  }
 
   try {
     const game = await Game.findOneAndUpdate({ title, week }, updates, { new: true });
-    if (!game) return res.status(404).json({message: 'Game not found'});
+    if (!game) return res.status(404).json({ message: 'Game not found' });
     res.json(game);
   } catch (err) {
-    res.status(500).json({message: 'Error updating game by week'});
+    res.status(500).json({ message: 'Error updating game by week' });
   }
 };
 
