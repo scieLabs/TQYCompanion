@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import promptApi from '../api/promptApi.js';
+import gameAPI from '../api/gameApi.js';
 import { handleApiError } from '../utils/errorHandler.js';
 
 export default function PromptModal({ prompt, formData, setFormData, gameTitle, currentWeek }) {
@@ -8,7 +9,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
 
   const savePromptData = async (gameTitle, week, formData) => {
     try {
-      await promptApi.post(`/game/title/${gameTitle}/week/${week}/prompts`, formData);
+      await gameAPI.savePromptData(gameTitle, week, formData);
       // Save the current prompt data for the given gameTitle and week.
     } catch (error) {
         handleApiError(error, 'savePromptData');
