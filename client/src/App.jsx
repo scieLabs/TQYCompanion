@@ -1,22 +1,21 @@
 import './App.css'
-
+import './index.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/LandingPage';
+import Home from './pages/LandingPage';import Footer from './components/Footer';
+import LandingPage from './pages/LandingPage';
+import GameProgress from './pages/GameProgress';
+
 
 function App() {
   return (
-    <>
-      <Router>
-        <Nav />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/" element={<Home />} />
-        </Routes>
-        <Footer />
-      </Router>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/game" element={<GameProgress />} />
+        {/* <Route path="/summary/:id" element={<GameSummary />} /> */}
+      </Routes>
+      <Footer />
+    </Router>
   );
 }
 
