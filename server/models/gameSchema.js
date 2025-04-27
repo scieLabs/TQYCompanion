@@ -2,16 +2,7 @@ import mongoose from 'mongoose';
 
 const gameSchema = new mongoose.Schema({
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
-//   prompt_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Prompt', required: true }, //make array
-  prompts: [
-  {
-    prompt_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'Prompt',
-    },
-  },
-],
+  prompt_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Prompt', required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
   week: { type: Number, default: 0, required: true },
@@ -29,7 +20,9 @@ const gameSchema = new mongoose.Schema({
   p_discussion: { type: String },
   p_discovery: { type: String },
   end: { type: String }
-});
+}, { timestamps: true });
 
-const Game = mongoose.model('Stats', gameSchema);
+gameSchema.index({ title: 1, week: 1 }, { unique: true }); // Ensure unique combination of title and week
+
+const Game = mongoose.model('Game', gameSchema);
 export default Game;
