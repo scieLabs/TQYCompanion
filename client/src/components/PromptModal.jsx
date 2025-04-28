@@ -105,56 +105,6 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
     );
   }
 
-//   return (
-//     <div>
-//       {renderActionForm()}
-//       {prompt.isDiscussion && (
-//         <div className="mt-4">
-//           <label className="block font-bold">Prompt Discussion</label>
-//           <textarea
-//             className="textarea textarea-bordered w-full"
-//             value={formData.p_discussion || ''}
-//             onChange={(e) => updateField('p_discussion', e.target.value)}
-//           />
-//         </div>
-//       )}
-//       {prompt.isDiscovery && (
-//         <div className="mt-4">
-//           <label className="block font-bold">Prompt Discovery</label>
-//           <textarea
-//             className="textarea textarea-bordered w-full"
-//             value={formData.p_discovery || ''}
-//             onChange={(e) => updateField('p_discovery', e.target.value)}
-//           />
-//         </div>
-//       )}
-//       {prompt.isProject && (
-//         <div className="mt-4">
-//           <label className="block font-bold">Prompt Project</label>
-//           <input
-//             className="input input-bordered w-full"
-//             placeholder="Title"
-//             value={formData.pp_title || ''}
-//             onChange={(e) => updateField('pp_title', e.target.value)}
-//           />
-//           <textarea
-//             className="textarea textarea-bordered w-full mt-2"
-//             placeholder="Description"
-//             value={formData.pp_desc || ''}
-//             onChange={(e) => updateField('pp_desc', e.target.value)}
-//           />
-//           <div className="flex items-center space-x-2 mt-2">
-//             <span className="font-bold">Weeks:</span>
-//             <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.max(1, (formData.pp_weeks || 1) - 1))}>-</button>
-//             <span>{formData.pp_weeks || 1}</span>
-//             <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.min(6, (formData.pp_weeks || 1) + 1))}>+</button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
   return (
     <div>
       {/* Render always visible action form */}

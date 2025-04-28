@@ -9,15 +9,6 @@ export const getAllGames = async (req, res) => {
   }
 };
 
-// export const getLatestGame = async (req, res) => {
-//   try {
-//     const latest = await Game.findOne().sort({ week: -1 }).limit(1);
-//     res.json(latest || { week: 0 });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
-
 // Get the latest game for a user
 export const getLatestGame = async (req, res) => {
   const { user_id, title } = req.query;
