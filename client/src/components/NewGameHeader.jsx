@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuthContext } from '../authContext';
 import LogOut from '../pages/modals/LogOut';
 
-const GameHeader = () => {
+const NewGameHeader = () => {
   const { user } = useAuthContext();
   const [showLogOut, setShowLogOut] = useState(true);
 
@@ -46,4 +46,4 @@ const GameHeader = () => {
   );
 };
 
-export default GameHeader;
+export default NewGameHeader;
