@@ -1,4 +1,4 @@
-import HomeHeader from "../components/homeHeader";
+import HomeHeader from "../components/HomeHeader";
 import Login from "../pages/modals/Login";
 import { useAuthContext } from "../context/userContext";
 import { useState } from "react";

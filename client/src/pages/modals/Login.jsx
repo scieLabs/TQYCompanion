@@ -36,11 +36,11 @@ export default function Login({ onClose }) {
             onClose();
             login(response.data);
             setSuccessMessage('Login successful! Redirecting...');
-                        // Close the modal after a short delay
-                        setTimeout(() => {
-                            setLoading(false);
-                            onClose();
-                        }, 20000); // 20 seconds delay before closing the modal
+            // Close the modal after a short delay
+            setTimeout(() => {
+                setLoading(false);
+                onClose();
+            }, 20000); // 20 seconds delay before closing the modal
         } catch (error) {
             console.error('Login failed:', error);
             setErrorMessage('Login failed. Please check your credentials and try again.');
@@ -66,7 +66,7 @@ export default function Login({ onClose }) {
                     {errorMessage && (
                         <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
                     )}
-                                        {successMessage && (
+                    {successMessage && (
                         <div className="text-green-500 text-sm mb-4">{successMessage}</div>
                     )}
                     <div className="mb-4">
@@ -104,10 +104,9 @@ export default function Login({ onClose }) {
                         />
                     </div>
                     <div className="flex items-center justify-between">
-                    <button
-                            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                                loading ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
+                        <button
+                            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                             type="submit"
                             disabled={loading}
                         >
@@ -115,7 +114,11 @@ export default function Login({ onClose }) {
                         </button>
                     </div>
                     <div>
-                        <a href="/register">Don't have an account? Create one!</a>
+                        <a href="/register"
+                            className="register-button bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Don't have an account? Create one!
+                        </a>
                     </div>
                 </form>
             </div>

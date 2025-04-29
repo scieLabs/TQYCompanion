@@ -7,6 +7,25 @@ export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  /* The Machine Spirits suggests this to check session on page load:
+
+  useEffect(() => {
+  const checkSession = async () => {
+    try {
+      const response = await axios.get('/check-session', { withCredentials: true });
+      if (response.data.authenticated) {
+        setUser(response.data.user);
+      }
+    } catch (err) {
+      console.error('Session check failed:', err);
+    }
+  };
+
+  checkSession();
+}, []);
+
+*/
+
   const login = (userData) => {
     setLoading(true);
     setUser(userData);

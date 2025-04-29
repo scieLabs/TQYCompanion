@@ -30,8 +30,16 @@ const HomeHeader = () => {
             role="banner"
         >
             <nav className="flex space-x-4">
-                <a href="/about" className="hover:underline">About</a>
-                <a href="rules.pdf" target="_blank" rel="noopener noreferrer" download>Download Rules</a>
+                <a href="/about"
+                    className="about-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                    About
+                </a>
+                <a href="rules.pdf" target="_blank" rel="noopener noreferrer" download
+                    className="rules-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                    Download Rules
+                </a>
             </nav>
             <div className="header-content flex space-x-4">
                 {!user && (
