@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import promptApi from '../api/promptApi.js';
 import gameAPI from '../api/gameApi.js';
 import { handleApiError } from '../utils/errorHandler.js';
+import { useSeason } from '../contexts/seasonContext.jsx'; 
 
 export default function ActionModal({ action, formData, setFormData, gameTitle, currentWeek }) {
   const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
+
+  const { currentSeason, seasonThemes } = useSeason(); // Access season context
+  const theme = seasonThemes[currentSeason] || {};
 
   const saveActionData = async (gameTitle, week, formData) => {
     try {
@@ -23,7 +27,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
         <div>
           <label className="block font-bold">Discover something new</label>
           <textarea
-            className="textarea textarea-bordered w-full"
+            className={`textarea textarea-bordered w-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
             value={formData.discovery || ''}
             onChange={(e) => updateField('discovery', e.target.value)}
           />

@@ -3,14 +3,16 @@ import axios from 'axios';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { useNavigate } from 'react-router-dom';
-import { getLatestGame, createGame, saveGameData, saveActionData, getAllGames, getGameByTitleAndWeek } from '../api/gameApi.js';
+import { getLatestGame, createGame, saveGameData, saveActionData } from '../api/gameApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 import { authContext } from '../context/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
-  
+import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 
 export default function GameProgress() {
   const { user } = useContext(authContext); // get the logged-in user
+  const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+  const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
   const [gameTitle, setGameTitle] = useState(null);
   const [prompt, setPrompt] = useState(null);
   const [formData, setFormData] = useState({
@@ -25,7 +27,7 @@ export default function GameProgress() {
   });
 
   const [currentWeek, setCurrentWeek] = useState(1);
-  const [season, setSeason] = useState('Spring');
+  // const [season, setSeason] = useState('Spring');
   const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
   const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
   const navigate = useNavigate();
@@ -47,7 +49,9 @@ export default function GameProgress() {
       setGameTitle(game.title);
       const week = res.data.week;
       setCurrentWeek(week);
-      fetchPrompt(week, game.season || 'Spring'); // Fetch prompt based on the current season
+
+      // Fetch prompt based on the current season
+      fetchPrompt(week, game.season || 'Spring'); 
     } catch (err) {
       handleApiError(error, 'fetchCurrentGameState');
     }
@@ -71,9 +75,13 @@ export default function GameProgress() {
       }
 
       // Set the prompt for this week
-      setPrompt(availablePrompts[0]);
-      setSeason(season); // update the current season
-      setShownPrompts(prev => [...prev, availablePrompts[0]._id]); // Track shown prompt IDs
+      const selectedPrompt = availablePrompts[0];
+      setPrompt(selectedPrompt);
+
+      // setSeason(season); // update the current season
+      setCurrentSeason(selectedPrompt.season || 'Spring'); // Update the current season in context
+
+      setShownPrompts(prev => [...prev, selectedPrompt._id]); // Track shown prompt IDs
       setSeasonPrompts(availablePrompts); // Store the list of available prompts for the season
     } catch (err) {
       handleApiError(error, 'fetchPrompt');
@@ -84,7 +92,8 @@ export default function GameProgress() {
   const switchSeason = () => {
     const currentSeasonIndex = seasons.indexOf(season);
     const nextSeason = seasons[(currentSeasonIndex + 1) % seasons.length]; // determine the next season; Loop back to Spring after Winter
-    setSeason(nextSeason); //update season again
+    // setSeason(nextSeason); //update season again
+    setCurrentSeason(nextSeason); //update season in context
     fetchPrompt(currentWeek, nextSeason); // Fetch prompts for the next season
   };
   
@@ -136,29 +145,30 @@ export default function GameProgress() {
   };
   
 // define colour themes for each season, idk if I'm doing it right
-  const seasonThemes = {
-    Spring: 'bg-green-100 text-green-900',
-    Summer: 'bg-yellow-100 text-yellow-900',
-    Autumn: 'bg-orange-100 text-orange-900',
-    Winter: 'bg-blue-100 text-blue-900',
-  };
+  // const seasonThemes = {
+  //   Spring: 'bg-green-100 text-green-900',
+  //   Summer: 'bg-yellow-100 text-yellow-900',
+  //   Autumn: 'bg-orange-100 text-orange-900',
+  //   Winter: 'bg-blue-100 text-blue-900',
+  // };
 
-  const theme = seasonThemes[season] || '';
+  // const theme = seasonThemes[season] || '';
 
 
   return (
-    <div className={`min-h-screen p-4 ${theme}`}>
-      <div className={`flex ${theme}`}>
-        <div className={`w-1/4 pr-4 ${theme}`}>
+    <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
+      <div className={`flex`}> 
+        <div className={`w-1/4 pr-4`}>
           <GameStats 
             formData={formData} 
             setFormData={setFormData}
-            gameTitle={gameTitle} 
-              //pass the dynamic game title and data to GameStats
+            gameTitle={gameTitle}
+            currentSeason={currentSeason} 
+              //pass the dynamic game title and data to GameStats + season
             />
         </div>
         <div className={`w-3/4 ${theme}`}>
-          <h2 className="text-2xl font-bold mb-2">Week {currentWeek}, {season}</h2>
+          <h2 className="text-2xl font-bold mb-2">Week {currentWeek}, {currentSeason}</h2>
           {prompt && (
             <div>
               <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
@@ -167,7 +177,8 @@ export default function GameProgress() {
                 prompt={prompt} 
                 formData={formData} 
                 setFormData={setFormData} 
-                seasonTheme={seasonThemes[season]} 
+                // seasonTheme={seasonThemes[currentSeason]}
+                currentSeason={currentSeason} // Pass currentSeason as a prop
                 currentWeek={currentWeek} // Pass currentWeek as a prop
                 gameTitle={gameTitle} // Pass gameTitle as a prop
                 // Pass the prompt, form data, and seasonal themAction
