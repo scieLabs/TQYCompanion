@@ -38,5 +38,7 @@ router.put('/:id', updateUser);
 // TODO: will be router.put("/:id",auth, validateUpdateUser, updateUser);
 router.delete('/:id', deleteUser);
 // TODO: will be: router.delete("/:id",auth, deleteUser);
+// TODO:router.post('/login', loginUser);
+// TODO:router.post('/logout', logoutUser);
 
 export default router;
