@@ -1,7 +1,7 @@
 //the page where a user sets up basic info about their game. leads to GameProgress//the page where a user sets up basic info about their game. leads to GameProgress
 
 import React, { useState, useContext } from 'react';
-import { authContext } from '../contexts/authContext';
+import { useAuthContext } from '../contexts/authContext';
 import NewGameHeader from '../components/NewGameHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { ORIGIN_URL } from '../config';
 
 export default function CreateNewGame() {
     // Authentication and user context
-    const { user } = useContext(authContext);
+    const { user } = useContext(useAuthContext);
     const token = user?.token; // Assuming the token is stored in the user object
     
     // Redirecting to login if not authenticated
