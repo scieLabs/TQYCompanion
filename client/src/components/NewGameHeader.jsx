@@ -23,7 +23,7 @@ const NewGameHeader = () => {
         className="icon-image"
       />
       <nav className="flex space-x-4">
-        <a href="/about" className="hover:underline">About</a>
+        <a href="/about" className="hover:underline">Home</a>
         <a href="rules.pdf" target="_blank" rel="noopener noreferrer" download>Download Rules</a>
       </nav>
       <div className="header-content flex space-x-4"

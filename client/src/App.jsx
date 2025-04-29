@@ -8,6 +8,7 @@ import GameProgress from './pages/GameProgress';
 
 function App() {
   return (
+    <>
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -16,6 +17,7 @@ function App() {
       </Routes>
       <Footer />
     </Router>
+    </>
   );
 }
 
