@@ -3,9 +3,12 @@ import { useState, useEffect, useContext } from 'react';
 import gameAPI from '../api/gameApi.js';
 import { authContext } from '../contexts/authContext.jsx'; //edit later
 import { handleApiError } from '../utils/errorHandler.js';
+import { useSeason } from '../contexts/seasonContext.jsx'; 
 
 export default function GameStats({ formData, setFormData, currentWeek, currentSeason, gameTitle }) {
   const { user } = useContext(authContext); //change if needed
+  const { currentSeason, seasonThemes } = useSeason(); // Access season context
+  const theme = seasonThemes[currentSeason] || {}; // Get the theme for the current season
   const [resolveModal, setResolveModal] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [gameData, setGameData] = useState({
@@ -135,25 +138,8 @@ export default function GameStats({ formData, setFormData, currentWeek, currentS
   };
 
 
-  const getSeasonTheme = (season) => {
-    switch (season) {
-      case 'spring':
-        return 'bg-green-100';
-      case 'summer':
-        return 'bg-yellow-100';
-      case 'autumn':
-        return 'bg-orange-100';
-      case 'winter':
-        return 'bg-blue-100';
-      default:
-        return '';
-    }
-  };
-
-  const seasonClass = getSeasonTheme(currentSeason);
-
   return (
-    <div className={`p-4 rounded-lg ${seasonClass}`}>
+    <div className={`p-4 rounded-lg ${theme.statsBg} ${theme.statsText}`}>
       {/* Display Abundance and Scarcity */}
       <div className="flex justify-between mb-4">
         <div className="flex-1 text-center">
@@ -174,7 +160,9 @@ export default function GameStats({ formData, setFormData, currentWeek, currentS
 
             {/* Edit Button */}
       <div className="text-center">
-        <button className="btn btn-primary" onClick={handleEdit}>
+        <button
+          onClick={handleEdit}
+          className={`btn btn-primary ${theme.statsBtnBg} ${theme.statsBtnText} ${theme.statsBtnBgHover}`}>
           Edit Resources
         </button>
       </div>
