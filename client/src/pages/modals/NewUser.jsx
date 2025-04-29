@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useAuthContext } from './userContext';
+import { useAuthContext } from './authContext';
 
 export default function Register({ onClose }) {
     const [formData, setFormData] = useState({

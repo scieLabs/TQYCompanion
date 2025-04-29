@@ -2,9 +2,8 @@
 import { useState } from 'react';
 import { useAuthContext } from '../authContext';
 import LogOut from '../pages/modals/LogOut';
-import { gameTitle } from '../config';
 
-const GameHeader = () => {
+const NewGameHeader = () => {
   const { user } = useAuthContext();
   const [showLogOut, setShowLogOut] = useState(true);
 
@@ -42,9 +41,9 @@ const GameHeader = () => {
         alt="Game Title"
         className="title-image"
       />
-      <h1 className="game-title text-2xl font-bold">{gameTitle}</h1>
+
     </header>
   );
 };
 
-export default GameHeader;
+export default NewGameHeader;
