@@ -1,9 +1,9 @@
 import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import PromptModal from '../components/PromptModal.jsx';
+import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { useNavigate } from 'react-router-dom';
-import { getLatestGame, createGame, saveGameData, savePromptData, getAllGames, getGameByTitleAndWeek } from '../api/gameApi.js';
+import { getLatestGame, createGame, saveGameData, saveActionData, getAllGames, getGameByTitleAndWeek } from '../api/gameApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 import { authContext } from '../context/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
@@ -100,7 +100,7 @@ export default function GameProgress() {
           project_desc: formData.project_desc, // Save project description
           project_weeks: formData.project_weeks, // Save project weeks
         });
-        await savePromptData(gameTitle, currentWeek, formData); // Save the current week's prompt data
+        await saveActionData(gameTitle, currentWeek, formData); // Save the current week's prompt data
 
         // Create a new game entry for the next week
         const nextWeek = currentWeek + 1; // Increment the week number
@@ -163,14 +163,14 @@ export default function GameProgress() {
             <div>
               <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
               <p className="mb-4">{prompt.prompt}</p>
-              <PromptModal 
+              <ActionModal 
                 prompt={prompt} 
                 formData={formData} 
                 setFormData={setFormData} 
                 seasonTheme={seasonThemes[season]} 
                 currentWeek={currentWeek} // Pass currentWeek as a prop
                 gameTitle={gameTitle} // Pass gameTitle as a prop
-                // Pass the prompt, form data, and seasonal theme to PromptModal
+                // Pass the prompt, form data, and seasonal themAction
                 />
               <button className="btn btn-primary mt-6" onClick={handleNextWeek}>
                 {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}

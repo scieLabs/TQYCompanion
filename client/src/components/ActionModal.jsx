@@ -3,16 +3,16 @@ import promptApi from '../api/promptApi.js';
 import gameAPI from '../api/gameApi.js';
 import { handleApiError } from '../utils/errorHandler.js';
 
-export default function PromptModal({ prompt, formData, setFormData, gameTitle, currentWeek }) {
+export default function ActionModal({ action, formData, setFormData, gameTitle, currentWeek }) {
   const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
-  const savePromptData = async (gameTitle, week, formData) => {
+  const saveActionData = async (gameTitle, week, formData) => {
     try {
-      await gameAPI.savePromptData(gameTitle, week, formData);
-      // Save the current prompt data for the given gameTitle and week.
+      await gameAPI.saveActionData(gameTitle, week, formData);
+      // Save the current action data for the given gameTitle and week.
     } catch (error) {
-        handleApiError(error, 'savePromptData');
+        handleApiError(error, 'saveActionData');
     }
   };
 
@@ -30,7 +30,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
             {/* <button
                 className="btn btn-primary mt-4"
                 onClick={() =>
-                savePromptData(gameTitle, currentWeek, { discovery: formData.discovery })
+                saveActionData(gameTitle, currentWeek, { discovery: formData.discovery })
                 }
             >
                 Save Discovery
@@ -46,7 +46,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
             {/* <button
                 className="btn btn-primary mt-4"
                 onClick={() =>
-                savePromptData(gameTitle, currentWeek, { discussion: formData.discussion })
+                saveActionData(gameTitle, currentWeek, { discussion: formData.discussion })
                 }
             >
                 Save Discussion
@@ -75,7 +75,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
           {/* <button
                 className="btn btn-primary mt-4"
                 onClick={() =>
-                savePromptData(gameTitle, currentWeek, {
+                saveActionData(gameTitle, currentWeek, {
                     project_title: formData.project_title,
                     project_desc: formData.project_desc,
                     project_weeks: formData.project_weeks,
@@ -89,7 +89,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
     );
   };
 
-  if (prompt._id.toString() === GAME_OVER_PROMPT_ID) {
+  if (action._id.toString() === GAME_OVER_PROMPT_ID) {
     return (
       <div>
         <label className="block font-bold">Enter Epilogue</label>
@@ -111,7 +111,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
       {renderActionForm()}
 
       {/* Conditionally show the modal buttons */}
-      {prompt.isDiscussion && (
+      {action.isDiscussion && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showDiscussionModal: true }))}
@@ -119,7 +119,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
           Open Discussion Modal
         </button>
       )}
-      {prompt.isDiscovery && (
+      {action.isDiscovery && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showDiscoveryModal: true }))}
@@ -127,7 +127,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
           Open Discovery Modal
         </button>
       )}
-      {prompt.isProject && (
+      {action.isProject && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showProjectModal: true }))}
@@ -137,7 +137,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
       )}
 
       {/* Modal rendering logic will go here */}
-      {formData.showDiscussionModal && prompt.isDiscussion && (
+      {formData.showDiscussionModal && action.isDiscussion && (
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Discussion</label>
           <textarea
@@ -149,7 +149,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
                 <button
                     className="btn btn-primary mt-4"
                     onClick={() =>
-                        savePromptData(gameTitle, currentWeek, { p_discussion: formData.p_discussion })
+                        saveActionData(gameTitle, currentWeek, { p_discussion: formData.p_discussion })
                     }
                     >
                     Save Prompt Discussion
@@ -158,7 +158,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
         </div>
       )}
 
-      {formData.showDiscoveryModal && prompt.isDiscovery && (
+      {formData.showDiscoveryModal && action.isDiscovery && (
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Discovery</label>
           <textarea
@@ -170,7 +170,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
             <button
                 className="btn btn-primary mt-4"
                 onClick={() =>
-                    savePromptData(gameTitle, currentWeek, { p_discovery: formData.p_discovery })
+                    saveActionData(gameTitle, currentWeek, { p_discovery: formData.p_discovery })
                 }
                 >
                 Save Prompt Discovery
@@ -179,7 +179,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
         </div>
       )}
 
-      {formData.showProjectModal && prompt.isProject && (
+      {formData.showProjectModal && action.isProject && (
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Project</label>
           <input
@@ -204,7 +204,7 @@ export default function PromptModal({ prompt, formData, setFormData, gameTitle, 
                 <button
                     className="btn btn-primary mt-4"
                     onClick={() =>
-                        savePromptData(gameTitle, currentWeek, {
+                        saveActionData(gameTitle, currentWeek, {
                         pp_title: formData.pp_title,
                         pp_desc: formData.pp_desc,
                         pp_weeks: formData.pp_weeks,
