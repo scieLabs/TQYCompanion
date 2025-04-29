@@ -5,12 +5,12 @@ import GameStats from '../components/GameStats.jsx';
 import { useNavigate } from 'react-router-dom';
 import { getLatestGame, createGame, saveGameData, saveActionData } from '../api/gameApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
-import { authContext } from '../context/authContext.jsx'; //adjust if needed
+import { useAuthContext } from '../context/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 
 export default function GameProgress() {
-  const { user } = useContext(authContext); // get the logged-in user
+  const { user } = useContext(useAuthContext); // get the logged-in user
   const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
   const [gameTitle, setGameTitle] = useState(null);
@@ -143,20 +143,10 @@ export default function GameProgress() {
       handleApiError(error, 'handleNextWeek');
     }
   };
-  
-// define colour themes for each season, idk if I'm doing it right
-  // const seasonThemes = {
-  //   Spring: 'bg-green-100 text-green-900',
-  //   Summer: 'bg-yellow-100 text-yellow-900',
-  //   Autumn: 'bg-orange-100 text-orange-900',
-  //   Winter: 'bg-blue-100 text-blue-900',
-  // };
-
-  // const theme = seasonThemes[season] || '';
 
 
   return (
-    <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
+    <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}> 
       <div className={`flex`}> 
         <div className={`w-1/4 pr-4`}>
           <GameStats 
