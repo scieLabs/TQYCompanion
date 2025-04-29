@@ -1,12 +1,12 @@
 //display of resources and projects. should we have a component for the gameplay (prompt + action) as well?
 import { useState, useEffect, useContext } from 'react';
 import gameAPI from '../api/gameApi.js';
-import { authContext } from '../contexts/authContext.jsx'; //edit later
+import { UseAuthContext } from '../contexts/authContext.jsx';
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; 
 
 export default function GameStats({ formData, setFormData, currentWeek, currentSeason, gameTitle }) {
-  const { user } = useContext(authContext); //change if needed
+  const { user } = useContext(UseAuthContext); //change if needed
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {}; // Get the theme for the current season
   const [resolveModal, setResolveModal] = useState(null);

@@ -5,7 +5,7 @@ import GameStats from '../components/GameStats.jsx';
 import { useNavigate } from 'react-router-dom';
 import { getLatestGame, createGame, saveGameData, saveActionData } from '../api/gameApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
-import { useAuthContext } from '../context/authContext.jsx'; //adjust if needed
+import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 

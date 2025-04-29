@@ -1,6 +1,6 @@
 // for gameplay, not the landing page
 import { useState } from 'react';
-import { useAuthContext } from '../authContext';
+import { useAuthContext } from '../contexts/authContext';
 import LogOut from '../pages/modals/LogOut';
 import { gameTitle } from '../config';
 
