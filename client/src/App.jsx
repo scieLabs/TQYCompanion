@@ -5,6 +5,7 @@ import Footer from './components/Footer.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import GameProgress from './pages/GameProgress.jsx';
 import { SeasonProvider } from './contexts/seasonContext.jsx';
+import Home from './pages/LandingPage';import Footer from './components/Footer';
 
 
 function App() {
