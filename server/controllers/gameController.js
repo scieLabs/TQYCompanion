@@ -65,11 +65,11 @@ export const createGameEntry = async (req, res) => {
   }
 };
 
-export const savePromptData = async (req, res) => {
+export const saveActionData = async (req, res) => {
   const { title, week } = req.params; // Extract title and week from the route parameters
     if (!week)
       return res.status(400).json({ error: 'Week parameter is required' }); // Validate week
-  const promptData = req.body; // Extract the data to be saved
+  const actionData = req.body; // Extract the data to be saved
 
   try {
     // Find the specific game entry by title and week
@@ -78,18 +78,18 @@ export const savePromptData = async (req, res) => {
 
     // Update the relevant fields in the game document
     // prompt specific
-    if (promptData.p_discussion) game.p_discussion = promptData.p_discussion;
-    if (promptData.p_discovery) game.p_discovery = promptData.p_discovery;
-    if (promptData.pp_title) game.pp_title = promptData.pp_title;
-    if (promptData.pp_desc) game.pp_desc = promptData.pp_desc;
-    if (promptData.pp_weeks) game.pp_weeks = promptData.pp_weeks;
+    if (actionData.p_discussion) game.p_discussion = actionData.p_discussion;
+    if (actionData.p_discovery) game.p_discovery = actionData.p_discovery;
+    if (actionData.pp_title) game.pp_title = actionData.pp_title;
+    if (actionData.pp_desc) game.pp_desc = actionData.pp_desc;
+    if (actionData.pp_weeks) game.pp_weeks = actionData.pp_weeks;
 
     // General game action fields
-    if (promptData.discussion) game.discussion = promptData.discussion;
-    if (promptData.discovery) game.discovery = promptData.discovery;
-    if (promptData.project_title) game.project_title = promptData.project_title;
-    if (promptData.project_desc) game.project_desc = promptData.project_desc;
-    if (promptData.project_weeks) game.project_weeks = promptData.project_weeks;
+    if (actionData.discussion) game.discussion = actionData.discussion;
+    if (actionData.discovery) game.discovery = actionData.discovery;
+    if (actionData.project_title) game.project_title = actionData.project_title;
+    if (actionData.project_desc) game.project_desc = actionData.project_desc;
+    if (actionData.project_weeks) game.project_weeks = actionData.project_weeks;
     
 
     // Save the updated game document
