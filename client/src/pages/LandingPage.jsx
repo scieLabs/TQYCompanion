@@ -1,6 +1,6 @@
 import HomeHeader from "../components/HomeHeader";
 import Login from "../pages/modals/Login";
-import { useAuthContext } from "../context/userContext";
+import { useAuthContext } from "../contexts/authContext";
 import { useState } from "react";
 import titleImage from "../assets/title.png";
 import quietYearImage from "../assets/The-Quiet-Year.webp";
