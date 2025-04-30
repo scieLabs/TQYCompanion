@@ -8,7 +8,7 @@ import NewGame from './pages/NewGame.jsx';
 import { SeasonProvider } from './contexts/seasonContext.jsx';
 import { AuthProvider } from './contexts/authContext.jsx'; // Adjust the import path if needed
 import Home from './pages/LandingPage';
-import Footer from './components/Footer';
+
 
 
 function App() {

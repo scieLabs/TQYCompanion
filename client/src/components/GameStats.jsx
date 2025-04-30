@@ -5,7 +5,7 @@ import { useAuthContext } from '../contexts/authContext.jsx';
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; 
 
-export default function GameStats({ formData, setFormData, currentWeek, currentSeason, gameTitle }) {
+export default function GameStats({ formData, setFormData, currentWeek, gameTitle }) {
   const { user } = useContext(useAuthContext); //change if needed
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {}; // Get the theme for the current season

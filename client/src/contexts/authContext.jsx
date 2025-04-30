@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       // Replace with your backend API endpoint
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),

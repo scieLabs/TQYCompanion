@@ -5,7 +5,11 @@ import { useAuthContext } from '../contexts/authContext';
 import NewGameHeader from '../components/NewGameHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { ORIGIN_URL } from '../config';
+
+const gameAPI = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+    withCredentials: true,
+  });
 
 export default function CreateNewGame() {
     // Authentication and user context
@@ -47,7 +51,7 @@ export default function CreateNewGame() {
 
         try {
             // Send the data to the server
-            const res = await axios.post(`${ORIGIN_URL}/game`, formData, {
+            const res = await axios.post(`${gameAPI.defaults.baseURL}/game`, formData, {
                 headers: { Authorization: `Bearer ${token}` },
               });
             return res.data;
