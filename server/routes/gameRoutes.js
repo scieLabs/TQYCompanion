@@ -6,8 +6,9 @@ import {
   getGameByTitle,
   getGameByTitleAndWeek,
   createGameEntry,
-  savePromptData,
+  saveActionData,
   updateGameByTitle,
+  updateGameByWeek,
   deleteGameByTitle,
   updateGameEntry,
   deleteGameEntry
@@ -15,21 +16,42 @@ import {
 
 const router = express.Router();
 
-// Static and more specific routes first
-router.get('/latest', getLatestGame); // Fetch the latest game
-router.get('/title/:title/week/:week', getGameByTitleAndWeek); // Fetch by title and week
-router.get('/title/:title', getGameByTitle); // Fetch by title
-router.post('/title/:title/week/:week', savePromptData); // Save prompts by title and week
-router.put('/title/:title', updateGameByTitle); // Update by title
-router.delete('/title/:title', deleteGameByTitle); // Delete by title
+// Game routes (Copilot's suggestions:)
+router.get('/', getAllGames); // Get all games
+router.get('/latest', getLatestGame); // Get the latest game for a user
+router.get('/:title/:week', getGameByTitleAndWeek); // Get a game by title and week
+router.get('/:id', getGameById); // Get a game by ID
+router.get('/title/:title', getGameByTitle); // Get a game by title
 
-// Dynamic routes last
-router.get('/:id', getGameById); // Fetch by ID
-router.put('/:id', updateGameEntry); // Update by ID
-router.delete('/:id', deleteGameEntry); // Delete by ID
+router.post('/', createGameEntry); // Create a new game entry
+router.post('/:title/:week/actions', saveActionData); // Save action data for a game
 
-// General routes
-router.get('/', getAllGames); // Fetch all games
-router.post('/', createGameEntry); // Create a new game
+router.put('/:title/:week', updateGameByWeek); // Update a game by title and week
+router.put('/title/:title', updateGameByTitle); // Update a game by title
+router.put('/:id', updateGameEntry); // Update a game by ID
+
+router.delete('/title/:title', deleteGameByTitle); // Delete a game by title
+router.delete('/:id', deleteGameEntry); // Delete a game by ID
 
 export default router;
+
+
+//FIXME: Old version
+// Static and more specific routes first
+// router.get('/latest', getLatestGame); // Fetch the latest game
+// router.get('/title/:title/week/:week', getGameByTitleAndWeek); // Fetch by title and week
+// router.get('/title/:title', getGameByTitle); // Fetch by title
+// router.post('/title/:title/week/:week', saveActionData); // Save prompts by title and week
+// router.put('/title/:title', updateGameByTitle); // Update by title
+// router.delete('/title/:title', deleteGameByTitle); // Delete by title
+
+// // Dynamic routes last
+// router.get('/:id', getGameById); // Fetch by ID
+// router.put('/:id', updateGameEntry); // Update by ID
+// router.delete('/:id', deleteGameEntry); // Delete by ID
+
+// // General routes
+// router.get('/', getAllGames); // Fetch all games
+// router.post('/', createGameEntry); // Create a new game
+
+// export default router;

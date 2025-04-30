@@ -62,11 +62,11 @@ const HomeHeader = () => {
                     </>
                 )}
             </div>
-            <img
+            {/* <img
                 src={require("../assets/title.png")}
                 alt="Game Title"
                 className="title-image"
-            />
+            /> */}
 
             {showLogin && <Login onClose={handleCloseModal} />}
             {showRegister && <Register onClose={handleCloseModal} />}

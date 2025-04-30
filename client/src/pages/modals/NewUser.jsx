@@ -2,6 +2,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx'
 
+// Import the base URL from the .env file
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default function Register({ onClose }) {
     const [formData, setFormData] = useState({
         username: '',
@@ -46,16 +49,16 @@ export default function Register({ onClose }) {
 
         try {
             setLoading(true); // Show loading state
-            const response = await axios.post('/register', formData, { withCredentials: true });
+            const response = await axios.post(`${API_BASE_URL}/users/register`, formData, { withCredentials: true });
             console.log('Registration successful:', response.data);
             setSuccessMessage('Registration successful! Redirecting...');
-            login(response.data);
+            login({ email: formData.email, password: formData.password });
 
             // Close the modal after a short delay
             setTimeout(() => {
                 setLoading(false);
                 onClose();
-            }, 20000); // 20 seconds delay before closing the modal
+            }, 2000); // 2 seconds delay before closing the modal
         } catch (error) {
             console.error('Registration failed:', error.response?.data || error.message);
             setErrorMessage('Registration failed. Please try again.');

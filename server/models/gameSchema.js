@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const gameSchema = new mongoose.Schema({
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
-  prompt_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Prompt', required: true },
+  prompt_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Prompt' },
   title: { type: String, required: true },
   description: { type: String, required: true },
   week: { type: Number, default: 0, required: true },

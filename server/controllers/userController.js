@@ -23,6 +23,16 @@ export const getUserById = asyncHandler(async (req, res, next) => {
 
 export const createUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
+
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({ message: 'User with this email already exists.' });
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = new User({
@@ -32,9 +42,9 @@ export const createUser = asyncHandler(async (req, res) => {
   });
 
   await newUser.save();
-  res.status(201).json(newUser);
+  res.status(201).json({ message: 'User registered successfully.', user: newUser });
 });
-  
+
 
 // Update user by ID
 export const updateUser = asyncHandler(async (req, res) => {
@@ -72,6 +82,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
 
 //// TO BE UPDATED IN THE UPCOMING AUTH BRANCH
 // User Login
+
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -95,12 +106,12 @@ export const loginUser = asyncHandler(async (req, res) => {
       email: user.email,
     },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
   );
 
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'development',
     maxAge: 24 * 60 * 60 * 1000,
   });
 
@@ -122,8 +133,13 @@ export const logoutUser = (req, res) => {
 
 // Check Session
 export const checkSession = (req, res) => {
-  if (req.user) {
-    res.json({ authenticated: true, user: req.user });
+  if (req.cookies.token) {
+    try {
+      const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
+      res.json({ authenticated: true, user: decoded });
+    } catch (err) {
+      res.json({ authenticated: false });
+    }
   } else {
     res.json({ authenticated: false });
   }

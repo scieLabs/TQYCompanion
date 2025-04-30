@@ -23,14 +23,33 @@ export const getLatestGame = async (req, res) => {
 
 export const getGameByTitleAndWeek = async (req, res) => {
   const { title, week } = req.params;
+
+  // Validate required parameters
+  if (!title || !week) {
+    return res.status(400).json({ message: 'Both title and week parameters are required.' });
+  }
+
   try {
     const game = await Game.findOne({ title, week });
-    if (!game) return res.status(404).json({message: 'Game not found'});
+    if (!game) return res.status(404).json({ message: 'Game not found' });
     res.json(game);
   } catch (err) {
-    res.status(500).json({message: 'Error fetching game data'});
+    res.status(500).json({ message: 'Error fetching game data' });
   }
 };
+
+//FIXME: Old version
+
+// export const getGameByTitleAndWeek = async (req, res) => {
+//   const { title, week } = req.params;
+//   try {
+//     const game = await Game.findOne({ title, week });
+//     if (!game) return res.status(404).json({message: 'Game not found'});
+//     res.json(game);
+//   } catch (err) {
+//     res.status(500).json({message: 'Error fetching game data'});
+//   }
+// };
 
 export const getGameById = async (req, res) => {
   try {
@@ -54,16 +73,43 @@ export const getGameByTitle = async (req, res) => {
   }
 };
 
+
 export const createGameEntry = async (req, res) => {
   try {
-    const { prompt_id, ...gameData } = req.body; // Exclude prompt_id
-    const newGame = new Game(gameData);
+    const { title, description, abundance, scarcity, user_id } = req.body;
+
+    // Validate required fields
+    if (!title || !description || !abundance || !scarcity || !user_id) {
+      return res.status(400).json({ message: 'All fields (title, description, abundance, scarcity, user_id) are required.' });
+    }
+
+    // Create a new game entry
+    const newGame = new Game({
+      title,
+      description,
+      abundance,
+      scarcity,
+      user_id,
+    });
+
     await newGame.save();
-    res.status(201).json(newGame);
+    res.status(201).json({ message: 'Game created successfully.', game: newGame });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
+
+//FIXME: Old version
+// export const createGameEntry = async (req, res) => {
+//   try {
+//     const { prompt_id, ...gameData } = req.body; // Exclude prompt_id
+//     const newGame = new Game(gameData);
+//     await newGame.save();
+//     res.status(201).json(newGame);
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// };
 
 export const saveActionData = async (req, res) => {
   const { title, week } = req.params; // Extract title and week from the route parameters
@@ -102,15 +148,21 @@ export const saveActionData = async (req, res) => {
 };
 
 // Update a game by week
+
 export const updateGameByWeek = async (req, res) => {
   const { title } = req.params;
   let { week } = req.params; // Extract week as a string
   const updates = req.body;
 
+  // Validate required parameters
+  if (!title || !week) {
+    return res.status(400).json({ message: 'Both title and week parameters are required.' });
+  }
+
   // Parse week to a number
   week = Number(week);
   if (isNaN(week)) {
-    return res.status(400).json({ error: 'Invalid week parameter. It must be a number.' });
+    return res.status(400).json({ message: 'Invalid week parameter. It must be a number.' });
   }
 
   try {
@@ -121,6 +173,27 @@ export const updateGameByWeek = async (req, res) => {
     res.status(500).json({ message: 'Error updating game by week' });
   }
 };
+
+//FIXME: Old version
+// export const updateGameByWeek = async (req, res) => {
+//   const { title } = req.params;
+//   let { week } = req.params; // Extract week as a string
+//   const updates = req.body;
+
+//   // Parse week to a number
+//   week = Number(week);
+//   if (isNaN(week)) {
+//     return res.status(400).json({ error: 'Invalid week parameter. It must be a number.' });
+//   }
+
+//   try {
+//     const game = await Game.findOneAndUpdate({ title, week }, updates, { new: true });
+//     if (!game) return res.status(404).json({ message: 'Game not found' });
+//     res.json(game);
+//   } catch (err) {
+//     res.status(500).json({ message: 'Error updating game by week' });
+//   }
+// };
 
 export const updateGameByTitle = async (req, res) => {
   const { title } = req.params;

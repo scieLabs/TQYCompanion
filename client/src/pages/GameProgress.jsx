@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
@@ -10,11 +11,15 @@ import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 
 export default function GameProgress() {
-  const { user } = useContext(useAuthContext); // get the logged-in user
+  // const { state } = useLocation(); // Access the passed state
+  const { user } = useAuthContext(); // get the logged-in user
+  // const game = state?.game; // Get the game data from the passed state
   const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+  const [game, setGame] = useState(null);
   const [gameTitle, setGameTitle] = useState(null);
   const [prompt, setPrompt] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     discussion: '',
     discovery: '',
@@ -183,3 +188,26 @@ export default function GameProgress() {
     </div>
   );
 }
+
+
+//TODO: CHECK THE FOLLOWING PIECE OF CODE SUGGESTED FROM COPILOT:
+
+// import { useLocation } from 'react-router-dom';
+// import { useAuthContext } from '../contexts/authContext';
+
+// export default function GameProgress() {
+//   const { state } = useLocation(); // Access the passed state
+//   const { user } = useAuthContext(); // Access the logged-in user from authContext
+
+//   const game = state?.game; // Get the game data from the passed state
+
+//   return (
+//     <div>
+//       <h1>Welcome, {user?.username}</h1>
+//       <h2>Game Progress for: {game?.title}</h2>
+//       <p>Description: {game?.description}</p>
+//       <p>Abundance: {game?.abundance}</p>
+//       <p>Scarcity: {game?.scarcity}</p>
+//     </div>
+//   );
+// }

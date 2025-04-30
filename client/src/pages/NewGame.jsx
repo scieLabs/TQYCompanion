@@ -1,6 +1,6 @@
 //the page where a user sets up basic info about their game. leads to GameProgress//the page where a user sets up basic info about their game. leads to GameProgress
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useAuthContext } from '../contexts/authContext';
 import NewGameHeader from '../components/NewGameHeader';
 import axios from 'axios';
@@ -13,8 +13,9 @@ const gameAPI = axios.create({
 
 export default function CreateNewGame() {
     // Authentication and user context
-    const { user } = useContext(useAuthContext);
-    const token = user?.token; // Assuming the token is stored in the user object
+    const { user } = useAuthContext();
+    console.log('CreateNewGame user:', user);
+    // const token = user?.token; // Assuming the token is stored in the user object
     
     // Redirecting to login if not authenticated
     const navigate = useNavigate();
@@ -28,50 +29,87 @@ export default function CreateNewGame() {
     // State variables
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [end, setEnding] = useState('');
     const [abundance, setAbundance] = useState('');
     const [scarcity, setScarcity] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState({ 
         title: false, 
         description: false, 
-        end: false, 
         abundance: false, 
         scarcity: false 
     });
 
     //Handle creating a new game:
-    const handleCreateGame = async () => {
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('end', end);
-        formData.append('abundance', abundance);
-        formData.append('scarcity', scarcity);
 
-        try {
-            // Send the data to the server
-            const res = await axios.post(`${gameAPI.defaults.baseURL}/game`, formData, {
-                headers: { Authorization: `Bearer ${token}` },
-              });
-            return res.data;
-          } catch (err) {
-            console.error('Error creating game:', err);
-            setError('Failed to create the game. Please try again.');
-            throw err;
-          }
+    const handleCreateGame = async () => {
+        if (!title || !description || !abundance || !scarcity) {
+          setError('All fields are required to create a game.');
+          throw new Error('Validation failed: Missing required fields.');
+        }
+      
+        // Payload to carry data along paths:
+
+        const payload = {
+          title,
+          description,
+          abundance,
+          scarcity,
+          user_id: user.id, // Assuming the user ID is available in the `user` object
         };
+      
+        console.log('Payload being sent to the backend:', payload);
+      
+        try {
+          const res = await gameAPI.post('/game', payload, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          });
+          return res.data;
+        } catch (err) {
+          console.error('Error creating game:', err.response?.data || err.message);
+          setError(err.response?.data?.error || 'Failed to create the game. Please try again.');
+          throw err;
+        }
+      };
+
+    //FIXME: Old version
+    // const handleCreateGame = async () => {
+    //     if (!title || !description || !abundance || !scarcity) {
+    //         setError('All fields are required to create a game.');
+    //         throw new Error('Validation failed: Missing required fields.');
+    //     }
+
+    //     const formData = new FormData();
+    //     formData.append('title', title);
+    //     formData.append('description', description);
+    //     formData.append('abundance', abundance);
+    //     formData.append('scarcity', scarcity);
+
+    //     try {
+    //         // Send the data to the server
+    //         const res = await gameAPI.post('/game', formData, {
+    //             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    //           });
+    //         return res.data;
+    //       } catch (err) {
+    //         console.error('Error creating game:', err);
+    //         setError('Failed to create the game. Please try again.');
+    //         throw err;
+    //       }
+    //     };
 
     //Handle submit and start spring:   
     const handleStartSpring = async (e) => {
         e.preventDefault();
-        if (!title || !description || !end || !abundance || !scarcity) {
+        if (!title || !description || !abundance || !scarcity) {
           setError('Please fill in all fields before starting the game.');
           return;
         }
         try {
-          const gameData = await handleCreateGame();
-          navigate('/gameProgress'); // Navigate to the game progress page
+          const gameData =await handleCreateGame();
+          navigate('/game', { state: { game: gameData, user } }); // Navigate to the game progress page
         } catch (err) {
           console.error('Error starting the game:', err);
         }
@@ -79,26 +117,26 @@ export default function CreateNewGame() {
 
   // Update success state for checkmarks
   const updateSuccess = (field, value) => {
-    switch (field) {
-      case 'title':
-        setSuccess((prev) => ({ ...prev, title: !!value }));
-        break;
-      case 'description':
-        setSuccess((prev) => ({ ...prev, description: !!value }));
-        break;
-      case 'end':
-        setSuccess((prev) => ({ ...prev, end: !!value }));
-        break;
-      case 'abundance':
-        setSuccess((prev) => ({ ...prev, abundance: !!value }));
-        break;
-      case 'scarcity':
-        setSuccess((prev) => ({ ...prev, scarcity: !!value }));
-        break;
-      default:
-        break;
-    }
+    setSuccess((prev) => ({ ...prev, [field]: !!value }));
   };
+//   const updateSuccess = (field, value) => {
+//     switch (field) {
+//       case 'title':
+//         setSuccess((prev) => ({ ...prev, title: !!value }));
+//         break;
+//       case 'description':
+//         setSuccess((prev) => ({ ...prev, description: !!value }));
+//         break;
+//       case 'abundance':
+//         setSuccess((prev) => ({ ...prev, abundance: !!value }));
+//         break;
+//       case 'scarcity':
+//         setSuccess((prev) => ({ ...prev, scarcity: !!value }));
+//         break;
+//       default:
+//         break;
+//     }
+//   };
 
   return (
     <div>
@@ -130,19 +168,6 @@ export default function CreateNewGame() {
               }}
             ></textarea>
             {success.description && <span className="text-green-500">✔</span>}
-
-            <h2 className="text-2xl font-bold mb-2">End:</h2>
-            <textarea
-              className="textarea textarea-bordered w-full mb-4"
-              placeholder="Enter an ending for this game"
-              value={end}
-              onChange={(e) => {
-                setEnding(e.target.value);
-                updateSuccess('end', e.target.value);
-              }}
-            ></textarea>
-            {success.end && <span className="text-green-500">✔</span>}
-
             <h2 className="text-2xl font-bold mb-2">Abundance:</h2>
             <textarea
               className="textarea textarea-bordered w-full mb-4"
