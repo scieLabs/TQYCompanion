@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Login from "../pages/modals/Login";
 import Logout from "../pages/modals/LogOut";
 import Register from "../pages/modals/NewUser";
-import { useAuthContext } from '../path/to/userContext';
+import { useAuthContext } from "../contexts/authContext.jsx";
 
 const HomeHeader = () => {
     const [showLogin, setShowLogin] = useState(false);

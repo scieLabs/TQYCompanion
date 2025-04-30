@@ -1,7 +1,7 @@
 // for gameplay, not the landing page
 import { useState } from 'react';
-import { useAuthContext } from '../authContext';
-import LogOut from '../pages/modals/LogOut';
+import { useAuthContext } from '../contexts/authContext.jsx';
+import LogOut from '../pages/modals/LogOut.jsx';
 
 const NewGameHeader = () => {
   const { user } = useAuthContext();
