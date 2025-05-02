@@ -1,4 +1,6 @@
 import Game from '../models/gameSchema.js';
+import User from '../models/userSchema.js';
+import mongoose from 'mongoose';
 
 export const getAllGames = async (req, res) => {
   try {
@@ -11,26 +13,50 @@ export const getAllGames = async (req, res) => {
 
 // Get the latest game for a user
 export const getLatestGame = async (req, res) => {
-  const { user_id, title } = req.query;
+  const { user_id } = req.query; //TODO: removed title here and below
+
+  if (!user_id) {
+    return res.status(400).json({ message: 'User ID is required.' });
+  }
   try {
-    const latestGame = await Game.findOne({ user_id, title }).sort({ week: -1 });
+    const latestGame = await Game.findOne({ user_id }).sort({ createdAt: -1 });
     if (!latestGame) return res.status(404).json({message: 'No games found for this user and title'});
     res.json(latestGame);
   } catch (err) {
-    res.status(500).json({message: 'Error fetching latest game'});
+    console.error('Error fetching latest game:', err);
+    res.status(500).json({message: 'Error fetching latest game', error: err.message});
   }
 };
 
 export const getGameByTitleAndWeek = async (req, res) => {
   const { title, week } = req.params;
+
+  // Validate required parameters
+  if (!title || !week) {
+    return res.status(400).json({ message: 'Both title and week parameters are required.' });
+  }
+
   try {
     const game = await Game.findOne({ title, week });
-    if (!game) return res.status(404).json({message: 'Game not found'});
+    if (!game) return res.status(404).json({ message: 'Game not found' });
     res.json(game);
   } catch (err) {
-    res.status(500).json({message: 'Error fetching game data'});
+    res.status(500).json({ message: 'Error fetching game data' });
   }
 };
+
+//FIXME: Old version
+
+// export const getGameByTitleAndWeek = async (req, res) => {
+//   const { title, week } = req.params;
+//   try {
+//     const game = await Game.findOne({ title, week });
+//     if (!game) return res.status(404).json({message: 'Game not found'});
+//     res.json(game);
+//   } catch (err) {
+//     res.status(500).json({message: 'Error fetching game data'});
+//   }
+// };
 
 export const getGameById = async (req, res) => {
   try {
@@ -54,16 +80,61 @@ export const getGameByTitle = async (req, res) => {
   }
 };
 
+
 export const createGameEntry = async (req, res) => {
-  try {
-    const { prompt_id, ...gameData } = req.body; // Exclude prompt_id
-    const newGame = new Game(gameData);
+  const { user_id, gameTitle, description, abundance, scarcity, week } = req.body;
+
+  // Validate required fields
+  if (!user_id || !gameTitle || !description || !abundance || !scarcity) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  // Validate that user_id is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(user_id)) {
+    return res.status(400).json({ message: 'Invalid user ID.' });
+  }
+
+  // Check if the user exists
+  const user = await User.findById(user_id);
+  if (!user) {
+    return res.status(404).json({ message: 'User not found.' });
+  }
+  console.log('Received user_id:', user_id); // Debugging: Log the received user ID
+  console.log('Checking if user exists...');
+
+    try {
+      // Create the new game
+      const newGame = new Game({
+        user_id: new mongoose.Types.ObjectId(user_id), // Convert user_id to ObjectId
+        title: gameTitle,
+        description,
+        abundance,
+        scarcity,
+        contempt: 0,
+        week,
+      });
+
     await newGame.save();
-    res.status(201).json(newGame);
+    console.log('Request payload:', req.body);
+    console.log('Converted user_id:', new mongoose.Types.ObjectId(user_id));
+    res.status(201).json({ message: 'Game created successfully.', game: newGame });
   } catch (err) {
+    console.error('Error creating game entry:', err);
     res.status(400).json({ error: err.message });
   }
 };
+
+//FIXME: Old version
+// export const createGameEntry = async (req, res) => {
+//   try {
+//     const { prompt_id, ...gameData } = req.body; // Exclude prompt_id
+//     const newGame = new Game(gameData);
+//     await newGame.save();
+//     res.status(201).json(newGame);
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// };
 
 export const saveActionData = async (req, res) => {
   const { title, week } = req.params; // Extract title and week from the route parameters
@@ -77,6 +148,7 @@ export const saveActionData = async (req, res) => {
     if (!game) return res.status(404).json({ message: 'Game not found' });
 
     // Update the relevant fields in the game document
+    Object.assign(game, actionData); // Update the game document with the new data
     // prompt specific
     if (actionData.p_discussion) game.p_discussion = actionData.p_discussion;
     if (actionData.p_discovery) game.p_discovery = actionData.p_discovery;
@@ -102,15 +174,21 @@ export const saveActionData = async (req, res) => {
 };
 
 // Update a game by week
+
 export const updateGameByWeek = async (req, res) => {
   const { title } = req.params;
   let { week } = req.params; // Extract week as a string
   const updates = req.body;
 
+  // Validate required parameters
+  if (!title || !week) {
+    return res.status(400).json({ message: 'Both title and week parameters are required.' });
+  }
+
   // Parse week to a number
   week = Number(week);
   if (isNaN(week)) {
-    return res.status(400).json({ error: 'Invalid week parameter. It must be a number.' });
+    return res.status(400).json({ message: 'Invalid week parameter. It must be a number.' });
   }
 
   try {
@@ -121,6 +199,27 @@ export const updateGameByWeek = async (req, res) => {
     res.status(500).json({ message: 'Error updating game by week' });
   }
 };
+
+//FIXME: Old version
+// export const updateGameByWeek = async (req, res) => {
+//   const { title } = req.params;
+//   let { week } = req.params; // Extract week as a string
+//   const updates = req.body;
+
+//   // Parse week to a number
+//   week = Number(week);
+//   if (isNaN(week)) {
+//     return res.status(400).json({ error: 'Invalid week parameter. It must be a number.' });
+//   }
+
+//   try {
+//     const game = await Game.findOneAndUpdate({ title, week }, updates, { new: true });
+//     if (!game) return res.status(404).json({ message: 'Game not found' });
+//     res.json(game);
+//   } catch (err) {
+//     res.status(500).json({ message: 'Error updating game by week' });
+//   }
+// };
 
 export const updateGameByTitle = async (req, res) => {
   const { title } = req.params;
@@ -164,5 +263,93 @@ export const deleteGameEntry = async (req, res) => {
     res.json({ message: 'Game deleted' });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+
+// Projects
+
+// Fetch all projects and personal projects for a game by title
+export const getAllProjectsByTitle = async (req, res) => {
+  const { title } = req.params;
+  try {
+    const gameEntries = await Game.find({ title }).sort({ week: 1 });
+    const projects = [];
+    const pp = [];
+
+    gameEntries.forEach((entry) => {
+      if (entry.project_title) {
+        projects.push({
+          title: entry.project_title,
+          desc: entry.project_desc,
+          weeks: entry.project_weeks,
+          type: 'projects',
+        });
+      }
+      if (entry.pp_title) {
+        pp.push({
+          title: entry.pp_title,
+          desc: entry.pp_desc,
+          weeks: entry.pp_weeks,
+          type: 'pp',
+        });
+      }
+    });
+
+    res.json({ projects, pp });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching projects', error: err.message });
+  }
+};
+
+// Fetch completed projects
+export const getCompletedProjects = async (req, res) => {
+  const { title } = req.params;
+  try {
+    const gameEntries = await Game.find({ title, $or: [{ project_resolve: { $exists: true } }, { pp_resolve: { $exists: true } }] }).sort({ updatedAt: 1 });
+    const completed = [];
+
+    gameEntries.forEach((entry) => {
+      if (entry.project_resolve) {
+        completed.push({
+          title: entry.project_title,
+          desc: entry.project_desc,
+          resolution: entry.project_resolve,
+        });
+      }
+      if (entry.pp_resolve) {
+        completed.push({
+          title: entry.pp_title,
+          desc: entry.pp_desc,
+          resolution: entry.pp_resolve,
+        });
+      }
+    });
+
+    res.json(completed);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching completed projects', error: err.message });
+  }
+};
+
+// Resolve a project
+export const resolveProject = async (req, res) => {
+  const { title, projectTitle, type } = req.params;
+  const { resolution } = req.body;
+
+  try {
+    const updateField = type === 'projects' ? 'project_resolve' : 'pp_resolve';
+    const filter = type === 'projects' ? { project_title: projectTitle } : { pp_title: projectTitle };
+
+    const game = await Game.findOneAndUpdate(
+      { title, ...filter },
+      { [updateField]: resolution },
+      { new: true }
+    );
+
+    if (!game) return res.status(404).json({ message: 'Project not found' });
+    res.json({ message: 'Project resolved successfully', game });
+  } catch (err) {
+    res.status(500).json({ message: 'Error resolving project', error: err.message });
   }
 };

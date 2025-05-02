@@ -3,11 +3,13 @@ import Login from "../pages/modals/Login";
 import Logout from "../pages/modals/LogOut";
 import Register from "../pages/modals/NewUser";
 import { useAuthContext } from "../contexts/authContext.jsx";
+import { useNavigate } from 'react-router-dom';
 
 const HomeHeader = () => {
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
     const { user } = useAuthContext();
+    const navigate = useNavigate();
 
     const handleLoginClick = () => {
         setShowLogin(true);
@@ -23,6 +25,10 @@ const HomeHeader = () => {
         setShowLogin(false);
         setShowRegister(false);
     };
+
+    const handleNewGameClick = () => {
+        navigate('/new-game'); // Navigate to the NewGame page
+      };
 
     return (
         <header
@@ -53,20 +59,20 @@ const HomeHeader = () => {
                 {user && (
                     <>
                         <Logout />
-                        <a
-                            href="/new-game"
+                        <button
+                            onClick={handleNewGameClick}
                             className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
                             New Game
-                        </a>
+                        </button>
                     </>
                 )}
             </div>
-            <img
+            {/* <img
                 src={require("../assets/title.png")}
                 alt="Game Title"
                 className="title-image"
-            />
+            /> */}
 
             {showLogin && <Login onClose={handleCloseModal} />}
             {showRegister && <Register onClose={handleCloseModal} />}

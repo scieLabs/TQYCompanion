@@ -8,27 +8,47 @@ export default function Logout() {
     const [successMessage, setSuccessMessage] = useState('');
     const { logout } = useAuthContext();
 
+
     const handleLogout = async () => {
-        setErrorMessage(''); // Clear previous error messages
-        setSuccessMessage(''); // Clear previous success messages
-
+        setErrorMessage('');
+        setSuccessMessage('');
+    
         try {
-            setLoading(true); // Show loading state
-            const response = await axios.post('/logout', {}, { withCredentials: true });
-            console.log('Logout successful:', response.data);
-            setSuccessMessage('Logout successful! Redirecting...');
-            logout();
-
-            // Optionally redirect or perform additional actions after logout
+            setLoading(true);
+            await logout(); // Use the logout function from authContext
+            setSuccessMessage('Logout successful!');
             setTimeout(() => {
                 setLoading(false);
-            }, 20000); // 20 seconds delay before closing the modal
+            }, 2000);
         } catch (error) {
-            console.error('Logout failed:', error.response?.data || error.message);
-            setErrorMessage('Logout failed. Please try again.');
+            console.error('Logout failed:', error);
+            setErrorMessage(error.message || 'Logout failed. Please try again.');
             setLoading(false);
         }
     };
+
+   // TODO: Old version:
+    // const handleLogout = async () => {
+    //     setErrorMessage(''); // Clear previous error messages
+    //     setSuccessMessage(''); // Clear previous success messages
+
+    //     try {
+    //         setLoading(true); // Show loading state
+    //         const response = await axios.post('/logout', {}, { withCredentials: true });
+    //         console.log('Logout successful:', response.data);
+    //         setSuccessMessage('Logout successful! Redirecting...');
+    //         logout();
+
+    //         // Optionally redirect or perform additional actions after logout
+    //         setTimeout(() => {
+    //             setLoading(false);
+    //         }, 20000); // 20 seconds delay before closing the modal
+    //     } catch (error) {
+    //         console.error('Logout failed:', error.response?.data || error.message);
+    //         setErrorMessage('Logout failed. Please try again.');
+    //         setLoading(false);
+    //     }
+    // };
 
     return (
         <div className="bg-white p-6 rounded shadow-md w-full max-w-sm mx-auto">
