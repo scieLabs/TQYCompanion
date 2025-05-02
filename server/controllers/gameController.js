@@ -31,17 +31,14 @@ export const getLatestGame = async (req, res) => {
 export const getGameByTitleAndWeek = async (req, res) => {
   const { title, week } = req.params;
 
-  // Validate required parameters
-  if (!title || !week) {
-    return res.status(400).json({ message: 'Both title and week parameters are required.' });
-  }
-
   try {
-    const game = await Game.findOne({ title, week });
-    if (!game) return res.status(404).json({ message: 'Game not found' });
-    res.json(game);
+    const game = await Game.findOne({ title, week: parseInt(week, 10) });
+    if (!game) return res.status(404).json({ message: 'Game not found.' });
+
+    res.status(200).json(game);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching game data' });
+    console.error('Error fetching game by title and week:', err);
+    res.status(500).json({ message: 'Error fetching game by title and week.', error: err.message });
   }
 };
 
@@ -82,10 +79,10 @@ export const getGameByTitle = async (req, res) => {
 
 
 export const createGameEntry = async (req, res) => {
-  const { user_id, gameTitle, description, abundance, scarcity, week } = req.body;
+  const { user_id, title, description, abundance, scarcity, week } = req.body;
 
   // Validate required fields
-  if (!user_id || !gameTitle || !description || !abundance || !scarcity) {
+  if (!user_id || !title || !description || !abundance || !scarcity) {
     return res.status(400).json({ message: 'All fields are required.' });
   }
 
@@ -106,7 +103,7 @@ export const createGameEntry = async (req, res) => {
       // Create the new game
       const newGame = new Game({
         user_id: new mongoose.Types.ObjectId(user_id), // Convert user_id to ObjectId
-        title: gameTitle,
+        title,
         description,
         abundance,
         scarcity,
@@ -124,6 +121,26 @@ export const createGameEntry = async (req, res) => {
   }
 };
 
+export const saveGameData = async (req, res) => {
+  const { title, week } = req.params; // Extract title and week from the route parameters
+  const updates = req.body; // Extract the data to be saved
+
+  try {
+    const game = await Game.findOneAndUpdate(
+      { title, week: parseInt(week, 10) }, // Match the game by title and week
+      { $set: updates }, // Apply the updates
+      { new: true } // Return the updated document
+    );
+
+    if (!game) return res.status(404).json({ message: 'Game not found.' });
+
+    res.json({ message: 'Game data updated successfully.', game });
+  } catch (err) {
+    console.error('Error saving game data:', err);
+    res.status(500).json({ message: 'Error saving game data.', error: err.message });
+  }
+};
+
 //FIXME: Old version
 // export const createGameEntry = async (req, res) => {
 //   try {
@@ -138,40 +155,68 @@ export const createGameEntry = async (req, res) => {
 
 export const saveActionData = async (req, res) => {
   const { title, week } = req.params; // Extract title and week from the route parameters
-    if (!week)
-      return res.status(400).json({ error: 'Week parameter is required' }); // Validate week
   const actionData = req.body; // Extract the data to be saved
+
+  // Validate required parameters
+  if (!title || !week) {
+    return res.status(400).json({ message: 'Both title and week parameters are required.' });
+  }
 
   try {
     // Find the specific game entry by title and week
-    const game = await Game.findOne({ title, week });
+    const game = await Game.findOne({ title, week: parseInt(week, 10) });
     if (!game) return res.status(404).json({ message: 'Game not found' });
 
     // Update the relevant fields in the game document
-    Object.assign(game, actionData); // Update the game document with the new data
-    // prompt specific
-    if (actionData.p_discussion) game.p_discussion = actionData.p_discussion;
-    if (actionData.p_discovery) game.p_discovery = actionData.p_discovery;
-    if (actionData.pp_title) game.pp_title = actionData.pp_title;
-    if (actionData.pp_desc) game.pp_desc = actionData.pp_desc;
-    if (actionData.pp_weeks) game.pp_weeks = actionData.pp_weeks;
-
-    // General game action fields
-    if (actionData.discussion) game.discussion = actionData.discussion;
-    if (actionData.discovery) game.discovery = actionData.discovery;
-    if (actionData.project_title) game.project_title = actionData.project_title;
-    if (actionData.project_desc) game.project_desc = actionData.project_desc;
-    if (actionData.project_weeks) game.project_weeks = actionData.project_weeks;
-    
+    Object.assign(game, actionData);
 
     // Save the updated game document
     await game.save();
 
-    res.status(200).json({ message: 'Prompt data saved successfully', game });
+    res.status(200).json({ message: 'Action data saved successfully', game });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error saving action data:', err);
+    res.status(500).json({ message: 'Error saving action data', error: err.message });
   }
 };
+
+//FIXME: Old version
+// export const saveActionData = async (req, res) => {
+//   const { title, week } = req.params; // Extract title and week from the route parameters
+//     if (!week)
+//       return res.status(400).json({ error: 'Week parameter is required' }); // Validate week
+//   const actionData = req.body; // Extract the data to be saved
+
+//   try {
+//     // Find the specific game entry by title and week
+//     const game = await Game.findOne({ title, week });
+//     if (!game) return res.status(404).json({ message: 'Game not found' });
+
+//     // Update the relevant fields in the game document
+//     Object.assign(game, actionData); // Update the game document with the new data
+//     // prompt specific
+//     if (actionData.p_discussion) game.p_discussion = actionData.p_discussion;
+//     if (actionData.p_discovery) game.p_discovery = actionData.p_discovery;
+//     if (actionData.pp_title) game.pp_title = actionData.pp_title;
+//     if (actionData.pp_desc) game.pp_desc = actionData.pp_desc;
+//     if (actionData.pp_weeks) game.pp_weeks = actionData.pp_weeks;
+
+//     // General game action fields
+//     if (actionData.discussion) game.discussion = actionData.discussion;
+//     if (actionData.discovery) game.discovery = actionData.discovery;
+//     if (actionData.project_title) game.project_title = actionData.project_title;
+//     if (actionData.project_desc) game.project_desc = actionData.project_desc;
+//     if (actionData.project_weeks) game.project_weeks = actionData.project_weeks;
+    
+
+//     // Save the updated game document
+//     await game.save();
+
+//     res.status(200).json({ message: 'Prompt data saved successfully', game });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
 
 // Update a game by week
 
