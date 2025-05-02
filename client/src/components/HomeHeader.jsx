@@ -35,6 +35,7 @@ const HomeHeader = () => {
                 >
                     About
                 </a>
+                {/* downloads an htm file, whatever that even is - also does NOT open in a new window */}
                 <a href="rules.pdf" target="_blank" rel="noopener noreferrer" download
                     className="rules-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
@@ -70,11 +71,11 @@ const HomeHeader = () => {
                     </>
                 )}
             </div>
-            <img
+            {/*<img
                 src={require("../assets/title.png")}
                 alt="Game Title"
                 className="title-image"
-            />
+            />*/}
 
             {showLogin && <Login onClose={handleCloseModal} />}
             {showRegister && <Register onClose={handleCloseModal} />}

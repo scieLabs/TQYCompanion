@@ -4,6 +4,7 @@ import { useAuthContext } from '../../contexts/authContext.jsx';
 
 export default function Login({ onClose }) {
     const [formData, setFormData] = useState({
+        username: '',
         email: '',
         password: '',
     });
@@ -25,8 +26,8 @@ export default function Login({ onClose }) {
         setErrorMessage(''); // Clear previous error messages
         setSuccessMessage(''); // Clear previous success messages
 
-        if (!formData.email || !formData.password) {
-            setErrorMessage('Email and password are required.');
+        if (!formData.email || !formData.password || !formData.username) {
+            setErrorMessage('Login failed. Please check your credentials and try again.');
             return;
         }
         try {
@@ -40,7 +41,7 @@ export default function Login({ onClose }) {
             setTimeout(() => {
                 setLoading(false);
                 onClose();
-            }, 20000); // 20 seconds delay before closing the modal
+            }, 2000); // 2 seconds delay before closing the modal
         } catch (error) {
             console.error('Login failed:', error);
             setErrorMessage('Login failed. Please check your credentials and try again.');
