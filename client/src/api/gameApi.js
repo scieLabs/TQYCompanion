@@ -20,8 +20,15 @@ export const getGameById = (id) => gameAPI.get(`/game/${id}`);
 export const getGameByTitle = (title) => gameAPI.get(`/game/title/${title}`);
 
 // Fetch a game by its title and week
-export const getGameByTitleAndWeek = (title, week) =>
-  gameAPI.get(`/game/title/${title}/week/${week}`);
+export const getGameByTitleAndWeek = async (gameTitle, week) => {
+  try {
+    const response = await gameAPI.get(`/game/title/${encodeURIComponent(gameTitle)}/week/${week}`);
+    return response.data;
+  } catch (err) {
+    console.error('Error in getGameByTitleAndWeek:', err.response?.data || err.message);
+    throw err;
+  }
+};
 
 // Create a new game
 export const createGameEntry = (data) => gameAPI.post('/game', data);
@@ -45,10 +52,11 @@ export const saveGameData = async (gameTitle, week, data) => {
 
 export const saveActionData = async (gameTitle, week, data) => {
   try {
-    await gameAPI.post(`/game/title/${gameTitle}/week/${week}`, data); // Removed '/prompts'
-  } catch (error) {
-    handleApiError(error, 'saveActionData');
-    throw error;
+    const response = await gameAPI.put(`/game/title/${encodeURIComponent(gameTitle)}/week/${week}`, data);
+    return response.data;
+  } catch (err) {
+    console.error('Error in saveActionData:', err.response?.data || err.message);
+    throw err;
   }
 };
 

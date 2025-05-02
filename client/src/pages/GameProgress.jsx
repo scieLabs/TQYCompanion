@@ -1,26 +1,20 @@
 import { useEffect, useState, useContext } from 'react';
-import { useParams } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
-import { useNavigate } from 'react-router-dom';
-import { getLatestGame, createGameEntry, saveGameData, saveActionData } from '../api/gameApi.js';
+import { getLatestGame, createGameEntry, saveGameData, saveActionData, getGameByTitle, getGameByTitleAndWeek } from '../api/gameApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 
 export default function GameProgress() {
-  // const { state } = useLocation(); // Access the passed state
-  // const { gametitle } = useParams(); // Get the game title from the URL parameters
+  const { gameTitle, week } = useParams(); // Get the game title from the URL parameters
   const { user } = useAuthContext(); // get the logged-in user
-
-  // const game = state?.game; // Get the game data from the passed state
   const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
   const [game, setGame] = useState(null);
-  const [gameTitle, setGameTitle] = useState(null);
+  // const [gameTitle, setGameTitle] = useState(null);
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -34,7 +28,7 @@ export default function GameProgress() {
     showProjectModal: false,
   });
 
-  const [currentWeek, setCurrentWeek] = useState(1);
+  const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
   // const [season, setSeason] = useState('Spring');
   const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
   const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
@@ -47,13 +41,13 @@ export default function GameProgress() {
 
 
   useEffect(() => {
-    if (!user) {
-      console.error('User is not logged in.');
-      return;
-    }
-    console.log('User ID:', user._id); // Debugging: Log the user ID
+    // if (!user) {
+    //   console.error('User is not logged in.');
+    //   return;
+    // }
+    // console.log('User ID:', user._id); // Debugging: Log the user ID
     fetchCurrentGameState();
-  }, [user]);
+  }, [gameTitle, currentWeek]);
 
   // Fetch the current game state and prompts
   const fetchCurrentGameState = async () => {
@@ -61,11 +55,15 @@ export default function GameProgress() {
       //FIXME: should removed gameTitle from after user._id
       console.log('Fetching game for user:', user._id);
 
-      const res = await getLatestGame(user._id); // Fetch the latest game for the user
+      // const res = await getLatestGame(user._id); // Fetch the latest game for the user
+      console.log('Fetching game for title:', gameTitle, 'and week:', currentWeek);
+      const game = await getGameByTitleAndWeek(gameTitle, currentWeek);
       console.log('API Response:', res.data); // Log the full response
 
-      const game = res.data;
+      // const game = res.data;
       console.log('Fetched game:', game); // Debugging: Log the fetched game
+
+      if (!game) throw new Error('Game not found.');
 
       if (!game || typeof game.week === 'undefined') {
         throw new Error('Week is not defined in the fetched game data.');
@@ -73,7 +71,7 @@ export default function GameProgress() {
 
       setGame(game);
       // setGameTitle(game.title); //should also be removed or?
-      setCurrentWeek(game.week || 1); // Set the current week from the game data
+      // setCurrentWeek(game.week || 1); // Set the current week from the game data //FIXME: need it or not?
 
       const season = game.season || 'Spring'; // Default to Spring if season is undefined
       console.log('Fetching prompt for season:', season);
@@ -156,7 +154,7 @@ export default function GameProgress() {
   const handleNextWeek = async () => {
     try {
         // Save data into the current week
-        await saveGameData(game.title, currentWeek, { //FIXME: instead of gameTitle
+        await saveActionData(game.title, currentWeek, { //FIXME: instead of gameTitle
           // ...formData, --- to avoid overwriting
           prompt_id: prompt._id.toString(), // Include the prompt_id for the current week
           discovery: formData.discovery, // Save discovery field
@@ -165,7 +163,7 @@ export default function GameProgress() {
           project_desc: formData.project_desc, // Save project description
           project_weeks: formData.project_weeks, // Save project weeks
         });
-        await saveActionData(gameTitle, currentWeek, formData); // Save the current week's prompt data
+        // await saveActionData(gameTitle, currentWeek, formData); // Save the current week's prompt data
 
         // Create a new game entry for the next week
         const nextWeek = currentWeek + 1; // Increment the week number
@@ -193,6 +191,8 @@ export default function GameProgress() {
 
       // Update the current week state
       setCurrentWeek(nextWeek);
+      // Redirect to the next week's URL
+      navigate(`/game/${encodeURIComponent(gameTitle)}/week/${nextWeek}`);
 
       fetchCurrentGameState(); //refresh game state
     } catch (err) {

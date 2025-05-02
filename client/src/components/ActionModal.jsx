@@ -11,11 +11,14 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {};
 
-  const saveActionData = async (formData) => {
+  const saveActionData = async (field, value) => {
     try {
-      const saveActionData = async (gameTitle, week, formData); // Save data to the backend
-    } catch (error) {
-      handleApiError(error, 'saveActionData');
+      await gameAPI.saveActionData(gameTitle, currentWeek, { [field]: value });
+      console.log(`Saved ${field}:`, value);
+      console.log('Saving action data:', { gameTitle, week, data });
+    } catch (err) {
+      console.error(`Error saving ${field}:`, err.message);
+      handleApiError(err, 'saveActionData');
     }
   };
 //  FIXME: Old with gameTitle and week parametres
@@ -231,7 +234,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
                         })
                     }
                     >
-                    Save Prompt Project
+                    Save Project
                 </button>
             </div>
         </div>

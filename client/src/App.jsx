@@ -20,13 +20,13 @@ function App() {
               path="/new-game"
               element={
                 <ProtectedRoute>
-                
+
                   <CreateNewGame />
                 </ProtectedRoute>
               }
             />
               <Route
-                path="/game"
+                path="/game/:gameTitle/week/:week"
                 element={
                   <ProtectedRoute>
                     <GameProgress />
