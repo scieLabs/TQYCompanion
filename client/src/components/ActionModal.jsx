@@ -1,19 +1,21 @@
 import { useState, useContext } from 'react';
-import promptApi from '../api/promptApi.js';
-import gameAPI from '../api/gameApi.js';
+import * as promptApi from '../api/promptApi.js';
+import * as gameAPI from '../api/gameApi.js';
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; 
 
-export default function ActionModal({ action, formData, setFormData, gameTitle, currentWeek }) {
-  const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+export default function ActionModal({ action, game_id, currentWeek, prompt, stats, setStats, formData, setFormData, isDiscussion, isDiscovery, isProject }) {
+  
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {};
 
+  const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+
   const saveActionData = async (field, value) => {
     try {
-      await gameAPI.saveActionData(gameTitle, currentWeek, { [field]: value });
+      await statAPI.saveActionData(game_id, currentWeek, { [field]: value });
       console.log(`Saved ${field}:`, value);
       console.log('Saving action data:', { gameTitle, week, data });
     } catch (err) {
@@ -21,19 +23,10 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
       handleApiError(err, 'saveActionData');
     }
   };
-//  FIXME: Old with gameTitle and week parametres
-  // const saveActionData = async (gameTitle, week, formData) => {
-  //   try {
-  //     await gameAPI.saveActionData(gameTitle, week, formData);
-  //     // Save the current action data for the given gameTitle and week.
-  //   } catch (error) {
-  //       handleApiError(error, 'saveActionData');
-  //   }
-  // };
 
-  // const handleSave = (field, value) => {
-  //   saveActionData(gameTitle, currentWeek, { [field]: value });
-  // };
+  
+
+
 
   const renderActionForm = () => {
     //displays individual actions
@@ -130,7 +123,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
       {renderActionForm()}
 
       {/* Conditionally show the modal buttons */}
-      {action.isDiscussion && (
+      {formData.isDiscussion && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showDiscussionModal: true }))}
@@ -138,7 +131,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
           Open Discussion Modal
         </button>
       )}
-      {action.isDiscovery && (
+      {formData.isDiscovery && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showDiscoveryModal: true }))}
@@ -146,7 +139,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
           Open Discovery Modal
         </button>
       )}
-      {action.isProject && (
+      {formData.isProject && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showProjectModal: true }))}
@@ -156,7 +149,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
       )}
 
       {/* Modal rendering logic will go here */}
-      {formData.showDiscussionModal && action.isDiscussion && (
+      {formData.showDiscussionModal && formData.isDiscussion && ( //FIXME: used to be action.isDiscussion
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Discussion</label>
           <textarea
@@ -179,7 +172,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
         </div>
       )}
 
-      {formData.showDiscoveryModal && action.isDiscovery && (
+      {formData.showDiscoveryModal && formData.isDiscovery && (
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Discovery</label>
           <textarea
@@ -201,7 +194,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
         </div>
       )}
 
-      {formData.showProjectModal && action.isProject && (
+      {formData.showProjectModal && formData.isProject && (
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Project</label>
           <input

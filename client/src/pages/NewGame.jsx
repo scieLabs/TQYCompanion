@@ -5,7 +5,13 @@ import { useAuthContext } from '../contexts/authContext';
 import NewGameHeader from '../components/NewGameHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import gameAPI from '../api/gameApi.js';
+import createGameEntry from '../api/gameApi.js';
+import createStatsEntry from '../api/statApi.js';
+
+const gameAPI = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  withCredentials: true,
+});
 
 export default function CreateNewGame() {
     // Authentication and user context
@@ -51,30 +57,39 @@ export default function CreateNewGame() {
           setError('All fields are required to create a game.');
           throw new Error('Validation failed: Missing required fields.');
         }
-      
-        // Payload to carry data along paths:
 
-        const payload = {
-          title: gameTitle,
-          description,
-          abundance,
-          scarcity,
-          week: 1, // to prime the entry to be able to be fetched by GameProgress
-          user_id: user?._id, // Assuming the user ID is available in the `user` object
-        };
-      
-        console.log('Payload being sent to the backend:', payload);
-        console.log('User ID being sent in payload:', user._id);
-      
         try {
-          const res = await gameAPI.post('/game', payload, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+
+          console.log('Calling axios.post directly with:', {
+            user_id: user?._id,
+            title: gameTitle,
+            description,
+            abundance,
+            scarcity,
           });
-          console.log('Response from backend:', res.data); // Debugging: Log the response
-          return res.data;
+
+          // Create the game entry
+          const response = await gameAPI.post('/game',
+            {
+              user_id: user?._id,
+              title: gameTitle,
+              description,
+              abundance,
+              scarcity,
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+              withCredentials: true, // Include credentials if needed
+            }
+          );
+
+          console.log('Game created:', response.data.game);
+          console.log('Initial stats created:', response.data.stats);
+
+          return response.data; // Return the data object directly
         } catch (err) {
           console.error('Error creating game:', err.response?.data || err.message);
           setError(err.response?.data?.error || 'Failed to create the game. Please try again.');
@@ -90,8 +105,12 @@ export default function CreateNewGame() {
           return;
         }
         try {
-          await handleCreateGame();
-          navigate(`/game/${encodeURIComponent(gameTitle)}/week/1`);
+          console.log('Starting spring with game data...');
+          const { game } = await handleCreateGame();
+          console.log('Navigating to game progress page for game:', game);
+
+          // Navigate to the game progress page
+          navigate(`/game/${game._id}/week/1`);
 
           //FIXME: yet another old version
           // const newGame = await handleCreateGame();

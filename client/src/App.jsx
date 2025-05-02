@@ -26,7 +26,7 @@ function App() {
               }
             />
               <Route
-                path="/game/:gameTitle/week/:week"
+                path="/game/:game_id/week/:week"
                 element={
                   <ProtectedRoute>
                     <GameProgress />

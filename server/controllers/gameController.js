@@ -1,5 +1,6 @@
 import Game from '../models/gameSchema.js';
 import User from '../models/userSchema.js';
+import Stats from '../models/statsSchema.js';
 import mongoose from 'mongoose';
 
 export const getAllGames = async (req, res) => {
@@ -58,10 +59,11 @@ export const getGameByTitleAndWeek = async (req, res) => {
 export const getGameById = async (req, res) => {
   try {
     const game = await Game.findById(req.params.id);
-    if (!game) return res.status(404).json({ message: 'Game not found' });
+    if (!game) return res.status(404).json({ message: 'Game not found.' });
     res.json(game);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error fetching game by ID:', err);
+    res.status(500).json({ message: 'Error fetching game by ID.', error: err.message });
   }
 };
 
@@ -79,45 +81,35 @@ export const getGameByTitle = async (req, res) => {
 
 
 export const createGameEntry = async (req, res) => {
-  const { user_id, title, description, abundance, scarcity, week } = req.body;
+  console.log('Incoming request to create game:', req.body);
+  try {
+    const { user_id, title, description, abundance, scarcity } = req.body;
 
-  // Validate required fields
-  if (!user_id || !title || !description || !abundance || !scarcity) {
-    return res.status(400).json({ message: 'All fields are required.' });
-  }
+    if (!user_id || !title || !description || !abundance || !scarcity) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
 
-  // Validate that user_id is a valid ObjectId
-  if (!mongoose.Types.ObjectId.isValid(user_id)) {
-    return res.status(400).json({ message: 'Invalid user ID.' });
-  }
+    // Check if the user exists in the database
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
 
-  // Check if the user exists
-  const user = await User.findById(user_id);
-  if (!user) {
-    return res.status(404).json({ message: 'User not found.' });
-  }
-  console.log('Received user_id:', user_id); // Debugging: Log the received user ID
-  console.log('Checking if user exists...');
+      const newGame = new Game({ user_id, title, description });
+      const savedGame = await newGame.save();
 
-    try {
-      // Create the new game
-      const newGame = new Game({
-        user_id: new mongoose.Types.ObjectId(user_id), // Convert user_id to ObjectId
-        title,
-        description,
+      const initialStats = new Stats({
+        game_id: savedGame._id,
+        week: 1,
         abundance,
         scarcity,
-        contempt: 0,
-        week,
       });
+      await initialStats.save();
 
-    await newGame.save();
-    console.log('Request payload:', req.body);
-    console.log('Converted user_id:', new mongoose.Types.ObjectId(user_id));
-    res.status(201).json({ message: 'Game created successfully.', game: newGame });
+    res.status(201).json({ message: 'Game created successfully.', game: savedGame, stats: initialStats });
   } catch (err) {
     console.error('Error creating game entry:', err);
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ message: 'Error creating game entry.', error: err.message });
   }
 };
 

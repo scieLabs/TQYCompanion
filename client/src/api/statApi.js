@@ -1,0 +1,20 @@
+import axios from 'axios';
+import gameAPI from './gameApi'; 
+
+const statAPI = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+    withCredentials: true,
+  });
+
+  export const getStatsByGameAndWeek = async (game_id, week) =>
+    statAPI.get(`/stats/${game_id}/week/${week}`);
+
+  export const createStatsEntry = async (data) => statAPI.post('/stats', data);
+
+  export const saveActionData = async (game_id, week, data) =>
+    statAPI.put(`/stats/${game_id}/week/${week}`, data);
+
+  export const updateStatsByGameAndWeek = (game_id, week, data) =>
+    statAPI.put(`/stats/${game_id}/week/${week}`, data);
+
+  export default statAPI;

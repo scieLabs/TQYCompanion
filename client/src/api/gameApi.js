@@ -31,7 +31,7 @@ export const getGameByTitleAndWeek = async (gameTitle, week) => {
 };
 
 // Create a new game
-export const createGameEntry = (data) => gameAPI.post('/game', data);
+export const createGameEntry = (data, config) => gameAPI.post('/game', data, config);
 
 // Update a game by its ID
 export const updateGame = (id, data) => gameAPI.put(`/game/${id}`, data);
