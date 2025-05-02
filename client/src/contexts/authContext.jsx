@@ -11,18 +11,31 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   console.log('AuthProvider initialized:', { user });
 
-  // Fetching user from database
   useEffect(() => {
+    console.log('AuthContext: Fetching user session...');
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/users/check-session`, { withCredentials: true });
+        const token = localStorage.getItem('token'); // Retrieve the JWT token from localStorage
+        if (!token || token === 'undefined') {
+          console.error('Invalid or missing token in localStorage.');
+          console.log('JWT Token:', localStorage.getItem('token'));
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/users/check-session`, {
+          headers: { Authorization: `Bearer ${token}` }, // Send the token in the Authorization header
+          withCredentials: true,
+        });
+
         if (response.data.authenticated) {
-          setUser(response.data.user);
+          setUser(response.data.user); // Set the user object from the response
         } else {
           setUser(null);
         }
       } catch (err) {
-        console.error('Error fetching user session:', err);
+        console.error('Error fetching user session:', err.response?.data || err.message);
         setUser(null);
       } finally {
         setLoading(false);
@@ -32,22 +45,73 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
+  // Fetching user from database //FIXME: old version
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     try {
+  //       const response = await axios.get(`${API_BASE_URL}/users/check-session`, { withCredentials: true });
+  //       if (response.data.authenticated) {
+  //         setUser(response.data.user);
+  //       } else {
+  //         setUser(null);
+  //       }
+  //     } catch (err) {
+  //       console.error('Error fetching user session:', err);
+  //       setUser(null);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchUser();
+  // }, []);
+
   const login = async (credentials) => {
     setLoading(true);
     setError(null);
     try {
-        const response = await axios.post(`${API_BASE_URL}/users/login`, credentials, { withCredentials: true });
-        setUser(response.data.user); // Assuming the backend returns user details
-        localStorage.setItem('user', JSON.stringify(response.data.user)) // FIXME: Copilot says: Persist user in localStorage
-        localStorage.setItem('token', response.data.token); // Store the token
+      const response = await axios.post(`${API_BASE_URL}/users/login`, credentials, {
+        withCredentials: true,
+      });
+      const { user, token } = response.data;
+
+      if (!token) {
+        console.error('No token received from the backend.');
+        throw new Error('Login failed: No token received.');
+      }
+  
+      console.log('Login successful. Token:', token); // Debugging: Log the token
+      console.log('User object:', user); // Debugging: Log the user object
+
+      localStorage.setItem('token', token); // Store the JWT token
+      localStorage.setItem('user', JSON.stringify(user)); // Persist user in localStorage
+      setUser(user); // Set the user object
     } catch (err) {
-        console.error('Login failed:', err.response?.data || err.message);
-        setError(err.response?.data?.message || 'Login failed. Please try again.');
-        throw err; // Re-throw the error to handle it in Login.jsx
+      console.error('Login failed:', err.response?.data || err.message);
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      throw err;
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
+
+  //FIXME: old version
+//   const login = async (credentials) => {
+//     setLoading(true);
+//     setError(null);
+//     try {
+//         const response = await axios.post(`${API_BASE_URL}/users/login`, credentials, { withCredentials: true });
+//         setUser(response.data.user); // Assuming the backend returns user details
+//         localStorage.setItem('user', JSON.stringify(response.data.user)) // FIXME: Copilot says: Persist user in localStorage
+//         localStorage.setItem('token', response.data.token); // Store the token
+//     } catch (err) {
+//         console.error('Login failed:', err.response?.data || err.message);
+//         setError(err.response?.data?.message || 'Login failed. Please try again.');
+//         throw err; // Re-throw the error to handle it in Login.jsx
+//     } finally {
+//         setLoading(false);
+//     }
+// };
 
 const logout = async () => {
     setLoading(true);
@@ -57,6 +121,7 @@ const logout = async () => {
         localStorage.removeItem('user'); // Clear user from localStorage
         localStorage.removeItem('token'); // Clear token or other persisted data
     } catch (err) {
+        console.error('Logout failed:', err.response?.data || err.message);
         setError('Logout failed. Please try again.');
         throw err; // Re-throw the error to handle it in Logout.jsx
     } finally {

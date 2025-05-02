@@ -5,35 +5,52 @@ import { useAuthContext } from '../contexts/authContext';
 import NewGameHeader from '../components/NewGameHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import gameAPI from '../api/gameApi.js';
 
-const gameAPI = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
-    withCredentials: true,
-  });
+// const gameAPI = axios.create({
+//     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+//     withCredentials: true,
+//   });
 
 export default function CreateNewGame() {
     // Authentication and user context
-    const { user } = useAuthContext();
+    const { user, loading } = useAuthContext();
     console.log('CreateNewGame user:', user);
     // const token = user?.token; // Assuming the token is stored in the user object
     
     // Redirecting to login if not authenticated
     const navigate = useNavigate();
-    useEffect(() => {
-      if (!user) {
-        navigate('/login');
-      }
-    }, [user, navigate]);
 
+    useEffect(() => {
+      if (loading) {
+        console.log('AuthContext is still loading...');
+        return;
+      }
+      if (!loading && !user) {
+        console.error('User is not logged in.');
+        navigate('/login');
+      } else {
+        console.log('User object in NewGame:', user); // Debugging: Log the full user object
+        console.log('User ID:', user._id); // Debugging: Log the user ID
+      }
+    }, [loading, user, navigate]);
+
+    // if (loading) {
+    //   return <div>Loading...</div>; // Show a loading indicator while fetching the user session
+    // }
+  
+    // if (!user) {
+    //   return null; // Prevent rendering if the user is not authenticated
+    // }
   
     // State variables
-    const [title, setTitle] = useState('');
+    const [gameTitle, setGameTitle] = useState('');
     const [description, setDescription] = useState('');
     const [abundance, setAbundance] = useState('');
     const [scarcity, setScarcity] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState({ 
-        title: false, 
+        gameTitle: false, 
         description: false, 
         abundance: false, 
         scarcity: false 
@@ -42,7 +59,7 @@ export default function CreateNewGame() {
     //Handle creating a new game:
 
     const handleCreateGame = async () => {
-        if (!title || !description || !abundance || !scarcity) {
+        if (!gameTitle || !description || !abundance || !scarcity) {
           setError('All fields are required to create a game.');
           throw new Error('Validation failed: Missing required fields.');
         }
@@ -50,14 +67,16 @@ export default function CreateNewGame() {
         // Payload to carry data along paths:
 
         const payload = {
-          title,
+          gameTitle,
           description,
           abundance,
           scarcity,
-          user_id: user.id, // Assuming the user ID is available in the `user` object
+          week: 1, // to prime the entry to be able to be fetched by GameProgress
+          user_id: user?._id, // Assuming the user ID is available in the `user` object
         };
       
         console.log('Payload being sent to the backend:', payload);
+        console.log('User ID being sent in payload:', user._id);
       
         try {
           const res = await gameAPI.post('/game', payload, {
@@ -66,6 +85,7 @@ export default function CreateNewGame() {
               Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
           });
+          console.log('Response from backend:', res.data); // Debugging: Log the response
           return res.data;
         } catch (err) {
           console.error('Error creating game:', err.response?.data || err.message);
@@ -103,15 +123,24 @@ export default function CreateNewGame() {
     //Handle submit and start spring:   
     const handleStartSpring = async (e) => {
         e.preventDefault();
-        if (!title || !description || !abundance || !scarcity) {
+        if (!gameTitle || !description || !abundance || !scarcity) {
           setError('Please fill in all fields before starting the game.');
           return;
         }
         try {
-          const gameData =await handleCreateGame();
-          navigate('/game', { state: { game: gameData, user } }); // Navigate to the game progress page
+          await handleCreateGame();
+          navigate('/game'); // Navigate to GameProgress
+
+          //FIXME: yet another old version
+          // const newGame = await handleCreateGame();
+          // console.log('Navigating to game:', newGame.title); // Debugging: Log the game title
+          // navigate(`/game/${newGame.title}`); // Navigate to the GameProgress page with the game title
+          //FIXME: Old version
+          // const gameData =await handleCreateGame();
+          // navigate('/game/${newGame.title}', { state: { game: gameData, user } }); // Navigate to the game progress page
         } catch (err) {
           console.error('Error starting the game:', err);
+          setError('Failed to start the game. Please try again.');
         }
       };
 
@@ -149,13 +178,13 @@ export default function CreateNewGame() {
               type="text"
               placeholder="Enter a title for this game"
               className="input input-bordered w-full mb-4"
-              value={title}
+              value={gameTitle}
               onChange={(e) => {
-                setTitle(e.target.value);
+                setGameTitle(e.target.value);
                 updateSuccess('title', e.target.value);
               }}
             />
-            {success.title && <span className="text-green-500">✔</span>}
+            {success.gameTitle && <span className="text-green-500">✔</span>}
 
             <h2 className="text-2xl font-bold mb-2">Description:</h2>
             <textarea

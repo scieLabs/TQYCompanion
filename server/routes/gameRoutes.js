@@ -11,7 +11,10 @@ import {
   updateGameByWeek,
   deleteGameByTitle,
   updateGameEntry,
-  deleteGameEntry
+  deleteGameEntry,
+  getAllProjectsByTitle,
+  getCompletedProjects,
+  resolveProject
 } from '../controllers/gameController.js';
 
 const router = express.Router();
@@ -22,6 +25,8 @@ router.get('/latest', getLatestGame); // Get the latest game for a user
 router.get('/:title/:week', getGameByTitleAndWeek); // Get a game by title and week
 router.get('/:id', getGameById); // Get a game by ID
 router.get('/title/:title', getGameByTitle); // Get a game by title
+router.get('/title/:title/projects', getAllProjectsByTitle);
+router.get('/title/:title/completed', getCompletedProjects);
 
 router.post('/', createGameEntry); // Create a new game entry
 router.post('/:title/:week/actions', saveActionData); // Save action data for a game
@@ -29,6 +34,7 @@ router.post('/:title/:week/actions', saveActionData); // Save action data for a 
 router.put('/:title/:week', updateGameByWeek); // Update a game by title and week
 router.put('/title/:title', updateGameByTitle); // Update a game by title
 router.put('/:id', updateGameEntry); // Update a game by ID
+router.put('/title/:title/projects/:projectTitle/:type/resolve', resolveProject);
 
 router.delete('/title/:title', deleteGameByTitle); // Delete a game by title
 router.delete('/:id', deleteGameEntry); // Delete a game by ID

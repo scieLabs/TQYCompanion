@@ -4,10 +4,12 @@ import { useAuthContext } from "../contexts/authContext";
 import { useState } from "react";
 import titleImage from "../assets/title.png";
 import quietYearImage from "../assets/The-Quiet-Year.webp";
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
     const [showLogin, setShowLogin] = useState(false);
     const { user } = useAuthContext();
+    const navigate = useNavigate();
 
     const handleLoginClick = () => {
         setShowLogin(true);
@@ -16,6 +18,10 @@ const LandingPage = () => {
     const handleCloseModal = () => {
         setShowLogin(false);
     };
+
+    const handleNewGameClick = () => {
+        navigate('/new-game'); // Navigate to the NewGame page
+      };
 
     return (
         <div>
@@ -80,12 +86,13 @@ const LandingPage = () => {
                             Get Started!
                         </button>
                     ) : (
-                        <a
-                            href="/new-game"
+                        <button
+                            onClick={handleNewGameClick}
+                            // onClick={() => navigate('/login')} TODO: suggested code
                             className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
+                            >
                             New Game
-                        </a>
+                        </button>
                     )}
                 </section>
 

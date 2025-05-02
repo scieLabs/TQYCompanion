@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../utils/errorHandler.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import mongoose from 'mongoose';
 
 // Get all users
 export const getAllUsers = asyncHandler(async (req, res, next) => {
@@ -85,6 +86,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
 
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+
   const user = await User.findOne({ email });
 
   // Check if user exists
@@ -101,7 +103,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   // Create and send token
   const token = jwt.sign(
     {
-      id: user._id,
+      _id: user._id,
       username: user.username,
       email: user.email,
     },
@@ -118,10 +120,11 @@ export const loginUser = asyncHandler(async (req, res) => {
   res.status(200).json({
     message: 'Login successful',
     user: {
-      id: user._id,
+      _id: user._id,
       username: user.username,
       email: user.email,
     },
+    token, // Include the token in the response for client-side storage
   });
 });
 
@@ -132,15 +135,61 @@ export const logoutUser = (req, res) => {
 };
 
 // Check Session
-export const checkSession = (req, res) => {
-  if (req.cookies.token) {
-    try {
-      const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
-      res.json({ authenticated: true, user: decoded });
-    } catch (err) {
-      res.json({ authenticated: false });
+
+export const checkSession = async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Extract the token from the Authorization header
+
+  if (!token) {
+    return res.status(401).json({ authenticated: false, message: 'No token provided.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token
+    const user = await User.findById(decoded._id); // Find the user by ID
+
+    if (!user) {
+      return res.status(404).json({ authenticated: false, message: 'User not found.' });
     }
-  } else {
-    res.json({ authenticated: false });
+
+    // Send the user object with _id
+    res.status(200).json({
+      authenticated: true,
+      user: {
+        _id: user._id, // Use _id instead of id
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error('Error verifying token:', err);
+    res.status(401).json({ authenticated: false, message: 'Invalid token.' });
   }
 };
+// FIXME: old version
+// export const checkSession = (req, res) => {
+//   const token = req.cookies.token; // Get the token from cookies
+//   if (!token) {
+//     return res.status(401).json({ authenticated: false, message: 'No token provided' });
+//   }
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token
+//     res.status(200).json({ authenticated: true, user: decoded }); // Return the decoded user data
+//   } catch (err) {
+//     res.status(401).json({ authenticated: false, message: 'Invalid token' });
+//   }
+// };
+
+//FIXME: Old version
+// export const checkSession = (req, res) => {
+//   if (req.cookies.token) {
+//     try {
+//       const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
+//       res.json({ authenticated: true, user: decoded });
+//     } catch (err) {
+//       res.json({ authenticated: false });
+//     }
+//   } else {
+//     res.json({ authenticated: false });
+//   }
+// };
