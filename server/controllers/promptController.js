@@ -1,5 +1,6 @@
 import Prompt from '../models/promptSchema.js';
 import Game from '../models/gameSchema.js';
+import mongoose from 'mongoose';
 
 export const getAllPrompts = async (req, res) => {
   try {
@@ -50,24 +51,68 @@ export const deletePrompt = async (req, res) => {
   }
 };
 
+
 export const getNextPrompt = async (req, res) => {
+  const { season } = req.query;
+  const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+  const gameOverPromptId = '6809feda210f991dba3d9c70'; // Replace with the actual Game Over prompt ID
+
+  if (!season || !validSeasons.includes(season)) {
+    return res.status(400).json({ message: 'Invalid or missing season parameter.' });
+  }
+
   try {
-    const week = parseInt(req.query.week, 10); // Extract week from query parameters
-    const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
-    const season = seasons[Math.min(Math.floor((week - 1) / 13), 3)];
+    const prompts = await Prompt.find({ season });
+    // const prompts = await Prompt.find({ week: parseInt(week, 10) }); // Ensure week is parsed as a number
+    console.log('Fetching prompts for season:', season);
+    if (!prompts || prompts.length === 0) {
+      // If no prompts are available for the current season, move to the next season
+      const nextSeasonIndex = (validSeasons.indexOf(season) + 1) % validSeasons.length;
+      const nextSeason = validSeasons[nextSeasonIndex];
 
-    // Fetch all used prompt IDs from the Game model
-    const usedPromptIds = (await Game.find()).map(game => game.prompt_id.toString());
+      if (nextSeason === 'Spring') {
+        // If we've cycled back to Spring and still no prompts, return a game-over response
+        return res.status(404).json({ message: 'No prompts available. Game over.' });
+      }
 
-    // Find the next available prompt for the current season
-    const prompt = await Prompt.findOne({ season, _id: { $nin: usedPromptIds } });
+      return res.status(404).json({ message: `No prompts found for ${season}. Try ${nextSeason}.`, nextSeason });
+    }
 
-    if (!prompt) return res.status(404).json({ message: 'No more prompts in this season' });
-    res.json(prompt);
+    // Select a random prompt
+    const randomIndex = Math.floor(Math.random() * prompts.length);
+    const selectedPrompt = prompts[randomIndex];
+
+    // Check if the selected prompt is the Game Over prompt
+    if (selectedPrompt._id.toString() === gameOverPromptId) {
+      return res.status(200).json({ message: 'Game over.', prompt: selectedPrompt });
+    }
+
+    res.json(selectedPrompt);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error fetching prompts:', err);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
+
+//FIXME: old version
+// export const getNextPrompt = async (req, res) => {
+//   try {
+//     const week = parseInt(req.query.week, 10); // Extract week from query parameters
+//     const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+//     const season = seasons[Math.min(Math.floor((week - 1) / 13), 3)];
+
+//     // Fetch all used prompt IDs from the Game model
+//     const usedPromptIds = (await Game.find()).map(game => game.prompt_id.toString());
+
+//     // Find the next available prompt for the current season
+//     const prompt = await Prompt.findOne({ season, _id: { $nin: usedPromptIds } });
+
+//     if (!prompt) return res.status(404).json({ message: 'No more prompts in this season' });
+//     res.json(prompt);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
 
 export const getPromptsBySeason = async (req, res) => {
   try {

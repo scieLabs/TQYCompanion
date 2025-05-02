@@ -17,11 +17,11 @@ const NewGameHeader = () => {
       className="game-header width-full bg-[#97be5a] text-[#f4eeee] py-4 px-6 flex justify-between items-center"
       role="banner"
     >
-      <img
+      {/* <img
         src={require("../assets/TheQuietYear.webp")}
         alt="Game Icon"
         className="icon-image"
-      />
+      /> */}
       <nav className="flex space-x-4">
         <a href="/about" className="hover:underline">Home</a>
         <a href="rules.pdf" target="_blank" rel="noopener noreferrer" download>Download Rules</a>
@@ -36,11 +36,11 @@ const NewGameHeader = () => {
         {showLogOut && <LogOut onClose={() => setShowLogOut(false)} />}
 
       </div>
-      <img
+      {/* <img
         src={require("../assets/title.png")}
         alt="Game Title"
         className="title-image"
-      />
+      /> */}
 
     </header>
   );

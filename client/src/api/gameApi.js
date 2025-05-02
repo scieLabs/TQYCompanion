@@ -7,8 +7,8 @@ const gameAPI = axios.create({
 });
 
 // Fetch the latest game for a specific user and title
-export const getLatestGame = (user_id, title) =>
-  gameAPI.get(`/game/latest`, { params: { user_id, title } });
+export const getLatestGame = (user_id) =>
+  gameAPI.get(`/game/latest`, { params: { user_id } });
 
 // Fetch all games
 export const getAllGames = () => gameAPI.get('/game');
@@ -24,7 +24,7 @@ export const getGameByTitleAndWeek = (title, week) =>
   gameAPI.get(`/game/title/${title}/week/${week}`);
 
 // Create a new game
-export const createGame = (data) => gameAPI.post('/game', data);
+export const createGameEntry = (data) => gameAPI.post('/game', data);
 
 // Update a game by its ID
 export const updateGame = (id, data) => gameAPI.put(`/game/${id}`, data);
@@ -57,6 +57,15 @@ export const deleteGame = (id) => gameAPI.delete(`/game/${id}`);
 
 // Delete a game by its title
 export const deleteGameByTitle = (title) => gameAPI.delete(`/game/title/${title}`);
+
+export const getProjectsByTitle = (title) =>
+  gameAPI.get(`/game/title/${title}/projects`);
+
+export const getCompletedProjects = (title) =>
+  gameAPI.get(`/game/title/${title}/completed`);
+
+export const resolveProject = (title, projectTitle, type, resolution) =>
+  gameAPI.put(`/game/title/${title}/projects/${projectTitle}/${type}/resolve`, { resolution });
 
 // Default export for direct use of Axios instance
 export default gameAPI;

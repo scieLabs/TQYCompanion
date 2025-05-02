@@ -12,11 +12,18 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors());
-app.use(express.json());
+// Middleware to handle CORS and JSON parsing
+app.use(cors({
+    origin: 'http://localhost:5173', // frontend's URL
+    credentials: true, // Allow cookies and credentials
+}));
+app.use(express.json()); // parse JSON request bodies
+app.use(express.urlencoded({ extended: true })); // parse URL-encoded bodies
+
 
 app.use('/users', userRoutes);
 app.use('/prompts', promptRoutes);
-app.use('/games', gameRoutes);
+app.use('/game', gameRoutes);
+//FIXME: check if we have to change game to games in the route
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
