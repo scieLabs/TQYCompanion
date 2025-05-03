@@ -5,12 +5,13 @@ import { useAuthContext } from '../contexts/authContext';
 import NewGameHeader from '../components/NewGameHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import gameAPI from '../api/gameApi.js';
+import createGameEntry from '../api/gameApi.js';
+import createStatsEntry from '../api/statApi.js';
 
-// const gameAPI = axios.create({
-//     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
-//     withCredentials: true,
-//   });
+const gameAPI = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  withCredentials: true,
+});
 
 export default function CreateNewGame() {
     // Authentication and user context
@@ -35,13 +36,6 @@ export default function CreateNewGame() {
       }
     }, [loading, user, navigate]);
 
-    // if (loading) {
-    //   return <div>Loading...</div>; // Show a loading indicator while fetching the user session
-    // }
-  
-    // if (!user) {
-    //   return null; // Prevent rendering if the user is not authenticated
-    // }
   
     // State variables
     const [gameTitle, setGameTitle] = useState('');
@@ -63,62 +57,45 @@ export default function CreateNewGame() {
           setError('All fields are required to create a game.');
           throw new Error('Validation failed: Missing required fields.');
         }
-      
-        // Payload to carry data along paths:
 
-        const payload = {
-          gameTitle,
-          description,
-          abundance,
-          scarcity,
-          week: 1, // to prime the entry to be able to be fetched by GameProgress
-          user_id: user?._id, // Assuming the user ID is available in the `user` object
-        };
-      
-        console.log('Payload being sent to the backend:', payload);
-        console.log('User ID being sent in payload:', user._id);
-      
         try {
-          const res = await gameAPI.post('/game', payload, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+
+          console.log('Calling axios.post directly with:', {
+            user_id: user?._id,
+            title: gameTitle,
+            description,
+            abundance,
+            scarcity,
           });
-          console.log('Response from backend:', res.data); // Debugging: Log the response
-          return res.data;
+
+          // Create the game entry
+          const response = await gameAPI.post('/game',
+            {
+              user_id: user?._id,
+              title: gameTitle,
+              description,
+              abundance,
+              scarcity,
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+              withCredentials: true, // Include credentials if needed
+            }
+          );
+
+          console.log('Game created:', response.data.game);
+          console.log('Initial stats created:', response.data.stats);
+
+          return response.data; // Return the data object directly
         } catch (err) {
           console.error('Error creating game:', err.response?.data || err.message);
           setError(err.response?.data?.error || 'Failed to create the game. Please try again.');
           throw err;
         }
       };
-
-    //FIXME: Old version
-    // const handleCreateGame = async () => {
-    //     if (!title || !description || !abundance || !scarcity) {
-    //         setError('All fields are required to create a game.');
-    //         throw new Error('Validation failed: Missing required fields.');
-    //     }
-
-    //     const formData = new FormData();
-    //     formData.append('title', title);
-    //     formData.append('description', description);
-    //     formData.append('abundance', abundance);
-    //     formData.append('scarcity', scarcity);
-
-    //     try {
-    //         // Send the data to the server
-    //         const res = await gameAPI.post('/game', formData, {
-    //             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    //           });
-    //         return res.data;
-    //       } catch (err) {
-    //         console.error('Error creating game:', err);
-    //         setError('Failed to create the game. Please try again.');
-    //         throw err;
-    //       }
-    //     };
 
     //Handle submit and start spring:   
     const handleStartSpring = async (e) => {
@@ -128,8 +105,12 @@ export default function CreateNewGame() {
           return;
         }
         try {
-          await handleCreateGame();
-          navigate('/game'); // Navigate to GameProgress
+          console.log('Starting spring with game data...');
+          const { game } = await handleCreateGame();
+          console.log('Navigating to game progress page for game:', game);
+
+          // Navigate to the game progress page
+          navigate(`/game/${game._id}/week/1`);
 
           //FIXME: yet another old version
           // const newGame = await handleCreateGame();
@@ -139,8 +120,9 @@ export default function CreateNewGame() {
           // const gameData =await handleCreateGame();
           // navigate('/game/${newGame.title}', { state: { game: gameData, user } }); // Navigate to the game progress page
         } catch (err) {
-          console.error('Error starting the game:', err);
-          setError('Failed to start the game. Please try again.');
+          console.error('Error creating game:', err.response?.data || err.message);
+          setError(err.response?.data?.error || 'Failed to create the game. Please try again.');
+          throw err;
         }
       };
 
