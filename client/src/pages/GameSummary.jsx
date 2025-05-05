@@ -3,96 +3,134 @@ import { useAuthContext } from '../path/to/authContext';
 import gameAPI from '../api/gameApi.js';
 import GameHeader from '../components/GameHeader';
 import GameOverview from './modals/GameOverview';
-import GameStats from '../components/GameStats.jsx';    
-    //fetchCurrentGameState from GameProgress.jsx!!!!!!!!!!!!!!!!!!!!!!!!
-    //fetchCurrentGameState from GameProgress.jsx!!!!!!!!!!!!!!!!!!!!!!!!
-    //fetchCurrentGameState from GameProgress.jsx!!!!!!!!!!!!!!!!!!!!!!!!
+import GameProgress from './GameProgress.jsx';
+import GameStats from '../components/GameStats.jsx';
 
 const GameSummary = () => {
-    const [gameSummary, setGameSummary] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showOverview, setShowOverview] = useState(false); // State to control the modal visibility
     const { user } = useAuthContext();
-    
-    //Do I even need this? If the user came this far, the user should be logged in, 
-    // and it would also allow to easily share game summaries with friends - no need to login or anything, 
-    // just click link, look up result of game
-    //also the game is over, there are no further prompts for the player to interact with, nothing can change anymore
-    //yeah, don't need it
-    //Actually, I DO NEED IT!!!!!!
-    //!!!!!!!!!!!!!!
+    //const { gameData } = ???; //I straight up have no way of importing this without creating gameContext; 
+    // local storage sounds really dumb; 
+    // and installing some weird library would be a bit wild just for this;
+    //Maybe as props?
+    //would have to turn GameSummary into a shild component of GameProgress, though
+    //and that doesn't work if I want to be able to access the history from other places, too, like GameHistory.jsx
+    // it always boils down to GameContext
 
+    const [showOverview, setShowOverview] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    //fetchCurrentGameState from GameProgress.jsx!!!!!!!!!!!!!!!!!!!!!!!!
-    //Fetching game state from the backend
-    const fetchGameSummary = async () => {
-        try {
-            const response = await gameAPI.get(`/game/title/${gameTitle}/week/${currentWeek}`);
-            //identical to current GameStats.jsx 
-            // Adjust the endpoint - should there be /stats at the end? - scie
-            // Fetch for the given week - scie
-            //we can just take the "current" week, as it is also the final week, 
-            //which, if I understood it right, should include all the data from the previous weeks
-            //as we need to have those very same stats present in the ongoing game
-            //Have to check if the final prompt kicks the player directly to the summary page
+    //TODO: CHECK IF THIS WORKS
+    //This below checks gameData for the number of projects, discussions and discoveries, counts them, and returns the total number of each
+    //and whenever anything goes wrong, it just defaults to 0, which is why we have so many 0 here
+    //I really have no clue if this works, but eh
+    const totalProjects = gameData?.weeks?.reduce((count, week) => count + (week.projects?.length || 0), 0) || 0;
+    const totalDiscussions = gameData?.weeks?.reduce((count, week) => count + (week.discussions?.length || 0), 0) || 0;
+    const totalDiscoveries = gameData?.weeks?.reduce((count, week) => count + (week.discoveries?.length || 0), 0) || 0;
 
-            //honestly, don't want to fetch myself, let's use import GameStats
-            setGameSummary(response.data);
-        } catch (err) {
-            setError('Failed to load game summary. Please try again later.');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     useEffect(() => {
-        fetchGameSummary();
-    }, []);
+        setLoading(true);
+        setErrorMessage('');
+        setSuccessMessage('');
+
+        if (!gameData) {
+            setTimeout(() => {
+                setErrorMessage('Failed to load game data. Please try again later.');
+                setLoading(false);
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                setSuccessMessage('Game data loaded successfully!');
+                setLoading(false);
+            }, 1000);
+        }
+    }, [gameData]);
 
     return (
         <div>
             <GameHeader />
-            <div className="game-summary-container">
-                {loading && <p>Loading...</p>} {/* will need to find some nice and fitting animation for loading, maybe snowflakes or so */}
-                {error && <p>{error}</p>}
-                {gameSummary && (
-                    <div className="game-summary-content">
-                        <h2>{gameSummary.gameTitle}</h2>
-                        <p>Weeks before Winter came: {gameSummary.currentWeek}</p>
-                        <p>Projects completed: {gameSummary.completedProjects}</p>
-                        <p>Abundances enjoyed: {gameSummary.abundance}</p>
-                        <p>Scarcities endured: {gameSummary.scarcity}</p>
-                        <p>Contempt within the Community: {gameSummary.abundances}</p>
-                        <p>Discoveries made: {gameSummary.discovery}</p>
-                        <p>Discussions held: {gameSummary.discussion}</p>
-                        <button
-                            onClick={() => setShowOverview(true)}
-                            className="show-overview-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            {user ? (
+                <div className="game-summary-container">
+                    {loading ? (
+                        <div className="loading-message text-blue-500 font-bold">
+                            <p>Loading game data...</p>
+                        </div>
+                    ) : errorMessage ? (
+                        <div className="error-message text-red-500 font-bold">
+                            <p>{errorMessage}</p>
+                        </div>
+                    ) : (
+                        <>
+                            {successMessage && (
+                                <div className="success-message text-green-500 font-bold">
+                                    <p>{successMessage}</p>
+                                </div>
+                            )}
+                            <div className="game-summary-content">
+                                {/*I also need to adjust the stuff below in the modals/GameOverview.jsx file, so that it actually shows the correct data*/}
+                                <h2>{gameData.gameTitle}</h2>
+                                {/* Going to have to pull the correct data one by one, checking what it is called in the database */}
+                                <p>Weeks before Winter came: {gameData.currentWeek}</p> {/*correct - I hope*/}
+                                <p>Projects completed: {totalProjects}</p> {/*need to check if this works - see line~15*/}
+                                <p>Discoveries made: {totalDiscussions}</p> {/*need to check if this works - see line~15*/}
+                                <p>Discussions held: {totalDiscoveries}</p> {/*need to check if this works - see line~15*/}
+                                <p>Abundances enjoyed: {gameData.stats.abundance}</p> {/*Or maybe without stats - will have to see*/}
+                                <p>Scarcities endured: {gameData.stats.scarcity}</p>{/*Or maybe without stats - will have to see*/}
+                                <p>Contempt within the Community: {gameData.stats.contempt}</p>{/*Or maybe without stats - will have to see*/}
+                                <button
+                                    onClick={() => setShowOverview(true)}
+                                    className="show-overview-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                >
+                                    Revisit a chosen week/Revisit the Year week by week
+                                </button>
+
+
+                                {/*I'll probably have to move this one around a bit, just like the modals from the header - we will see in the final version
+                    {showLogin && (
+                        <div
+                            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            Revisit a chosen week/Revisit the Year week by week
-                        </button>
-                    </div>
-                )}
-                {showOverview && (
-                    <GameOverview
-                        onClose={() => setShowOverview(false)}
-                        weeks={gameSummary.weeks} // Pass weeks data
-                        gameTitle={gameSummary.gameTitle} // Pass game title
-                    />
-                )}
-                <a
-                    href="/new-game"
-                    className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                >
-                    New Game
-                </a>
-                <a href="/about"
-                    className="about-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                >
-                    Homepage
-                </a>
-            </div>
+                            <Login onClose={handleCloseModal} handleRegisterClick={handleRegisterClick} />
+                        </div>
+                    )}
+                                Freshly stolen from LandingPage, just needs adjustments; replaces the current showOverview, at least in aprt*/}
+                                {showOverview && (
+                                    <GameOverview
+                                        onClose={() => setShowOverview(false)}
+                                        weeks={gameData.currentWeek} // Pass weeks data
+                                        gameTitle={gameData.gameTitle} // Pass game title
+                                    />
+                                )}
+                            </div>
+                            <a
+                                href="/new-game"
+                                className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            >
+                                New Game
+                            </a>
+                            <a
+                                href="/"
+                                className="about-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            >
+                                Homepage
+                            </a>
+                        </>
+                    )}
+                </div>
+            ) : (
+                <div className="game-summary-container">
+                    <p>You need to be logged in to view the summary.</p>
+                    <a
+                        href="/"
+                        className="login-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    >
+                        Return to Homepage
+                    </a>
+                </div>
+            )}
         </div>
     );
 };

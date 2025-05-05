@@ -31,7 +31,6 @@ export default function Register({ onClose }) {
         setErrorMessage(''); // Clear previous error messages
         setSuccessMessage(''); // Clear previous success messages
 
-        // Basic validation
         if (!formData.email || !formData.password) {
             setErrorMessage('Email and password are required.');
             return;
@@ -43,14 +42,11 @@ export default function Register({ onClose }) {
         if (formData.password.length < 8) {
             setErrorMessage('Password must be at least 8 characters long.');
             return;
-        } //should we be doing this in the front end? Belongs into the backend, ain't it, chief?
+        } 
         if (!/\S+@\S+\.\S+/.test(formData.email)) {
             setErrorMessage('Email is invalid.');
             return;
-        } //same here, should be in the backend, I wager
-        //nah, me big dummy - this is just to tell the user that they are doing something wrong, all good, chief
-        //just got to make sure that the backend is also doing this, so that we don't get any weird errors in the future
-        //tad bit terrifying that the machine spirit is tel
+        } 
 
         try {
             setLoading(true); // Show loading state
