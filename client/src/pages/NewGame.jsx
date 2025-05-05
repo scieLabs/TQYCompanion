@@ -1,8 +1,8 @@
 //the page where a user sets up basic info about their game. leads to GameProgress//the page where a user sets up basic info about their game. leads to GameProgress
 
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../contexts/authContext';
-import NewGameHeader from '../components/NewGameHeader';
+import GameHeader from '../components/GameHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import createGameEntry from '../api/gameApi.js';
@@ -151,7 +151,7 @@ export default function CreateNewGame() {
 
   return (
     <div>
-      <NewGameHeader />
+      <GameHeader />
       <div className="min-h-screen p-4">
         <div className="flex">
           <div className="w-1/4 pr-4">

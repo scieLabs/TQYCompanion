@@ -9,6 +9,7 @@ import { createProject } from '../api/projectApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
+import GameHeader from '../components/GameHeader.jsx'; // Import the GameHeader component
 
 export default function GameProgress() {
   const { game_id, week } = useParams(); // Get the game title from the URL parameters
@@ -208,6 +209,8 @@ export default function GameProgress() {
 
 
   return (
+    <div>
+      <GameHeader />
     <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}> 
       <div className={`flex`}> 
         <div className={`w-1/4 pr-4`}>
@@ -257,6 +260,7 @@ export default function GameProgress() {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }

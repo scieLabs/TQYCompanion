@@ -20,7 +20,6 @@ function App() {
               path="/new-game"
               element={
                 <ProtectedRoute>
-
                   <CreateNewGame />
                 </ProtectedRoute>
               }
