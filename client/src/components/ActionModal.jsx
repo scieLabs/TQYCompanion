@@ -1,36 +1,60 @@
 import { useState, useContext } from 'react';
-import promptApi from '../api/promptApi.js';
-import gameAPI from '../api/gameApi.js';
+import * as promptApi from '../api/promptApi.js';
+import * as gameAPI from '../api/gameApi.js';
+import * as statAPI from '../api/statApi.js';
+import * as projectAPI from '../api/projectApi.js';
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; 
 
-export default function ActionModal({ action, formData, setFormData, gameTitle, currentWeek }) {
-  const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+export default function ActionModal({ action, game_id, currentWeek, prompt, stats, setStats, formData, setFormData, isDiscussion, isDiscovery, isProject }) {
+  
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {};
 
-  const saveActionData = async (formData) => {
-    try {
-      const saveActionData = async (gameTitle, week, formData); // Save data to the backend
-    } catch (error) {
-      handleApiError(error, 'saveActionData');
-    }
-  };
-//  FIXME: Old with gameTitle and week parametres
-  // const saveActionData = async (gameTitle, week, formData) => {
+  const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+
+  // const saveActionData = async (field, value) => {
   //   try {
-  //     await gameAPI.saveActionData(gameTitle, week, formData);
-  //     // Save the current action data for the given gameTitle and week.
-  //   } catch (error) {
-  //       handleApiError(error, 'saveActionData');
+  //     await statAPI.saveActionData(game_id, currentWeek, { [field]: value });
+  //     console.log(`Saved ${field}:`, value);
+  //     console.log('Saving action data:', { gameTitle, week, data });
+  //   } catch (err) {
+  //     console.error(`Error saving ${field}:`, err.message);
+  //     handleApiError(err, 'saveActionData');
   //   }
   // };
 
-  // const handleSave = (field, value) => {
-  //   saveActionData(gameTitle, currentWeek, { [field]: value });
-  // };
+  const saveActionData = async () => {
+    try {
+      const data = {
+        game_id,
+        stats_week: currentWeek,
+        p_discussion: formData.p_discussion,
+        p_discovery: formData.p_discovery,
+        pp_title: formData.pp_title,
+        pp_desc: formData.pp_desc,
+        pp_weeks: formData.pp_weeks,
+      };
+  
+      await statAPI.saveActionData(game_id, currentWeek, data);
+      console.log('Conditional action data saved:', data);
+
+          // Close the modal
+      setFormData((prev) => ({
+        ...prev,
+        showDiscussionModal: false,
+        showDiscoveryModal: false,
+        showProjectModal: false,
+      }));
+    } catch (err) {
+      console.error('Error saving action data:', err.message);
+      handleApiError(err, 'saveActionData');
+    }
+  };
+
+
 
   const renderActionForm = () => {
     //displays individual actions
@@ -127,7 +151,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
       {renderActionForm()}
 
       {/* Conditionally show the modal buttons */}
-      {action.isDiscussion && (
+      {isDiscussion && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showDiscussionModal: true }))}
@@ -135,7 +159,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
           Open Discussion Modal
         </button>
       )}
-      {action.isDiscovery && (
+      {isDiscovery && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showDiscoveryModal: true }))}
@@ -143,7 +167,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
           Open Discovery Modal
         </button>
       )}
-      {action.isProject && (
+      {isProject && (
         <button
           className="btn btn-sm mt-4"
           onClick={() => setFormData(prev => ({ ...prev, showProjectModal: true }))}
@@ -153,7 +177,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
       )}
 
       {/* Modal rendering logic will go here */}
-      {formData.showDiscussionModal && action.isDiscussion && (
+      {formData.showDiscussionModal && isDiscussion && ( //FIXME: used to be action.isDiscussion
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Discussion</label>
           <textarea
@@ -164,7 +188,8 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
             <div>
                 <button
                     className="btn btn-primary mt-4"
-                    onClick={() => saveActionData({ p_discussion: formData.p_discussion })
+                    // onClick={() => saveActionData({ p_discussion: formData.p_discussion })
+                    onClick={() => saveActionData()
                     //FIXME: old with props
                     // onClick={() =>
                     //     saveActionData(gameTitle, currentWeek, { p_discussion: formData.p_discussion })
@@ -176,7 +201,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
         </div>
       )}
 
-      {formData.showDiscoveryModal && action.isDiscovery && (
+      {formData.showDiscoveryModal && isDiscovery && (
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Discovery</label>
           <textarea
@@ -187,10 +212,11 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
         <div>
             <button
                 className="btn btn-primary mt-4"
-                onClick={() =>
-                //FIXME: props removed
-                    saveActionData({ p_discovery: formData.p_discovery })
-                }
+                // onClick={() =>
+                // //FIXME: props removed
+                //     saveActionData({ p_discovery: formData.p_discovery })
+                // }
+                onClick={() => saveActionData()}
                 >
                 Save Prompt Discovery
             </button>
@@ -198,7 +224,7 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
         </div>
       )}
 
-      {formData.showProjectModal && action.isProject && (
+      {formData.showProjectModal && isProject && (
         <div className="modal modal-open mt-4">
           <label className="block font-bold">Prompt Project</label>
           <input
@@ -222,16 +248,17 @@ export default function ActionModal({ action, formData, setFormData, gameTitle, 
             <div>
                 <button
                     className="btn btn-primary mt-4"
-                    onClick={() =>
-                    //FIXME: props removed
-                        saveActionData({
-                        pp_title: formData.pp_title,
-                        pp_desc: formData.pp_desc,
-                        pp_weeks: formData.pp_weeks,
-                        })
-                    }
+                    // onClick={() =>
+                    // //FIXME: props removed
+                    //     saveActionData({
+                    //     pp_title: formData.pp_title,
+                    //     pp_desc: formData.pp_desc,
+                    //     pp_weeks: formData.pp_weeks,
+                    //     })
+                    // }
+                    onClick={() => saveActionData()}
                     >
-                    Save Prompt Project
+                    Save Project
                 </button>
             </div>
         </div>

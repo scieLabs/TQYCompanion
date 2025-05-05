@@ -4,170 +4,238 @@ import gameAPI from '../api/gameApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx';
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; 
+import * as statAPI from '../api/statApi.js';
+import * as projectAPI from '../api/projectApi.js'; 
 
-export default function GameStats({ abundance, scarcity, contempt, gameTitle, currentWeek, setFormData }) { //FIXME: was { formData, setFormData, currentWeek, gameTitle }
+
+export default function GameStats({ game_id, currentWeek, ongoingProjects, completedProjects, setOngoingProjects, setCompletedProjects }) { //FIXME: was { formData, setFormData, currentWeek, gameTitle }
   const { user } = useAuthContext(); //change if needed
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {}; // Get the theme for the current season
-  const [gameData, setGameData] = useState({
-    abundance: '',
-    scarcity: '',
-    contempt: 0,
-    projects: [],  // Include a field for projects
-    pp: []
-  });
-
-  // Groups the three under tempData to store any edits to them before saving
-  const [tempData, setTempData] = useState({
-    abundance: '',
-    scarcity: '',
-    contempt: 0,
-  });
-
+  // const [gameData, setGameData] = useState({
+  //   abundance: '',
+  //   scarcity: '',
+  //   contempt: 0,
+  //   projects: [],  // Include a field for projects
+  //   pp: []
+  // });
+  const [projects, setProjects] = useState([]);
+  const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [resolveModal, setResolveModal] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
-  const [completedProjects, setCompletedProjects] = useState([]);
+  // const [ongoingProjects, setOngoingProjects] = useState([]);
+  // const [completedProjects, setCompletedProjects] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchProjects = async () => {
+  //     try {
+  //       // Fetch ongoing projects
+  //       console.log(`Fetching projects for game_id: ${game_id}`);
+  //       const projectsResponse = await projectAPI.getOngoingProjects(game_id);
+  //       console.log('Ongoing projects:', projectsResponse.data);
+  //       setProjects(projectsResponse.data);
+
+  //       // Fetch completed projects
+  //       const completedResponse = await projectAPI.getCompletedProjects(game_id);
+  //       console.log('Completed projects:', completedResponse.data);
+  //       setCompletedProjects(completedResponse.data);
+
+  //     } catch (error) {
+  //       if (error.response?.status === 404) {
+  //         console.warn('No ongoing projects found.');
+  //         setProjects([]); // Set an empty array if no ongoing projects are found
+  //       } else {
+  //         console.error('Error fetching projects:', error);
+  //       }
+  //     }
+  //   };
+
+  //   if (game_id) {
+  //     fetchProjects();
+  //   }
+  // }, [game_id]);
+
+  // useEffect(() => {
+  //   const fetchProjects = async () => {
+  //     try {
+  //       console.log(`Fetching all projects for game_id: ${game_id}`);
+  //       const response = await projectAPI.getProjectsByGame(game_id);
+  //       console.log('Response from backend:', response);
+  //       const allProjects = response.data;
+
+  //       console.log('All projects:', allProjects);
+
+  //       // Sort projects into ongoing and completed
+  //       const ongoing = allProjects.filter(
+  //         (proj) => (proj.project_weeks > 0 || proj.pp_weeks > 0)
+  //       );
+  //       const completed = allProjects.filter(
+  //         (proj) => (proj.project_weeks === 0 || proj.pp_weeks === 0)
+  //       );
+
+  //       setProjects(allProjects);
+  //       setOngoingProjects(ongoing);
+  //       setCompletedProjects(completed);
+  //     } catch (error) {
+  //       console.error('Error fetching projects:', error);
+  //       if (error.response?.status === 404) {
+  //         console.warn('No projects found for this game.');
+  //         setProjects([]);
+  //         setOngoingProjects([]);
+  //         setCompletedProjects([]);
+  //     } else {
+  //       console.error('Error fetching projects:', error);
+  //     }
+  //   }
+  // };
+
+  //   if (game_id) {
+  //     console.log('Game ID:', game_id);
+  //     fetchProjects();
+  //   }
+  // }, [game_id]);
+
+  const [tempStats, setTempStats] = useState(stats);
+  useEffect(() => {
+    setTempStats(stats); // Sync tempStats with stats when stats change
+  }, [stats]);
+
+
 
   // Fetch the game data including abundance, scarcity, contempt, projects, and pp
   useEffect(() => {
-    const fetchGameData = async () => {
+    const fetchStats = async () => {
       try {
-        //fetch current week data for resources
-        const response = await gameAPI.getGameByTitleAndWeek(gameTitle, currentWeek);
-        const { abundance, scarcity, contempt } = response.data;
-        console.log('Fetched game data:', response.data);
-         // Fetch for the given week
-
-        // const { abundance, scarcity, contempt, prompts } = response.data;
-        // Fetch all projects and personal projects for the game
-        const projectsResponse = await gameAPI.getProjectsByTitle(gameTitle);
-        const { projects, pp } = projectsResponse.data;
-        console.log('Fetched projects and personal projects:', projectsResponse.data);
-        // const projectsResponse = await gameAPI.get(`/game/${gameTitle}/projects`);
-        // const { projects, pp } = projectsResponse.data;
-
-        // Fetch completed projects
-        const completedResponse = await gameAPI.getCompletedProjects(gameTitle);
-        console.log('Fetched completed projects:', completedResponse.data);
-        setCompletedProjects(completedResponse.data);
         
-        // // Separate the projects and pp data from the prompts
-        // const projects = prompts.filter(prompt => prompt.project_title && prompt.project_weeks > 0).map(prompt => ({
-        //   type: 'project',
-        //   title: prompt.project_title,
-        //   desc: prompt.project_desc,
-        //   weeks: prompt.project_weeks,
-        //   resolve: prompt.project_resolve,
-        // }));
-
-        // const pp = prompts.filter(prompt => prompt.pp_title && prompt.pp_weeks > 0).map(prompt => ({
-        //   type: 'pp',
-        //   title: prompt.pp_title,
-        //   desc: prompt.pp_desc,
-        //   weeks: prompt.pp_weeks,
-        //   resolve: prompt.pp_resolve,
-        // }));
-
-
-
-        setGameData({ 
-          abundance, 
-          scarcity, 
-          contempt, 
-          projects, 
-          pp 
-        });
-
-        // update form data with latest abundance, scarcitry, contempt, fill in required fields
-        // setFormData(prev => ({
-        //   ...prev,
-        //   // user_id: user._id,
-        //   // title: prev.title || title || 'Untitled Game',
-        //   // description: prev.description || description || 'No description provided.',
-        //     abundance: abundance || '',
-        //     scarcity: scarcity || '',
-        //     contempt: contempt || 0,
-        // }));
+        // Fetch stats for the current game and week
+        const statsResponse = await statAPI.getStatsByGameAndWeek(game_id, currentWeek);
+        setStats(statsResponse.data);
         
       } catch (error) {
         console.error('Error fetching game data:', error);
         handleApiError(error, 'fetchGameData');
       }
     };
-    console.log('GameStats Props:', { gameTitle, currentWeek });
-    if (gameTitle && currentWeek) { //FIXME: changed gameTitle to game here and below
-      fetchGameData();
+    console.log('GameStats Props:', { game_id, currentWeek });
+    if (game_id && currentWeek) { //FIXME: changed gameTitle to game here and below
+      fetchStats();
     }
-  }, [gameTitle, currentWeek]); //FIXME: took out "user" and "setFormData" with the formData commented out above
+  }, [game_id, currentWeek]); //FIXME: took out "user" and "setFormData" with the formData commented out above
 
   const handleChange = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   const handleEdit = () => {
-    setTempData({
-      abundance: gameData.abundance,
-      scarcity: gameData.scarcity,
-      contempt: gameData.contempt,
-    });
+    setTempStats(stats);
     setEditModalOpen(true);
   };
 
   const handleSave = async () => {
     try {
-      // await saveGameData(gameTitle, currentWeek, {
-      console.log('Saving updated resources:', tempData);
-      await gameAPI.updateGameByWeek(gameTitle, currentWeek, {
-        abundance: tempData.abundance,
-        scarcity: tempData.scarcity,
-        contempt: tempData.contempt,
-      });
-      setGameData(prev => ({ //FIXME: changed from setFormData
-        ...prev,
-        abundance: tempData.abundance,
-        scarcity: tempData.scarcity,
-        contempt: tempData.contempt,
-      }));
+      await statAPI.updateStatsByGameAndWeek(game_id, currentWeek, tempStats);
+      setStats(tempStats);
       setEditModalOpen(false);
     } catch (error) {
-      console.error('Error saving updated resources:', error);
+      console.error('Error saving stats:', error);
       handleApiError(error, 'handleSave');
     }
   };
 
-    // Handle updating project weeks
-    const updateProjectWeeks = (projectTitle, type, weeks) => {
-      console.log(`Updating weeks for project: ${projectTitle}, type: ${type}, weeks: ${weeks}`);
-      setGameData((prev) => ({
-        ...prev,
-        [type]: prev[type].map((proj) =>
-          proj.title === projectTitle ? { ...proj, weeks } : proj
-        ),
-      }));
-    };
+  //   const updateProjectWeeks = async (projectId, weeks) => {
+  //     try {
+  //       await projectAPI.updateProjectWeeks(projectId, weeks);
+  //       setProjects((prev) =>
+  //         prev.map((proj) => (proj._id === projectId ? { ...proj, weeks } : proj))
+  //       );
+  //     } catch (error) {
+  //       console.error('Error updating project weeks:', error);
+  //       handleApiError(error, 'updateProjectWeeks');
+  //     }
+  //   };
 
-  // Handle resolving a project
-  const handleResolve = async (projectTitle, type, resolution) => {
+
+  // const handleResolve = async (projectId, resolution) => {
+  //   try {
+  //     await projectAPI.resolveProject(projectId, resolution);
+  //     setProjects((prev) => prev.filter((proj) => proj._id !== projectId));
+  //     const completedResponse = await projectAPI.getCompletedProjects(game_id);
+  //     setCompletedProjects(completedResponse.data);
+  //   } catch (error) {
+  //     console.error('Error resolving project:', error);
+  //     handleApiError(error, 'handleResolve');
+  //   }
+  // };
+
+  const updateProjectWeeks = async (project_id, weeks) => {
     try {
-      console.log(`Resolving project: ${projectTitle}, type: ${type}, resolution: ${resolution}`);
-      await gameAPI.resolveProject(gameTitle, projectTitle, type, resolution);
-      setResolveModal(null);
-      // Refresh game data after resolving
-      const projectsResponse = await gameAPI.getProjectsByTitle(gameTitle);
-      const { projects, pp } = projectsResponse.data;
-      console.log('Updated projects after resolving:', projectsResponse.data);
+      console.log(`Updating project weeks for project_id: ${project_id}, weeks: ${weeks}`);
 
-      setGameData((prev) => ({
-        ...prev,
-        projects,
-        pp,
-      }));
+      // Call the API to update the project weeks
+      await projectAPI.updateProjectWeeks(project_id, weeks);
+
+      // Update the ongoing projects list
+      setOngoingProjects((prev) =>
+        prev.map((proj) =>
+          proj._id === project_id ? { ...proj, project_weeks: weeks } : proj
+        )
+      );
+
+      // If the project is completed (weeks === 0), move it to the completed list
+      // if (weeks === 0) {
+      //   setOngoingProjects((prev) => prev.filter((proj) => proj._id !== project_id));
+      //   setCompletedProjects((prev) => [
+      //     ...prev,
+      //     ongoingProjects.find((proj) => proj._id === project_id),
+      //   ]);
+      // }
+
+          // If the project is completed (weeks === 0), open the Resolve modal
+      // if (weeks === 0) {
+      //   const projectToResolve = ongoingProjects.find((proj) => proj._id === project_id);
+      //   setResolveModal(projectToResolve);
+      // }
+
     } catch (error) {
-      console.error('Error resolving project:', error);
-      handleApiError(error, 'handleResolve');
+      console.error('Error updating project weeks:', error);
     }
   };
+
+  // const handleResolve = (title, type, resolution) => {
+  //   console.log(`Resolving project: ${title}, type: ${type}, resolution: ${resolution}`);
+  //   setResolveModal(null);
+  // };
+
+  const handleResolve = async () => {
+    try {
+      const resolution = {
+        ...resolveModal,
+        project_resolve: resolveModal.project_weeks === 0 ? resolveModal.project_resolve : undefined,
+        pp_resolve: resolveModal.pp_weeks === 0 ? resolveModal.pp_resolve : undefined,
+      };
+  
+      // Save the resolution to the backend
+      await projectAPI.resolveProject(resolveModal._id, resolution);
+  
+      // Update the lists
+      setOngoingProjects((prev) => prev.filter((proj) => proj._id !== resolveModal._id));
+      setCompletedProjects((prev) => [
+        ...prev,
+        { ...resolveModal, project_resolve: resolveModal.project_resolve, pp_resolve: resolveModal.pp_resolve },
+      ]);
+  
+      setResolveModal(null); // Close the modal
+    } catch (error) {
+      console.error('Error resolving project:', error);
+    }
+  };
+
+  // const handleResolve = (title, type, resolution) => {
+  //   console.log(`Resolving project: ${title}, type: ${type}, resolution: ${resolution}`);
+  //   setResolveModal(null);
+  // };
+
 
   // Combine projects and personal projects, filter for ongoing ones, and sort by weeks remaining
   // const ongoingProjects = [...gameData.projects, ...gameData.pp]
@@ -194,18 +262,18 @@ export default function GameStats({ abundance, scarcity, contempt, gameTitle, cu
       <div className="flex justify-between mb-4">
         <div className="flex-1 text-center">
           <p className="font-semibold text-lg">Abundances</p>
-          <p>{abundance || 'No data available'}</p>
+          <p>{stats.abundance || 'No data available'}</p>
         </div>
         <div className="flex-1 text-center">
           <p className="font-semibold text-lg">Scarcities</p>
-          <p>{scarcity || 'No data available'}</p>
+          <p>{stats.scarcity || 'No data available'}</p>
         </div>
       </div>
 
       {/* Display Contempt */}
       <div className="text-center mb-4">
         <p className="font-semibold text-lg">Contempt</p>
-        <p>{contempt}</p>
+        <p>{stats.contempt}</p>
       </div>
 
             {/* Edit Button */}
@@ -227,8 +295,8 @@ export default function GameStats({ abundance, scarcity, contempt, gameTitle, cu
               <input
                 type="text"
                 className="input input-bordered w-full"
-                value={tempData.abundance}
-                onChange={(e) => setTempData({ ...tempData, abundance: e.target.value })}
+                value={tempStats.abundance}
+                onChange={(e) => setTempStats({ ...tempStats, abundance: e.target.value })}
               />
             </div>
             <div className="mb-4">
@@ -236,8 +304,8 @@ export default function GameStats({ abundance, scarcity, contempt, gameTitle, cu
               <input
                 type="text"
                 className="input input-bordered w-full"
-                value={tempData.scarcity}
-                onChange={(e) => setTempData({ ...tempData, scarcity: e.target.value })}
+                value={tempStats.scarcity}
+                onChange={(e) => setTempStats({ ...tempStats, scarcity: e.target.value })}
               />
             </div>
             <div className="mb-4">
@@ -245,8 +313,8 @@ export default function GameStats({ abundance, scarcity, contempt, gameTitle, cu
               <input
                 type="number"
                 className="input input-bordered w-full"
-                value={tempData.contempt}
-                onChange={(e) => setTempData({ ...tempData, contempt: parseInt(e.target.value, 10) || 0 })}
+                value={tempStats.contempt}
+                onChange={(e) => setTempStats({ ...tempStats, contempt: parseInt(e.target.value, 10) || 0 })}
               />
             </div>
             <div className="modal-action">
@@ -261,103 +329,75 @@ export default function GameStats({ abundance, scarcity, contempt, gameTitle, cu
         </dialog>
       )}
 
-      {/* Display Ongoing Projects */}
-      <h3 className="text-lg font-semibold mb-2">Ongoing Projects</h3>
-      {[...gameData.projects, ...gameData.pp]
-        .filter((proj) => proj.weeks > 0)
-        .map((proj) => (
-          <div key={proj.title} className="mb-4">
-            <p className="font-bold">{proj.title}</p>
-            <p className="text-sm italic mb-1">{proj.desc}</p>
-            <div className="flex items-center gap-2">
-              <button
-                className="btn btn-xs"
-                onClick={() => updateProjectWeeks(proj.title, proj.type, Math.max(proj.weeks - 1, 0))}
-              >
-                -
-              </button>
-              <span>{proj.weeks}</span>
-              <button
-                className="btn btn-xs"
-                onClick={() => updateProjectWeeks(proj.title, proj.type, proj.weeks + 1)}
-              >
-                +
-              </button>
-              {proj.weeks === 0 && (
-                <button
-                  className="btn btn-xs btn-secondary"
-                  onClick={() => setResolveModal(proj)}
-                >
-                  Resolve
-                </button>
-              )}
+      {/* Ongoing projects */}
+        <h3 className="text-lg font-semibold mb-2">Ongoing Projects</h3>
+        <div className="max-h-64 overflow-y-auto border border-gray-300 rounded p-2">
+        {ongoingProjects.length > 0 ? (
+          ongoingProjects.map((proj) => (
+            <div key={proj._id} className="mb-4">
+              <p className="font-bold">{proj.project_title || proj.pp_title}</p>
+              <p className="text-sm italic mb-1">{proj.project_desc || proj.pp_desc}</p>
+              <div className="flex items-center gap-2">
+                {proj.project_weeks > 0 || proj.pp_weeks > 0 ? (
+                  <>
+                    <button
+                      className="btn btn-xs"
+                      onClick={() =>
+                        updateProjectWeeks(proj._id, Math.max((proj.project_weeks || proj.pp_weeks) - 1, 0))
+                      }
+                    >
+                      -
+                    </button>
+                    <span>{proj.project_weeks || proj.pp_weeks}</span>
+                    <button
+                      className="btn btn-xs"
+                      onClick={() =>
+                        updateProjectWeeks(proj._id, (proj.project_weeks || proj.pp_weeks) + 1)
+                      }
+                    >
+                      +
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="btn btn-xs btn-secondary"
+                    onClick={() => setResolveModal(proj)}
+                  >
+                    Resolve
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-
-      {/* <h3 className="text-lg font-semibold mb-2">Ongoing Projects</h3>
-      {ongoingProjects.map((proj, idx) => (
-        <div key={idx} className="mb-4">
-          <p className="font-bold">{proj.title}</p>
-          <p className="text-sm italic mb-1">{proj.desc}</p>
-          <div className="flex items-center gap-2">
-            <button
-              className="btn btn-xs"
-              onClick={() => updateProjectWeeks(proj._id, proj.type, Math.max(proj.weeks - 1, 0))}
-
-              //FIXME: old
-              // onClick={() => {
-              //   handleChange(`${proj.type}_weeks`, Math.max((proj.weeks || 0) - 1, 0));
-              //   saveGameData(); // Save the updated data
-              // }}
-              >
-              -
-            </button>
-            <span>{proj.weeks}</span>
-            <button
-              className="btn btn-xs"
-              onClick={() => updateProjectWeeks(proj._id, proj.type, proj.weeks + 1)}
-
-              //FIXME: old
-              // onClick={() => {
-              //   handleChange(`${proj.type}_weeks`, Math.min((proj.weeks || 0) + 1, 6));
-              //   saveGameData();
-              //   }}
-                >
-              +
-            </button>
-          </div>
-          {proj.weeks === 0 && (
-            <button
-              className="btn btn-outline btn-sm mt-1"
-              onClick={() => {
-                handleResolve(proj.type);
-                setResolveModal(proj);
-              }}>
-              Resolve
-            </button>
-          )}
+          ))
+        ) : (
+          <p>No ongoing projects.</p>
+        )}
         </div>
-      ))} */}
 
             {/* Resolve Modal */}
         {resolveModal && (
         <dialog id="resolveModal" className="modal modal-open">
           <div className="modal-box">
             <h3 className="font-bold text-lg mb-4">Resolve Project</h3>
-            <p className="font-bold">{resolveModal.title}</p>
-            <p className="italic mb-4">{resolveModal.desc}</p>
+            <p className="font-bold">{resolveModal.project_title || resolveModal.pp_title}</p>
+            <p className="italic mb-4">{resolveModal.project_desc || resolveModal.pp_desc}</p>
             <textarea
               className="textarea textarea-bordered w-full"
               placeholder="Enter resolution"
-              onChange={(e) => setResolveModal({ ...resolveModal, resolution: e.target.value })}
+              value={resolveModal.project_resolve || resolveModal.pp_resolve || ''}
+              // onChange={(e) => setResolveModal({ ...resolveModal, resolution: e.target.value })}
+              onChange={(e) =>
+                setResolveModal({
+                  ...resolveModal,
+                  project_resolve: resolveModal.project_weeks === 0 ? e.target.value : undefined,
+                  pp_resolve: resolveModal.pp_weeks === 0 ? e.target.value : undefined,
+                })
+              }
             />
             <div className="modal-action">
               <button
                 className="btn btn-primary"
-                onClick={() =>
-                  handleResolve(resolveModal.title, resolveModal.type, resolveModal.resolution)
-                }
+                onClick={handleResolve}
               >
                 Save
               </button>
@@ -369,34 +409,6 @@ export default function GameStats({ abundance, scarcity, contempt, gameTitle, cu
         </dialog>
       )}
 
-      {/* <button className="btn btn-sm mt-2" onClick={() => setShowCompleted(true)}>Completed Projects</button> */}
-
-      {/* {resolveModal && (
-        <dialog id="resolveModal" className="modal modal-open">
-          <div className={`modal-box ${seasonClass}`}>
-            <h3 className="font-bold text-lg mb-2">Resolve Project</h3>
-            <p className="font-bold">{resolveModal.title}</p>
-            <p className="text-sm italic mb-2">{resolveModal.desc}</p>
-            <textarea
-              className="textarea textarea-bordered w-full mb-2"
-              placeholder="How does the project resolve?"
-              onChange={(e) => handleChange(`${resolveModal.type}_resolve`, e.target.value)}
-              value={formData[`${resolveModal.type}_resolve`] || ''}
-            ></textarea>
-            <div className="modal-action">
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  handleChange(`${resolveModal.type}_weeks`, 0);
-                  saveGameData(); // Save the updated data
-                  setResolveModal(null);
-                }}
-              >Save</button>
-              <button className="btn" onClick={() => setResolveModal(null)}>Cancel</button>
-            </div>
-          </div>
-        </dialog>
-      )} */}
 
       <button className="btn btn-sm mt-2" onClick={() => setShowCompleted(true)}>Completed Projects</button>
 
@@ -404,13 +416,17 @@ export default function GameStats({ abundance, scarcity, contempt, gameTitle, cu
         <dialog id="completedProjectsModal" className="modal modal-open">
           <div className="modal-box">
             <h3 className="font-bold text-lg mb-4">Completed Projects</h3>
-            {completedProjects.map((proj) => (
-              <div key={proj.title} className="mb-4">
-                <p className="font-bold">{proj.title}</p>
-                <p className="italic">{proj.desc}</p>
-                <p className="text-sm">{proj.resolution}</p>
-              </div>
-            ))}
+            {completedProjects.length > 0 ? (
+              completedProjects.map((proj) => (
+                <div key={proj._id} className="mb-4">
+                  <p className="font-bold">{proj.project_title || proj.pp_title}</p>
+                  <p className="italic">{proj.project_desc || proj.pp_desc}</p>
+                  <p className="text-sm">{proj.project_resolve || proj.pp_resolve}</p>
+                </div>
+              ))
+            ) : (
+              <p>No completed projects.</p>
+            )}
             <div className="modal-action">
               <button
                 className="btn"
