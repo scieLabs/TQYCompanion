@@ -238,6 +238,8 @@ export default function GameProgress() {
             setStats={setStats} 
             ongoingProjects={ongoingProjects}
             completedProjects={completedProjects}
+            setOngoingProjects={setOngoingProjects}
+            setCompletedProjects={setCompletedProjects}
               //pass the dynamic game title and data to GameStats + season
             />
         </div>

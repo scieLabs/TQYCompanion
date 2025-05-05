@@ -8,7 +8,7 @@ import * as statAPI from '../api/statApi.js';
 import * as projectAPI from '../api/projectApi.js'; 
 
 
-export default function GameStats({ game_id, currentWeek, ongoingProjects, completedProjects }) { //FIXME: was { formData, setFormData, currentWeek, gameTitle }
+export default function GameStats({ game_id, currentWeek, ongoingProjects, completedProjects, setOngoingProjects, setCompletedProjects }) { //FIXME: was { formData, setFormData, currentWeek, gameTitle }
   const { user } = useAuthContext(); //change if needed
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {}; // Get the theme for the current season
@@ -171,12 +171,32 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
   const updateProjectWeeks = async (project_id, weeks) => {
     try {
       console.log(`Updating project weeks for project_id: ${project_id}, weeks: ${weeks}`);
-      // Call API to update project weeks (not implemented here)
+
+      // Call the API to update the project weeks
+      await projectAPI.updateProjectWeeks(project_id, weeks);
+
+      // Update the ongoing projects list
       setOngoingProjects((prev) =>
         prev.map((proj) =>
           proj._id === project_id ? { ...proj, project_weeks: weeks } : proj
         )
       );
+
+      // If the project is completed (weeks === 0), move it to the completed list
+      // if (weeks === 0) {
+      //   setOngoingProjects((prev) => prev.filter((proj) => proj._id !== project_id));
+      //   setCompletedProjects((prev) => [
+      //     ...prev,
+      //     ongoingProjects.find((proj) => proj._id === project_id),
+      //   ]);
+      // }
+
+          // If the project is completed (weeks === 0), open the Resolve modal
+      // if (weeks === 0) {
+      //   const projectToResolve = ongoingProjects.find((proj) => proj._id === project_id);
+      //   setResolveModal(projectToResolve);
+      // }
+
     } catch (error) {
       console.error('Error updating project weeks:', error);
     }
@@ -189,18 +209,21 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
 
   const handleResolve = async () => {
     try {
-      const updatedProject = {
+      const resolution = {
         ...resolveModal,
         project_resolve: resolveModal.project_weeks === 0 ? resolveModal.project_resolve : undefined,
         pp_resolve: resolveModal.pp_weeks === 0 ? resolveModal.pp_resolve : undefined,
       };
   
       // Save the resolution to the backend
-      await projectAPI.updateProject(resolveModal._id, updatedProject);
+      await projectAPI.resolveProject(resolveModal._id, resolution);
   
       // Update the lists
       setOngoingProjects((prev) => prev.filter((proj) => proj._id !== resolveModal._id));
-      setCompletedProjects((prev) => [...prev, updatedProject]);
+      setCompletedProjects((prev) => [
+        ...prev,
+        { ...resolveModal, project_resolve: resolveModal.project_resolve, pp_resolve: resolveModal.pp_resolve },
+      ]);
   
       setResolveModal(null); // Close the modal
     } catch (error) {
@@ -315,20 +338,27 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
               <p className="font-bold">{proj.project_title || proj.pp_title}</p>
               <p className="text-sm italic mb-1">{proj.project_desc || proj.pp_desc}</p>
               <div className="flex items-center gap-2">
-                <button
-                  className="btn btn-xs"
-                  onClick={() => updateProjectWeeks(proj._id, Math.max((proj.project_weeks || proj.pp_weeks) - 1, 0))}
-                >
-                  -
-                </button>
-                <span>{proj.project_weeks || proj.pp_weeks}</span>
-                <button
-                  className="btn btn-xs"
-                  onClick={() => updateProjectWeeks(proj._id, (proj.project_weeks || proj.pp_weeks) + 1)}
-                >
-                  +
-                </button>
-                {proj.project_weeks === 0 && (
+                {proj.project_weeks > 0 || proj.pp_weeks > 0 ? (
+                  <>
+                    <button
+                      className="btn btn-xs"
+                      onClick={() =>
+                        updateProjectWeeks(proj._id, Math.max((proj.project_weeks || proj.pp_weeks) - 1, 0))
+                      }
+                    >
+                      -
+                    </button>
+                    <span>{proj.project_weeks || proj.pp_weeks}</span>
+                    <button
+                      className="btn btn-xs"
+                      onClick={() =>
+                        updateProjectWeeks(proj._id, (proj.project_weeks || proj.pp_weeks) + 1)
+                      }
+                    >
+                      +
+                    </button>
+                  </>
+                ) : (
                   <button
                     className="btn btn-xs btn-secondary"
                     onClick={() => setResolveModal(proj)}
