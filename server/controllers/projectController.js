@@ -14,15 +14,24 @@ export const getProjectsByGame = async (req, res) => {
 
 //TODO: should include pp_* ??? and resolution?? as an update
 export const createProject = async (req, res) => {
-    try {
-      const newProject = new Project(req.body);
-      const savedProject = await newProject.save();
-      res.status(201).json(savedProject);
-    } catch (err) {
-      console.error('Error creating project:', err);
-      res.status(500).json({ message: 'Error creating project.', error: err.message });
-    }
-  };
+  const { game_id, title, description, weeks } = req.body;
+
+  try {
+    const newProject = new Project({
+      game_id,
+      title,
+      description,
+      project_weeks: weeks,
+    });
+
+    await newProject.save();
+
+    res.status(201).json(newProject);
+  } catch (error) {
+    console.error('Error creating project:', error);
+    res.status(500).json({ message: 'Error creating project.', error: error.message });
+  }
+};
 
 
 // Fetch ongoing projects

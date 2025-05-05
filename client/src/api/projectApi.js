@@ -6,6 +6,7 @@ const projectAPI = axios.create({
   });
 
   export const getProjectsByGame = async (game_id) => projectAPI.get(`/projects/${game_id}`);
+  
   export const createProject = async (data) => projectAPI.post('/projects', data);
 
   export const getOngoingProjects = (game_id) =>

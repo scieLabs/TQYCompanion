@@ -111,23 +111,17 @@ export default function GameProgress() {
       console.log('API Response:', res.data);
       console.log('Fetched prompt ID:', selectedPrompt._id);
     } catch (err) {
-      console.error('Error in fetchPrompt:', err.response?.data?.message || err.message || err);
-      handleApiError(err, 'fetchPrompt');
-      // if (err.response?.status === 404) {
-      //   const nextSeason = err.response.data?.nextSeason;
-      //   if (nextSeason) {
-      //     console.warn(`No prompts found for ${season}. Switching to ${nextSeason}.`);
-      //     setCurrentSeason(nextSeason); // Update the season to the next one
-      //     fetchPrompt(nextSeason); // Fetch a prompt for the next season
-      //     console.log('Fetched prompt ID:', selectedPrompt._id);
-      //   } else {
-      //     console.error('No prompts available. Game over.');
-      //     // setGameOver(true); // Trigger the Game Over state
-      //   }
-      // } else {
-      //   console.error('Error in fetchPrompt:', err.response?.data?.message || err.message || err);
-      //   handleApiError(err, 'fetchPrompt');
-      // }
+      if (err.response?.status === 404) {
+        const nextSeasonIndex = (validSeasons.indexOf(season) + 1) % validSeasons.length;
+        const nextSeason = validSeasons[nextSeasonIndex];
+  
+        console.warn(`No prompts found for ${season}. Switching to ${nextSeason}.`);
+        setCurrentSeason(nextSeason); // Update the season to the next one
+        fetchPrompt(nextSeason); // Fetch a prompt for the next season
+      } else {
+        console.error('Error in fetchPrompt:', err.response?.data?.message || err.message || err);
+        handleApiError(err, 'fetchPrompt');
+      }
     } finally {
       setLoadingPrompt(false); // Reset loading state
     }
@@ -152,18 +146,21 @@ export default function GameProgress() {
         contempt: stats.contempt,
         discovery: formData.discovery,
         discussion: formData.discussion,
+        project_title: formData.project_title,
+        project_desc: formData.project_desc,
+        project_weeks: formData.project_weeks,
       });
 
       // Save project data
-      if (formData.project_title) {
-        await createProject({
-          game_id,
-          stats_week: currentWeek,
-          project_title: formData.project_title,
-          project_desc: formData.project_desc,
-          project_weeks: formData.project_weeks,
-        });
-      }
+      // if (formData.project_title) {
+      //   await createProject({
+      //     game_id,
+      //     stats_week: currentWeek,
+      //     project_title: formData.project_title,
+      //     project_desc: formData.project_desc,
+      //     project_weeks: formData.project_weeks,
+      //   });
+      // }
         // Create a new game entry for the next week
         const nextWeek = currentWeek + 1; // Increment the week number
         await createStatsEntry({
@@ -197,6 +194,7 @@ export default function GameProgress() {
 
       // Update the current week state
       setCurrentWeek(nextWeek);
+      fetchPrompt(currentSeason);
       // Redirect to the next week's URL
       navigate(`/game/${game_id}/week/${nextWeek}`);
 
