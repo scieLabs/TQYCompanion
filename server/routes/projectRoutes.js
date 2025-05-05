@@ -5,7 +5,8 @@ import {
     getOngoingProjects, 
     getCompletedProjects, 
     updateProjectWeeks, 
-    resolveProject
+    resolveProject,
+    updateProjectResolution
  } from '../controllers/projectController.js';
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get('/:game_id/ongoing', getOngoingProjects);
 router.get('/:game_id/completed', getCompletedProjects);
 router.put('/:project_id/weeks', updateProjectWeeks);
 router.put('/:project_id/resolve', resolveProject);
+router.put('/:id', updateProjectResolution);
 
 export default router;
