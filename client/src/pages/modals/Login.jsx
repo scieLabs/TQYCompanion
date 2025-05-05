@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx';
+import { useSeason } from "../../contexts/seasonContext";
+
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export default function Login({ onClose }) {
+
+export default function Login({ onClose, handleRegisterClick }) {
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -139,15 +143,19 @@ export default function Login({ onClose }) {
                             type="submit"
                             disabled={loading}
                         >
-                            {loading ? 'Logging into your account...' : 'Login'}
+                            {loading ? 'Logging in...' : 'Login'}
                         </button>
                     </div>
                     <div>
-                        <a href="/register"
+                        <button
+                            onClick={() => {
+                                onClose();
+                                handleRegisterClick();
+                            }}
                             className="register-button bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
                             Don't have an account? Create one!
-                        </a>
+                        </button>
                     </div>
                 </form>
             </div>
