@@ -20,15 +20,15 @@ const NewGameHeader = () => {
     }
   };
 
-  const handleLogoutClick = () => {
-    const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
-    if (confirmLeave) {
-      LogOut();
-      const notLoggedIn = window.confirm('You are not logged in. Would you like to log in to play?');
-      navigate('/');
+  // const handleLogoutClick = () => {
+  //   const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
+  //   if (confirmLeave) {
+  //     LogOut();
+  //     const notLoggedIn = window.confirm('You are not logged in. Would you like to log in to play?');
+  //     navigate('/');
     
-    }
-  };
+  //   }
+  // };
 
 
   return (
@@ -43,12 +43,12 @@ const NewGameHeader = () => {
       /> */}
       {/* Navigation */}
       <nav className="flex space-x-4">
-        <button
+        <a
           onClick={() => handleNavigation('/')}
           className="hover:underline"
         >
           Home
-        </button>
+        </a>
         <a
           href="rules.pdf"
           target="_blank"
@@ -68,15 +68,10 @@ const NewGameHeader = () => {
         {user && user.isLoggedIn ? (
           <div className="user-info flex space-x-4">
             <span className="username">{user.username}</span>
-            <button
-              onClick={handleLogoutClick}
-              className="logout-button hover:underline"
-            >
-              Log Out
-            </button>
+            <LogOut />
           </div>
         ) : null}
-        {showLogOut && <LogOut onClose={() => setShowLogOut(false)} />}
+        {showLogOut && <LogOut onClose={() => setShowLogOut(true)} />}
       </div>
     </header>
   );

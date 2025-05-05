@@ -10,9 +10,10 @@ export default function Logout() {
 
 
     const handleLogout = async () => {
+        const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
         setErrorMessage('');
         setSuccessMessage('');
-    
+        if (confirmLeave) {
         try {
             setLoading(true);
             await logout(); // Use the logout function from authContext
@@ -20,12 +21,14 @@ export default function Logout() {
             setTimeout(() => {
                 setLoading(false);
             }, 2000);
+            navigate('/');
         } catch (error) {
             console.error('Logout failed:', error);
             setErrorMessage(error.message || 'Logout failed. Please try again.');
             setLoading(false);
         }
     };
+
 
    // TODO: Old version:
     // const handleLogout = async () => {
@@ -72,4 +75,4 @@ export default function Logout() {
             </button>
         </div>
     );
-}
+}};
