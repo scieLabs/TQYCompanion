@@ -16,7 +16,7 @@ const gameAPI = axios.create({
 export default function CreateNewGame() {
     // Authentication and user context
     const { user, loading } = useAuthContext();
-    console.log('CreateNewGame user:', user);
+    // console.log('CreateNewGame user:', user);
     // const token = user?.token; // Assuming the token is stored in the user object
     
     // Redirecting to login if not authenticated
@@ -60,13 +60,13 @@ export default function CreateNewGame() {
 
         try {
 
-          console.log('Calling axios.post directly with:', {
-            user_id: user?._id,
-            title: gameTitle,
-            description,
-            abundance,
-            scarcity,
-          });
+          // console.log('Calling axios.post directly with:', {
+          //   user_id: user?._id,
+          //   title: gameTitle,
+          //   description,
+          //   abundance,
+          //   scarcity,
+          // });
 
           // Create the game entry
           const response = await gameAPI.post('/game',
@@ -86,8 +86,8 @@ export default function CreateNewGame() {
             }
           );
 
-          console.log('Game created:', response.data.game);
-          console.log('Initial stats created:', response.data.stats);
+          // console.log('Game created:', response.data.game);
+          // console.log('Initial stats created:', response.data.stats);
 
           return response.data; // Return the data object directly
         } catch (err) {
@@ -105,9 +105,9 @@ export default function CreateNewGame() {
           return;
         }
         try {
-          console.log('Starting spring with game data...');
+          // console.log('Starting spring with game data...');
           const { game } = await handleCreateGame();
-          console.log('Navigating to game progress page for game:', game);
+          // console.log('Navigating to game progress page for game:', game);
 
           // Navigate to the game progress page
           navigate(`/game/${game._id}/week/1`);

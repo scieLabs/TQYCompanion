@@ -5,8 +5,8 @@ const projectAPI = axios.create({
     withCredentials: true,
   });
 
-  export const getProjectsByGame = async (game_id) => projectAPI.get(`/projects/${game_id}`);
-  
+  export const getProjectsByGame = (game_id) => projectAPI.get(`/projects/${game_id}`);
+
   export const createProject = async (data) => projectAPI.post('/projects', data);
 
   export const getOngoingProjects = (game_id) =>
@@ -20,5 +20,9 @@ const projectAPI = axios.create({
   
   export const resolveProject = (project_id, resolution) =>
     projectAPI.put(`/projects/${project_id}/resolve`, { resolution });
+
+  // export const updateProject = (projectId, updatedProject) => {
+  //   return axios.put(`/projects/${projectId}`, updatedProject);
+  // };
 
   export default projectAPI;
