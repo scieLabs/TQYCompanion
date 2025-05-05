@@ -42,16 +42,12 @@ export default function GameStats({ game_id, currentWeek }) { //FIXME: was { for
         console.error('Error fetching ongoing projects:', error);
       }
     };
-  
-    fetchProjects();
+
+    if (game_id) {
+      fetchProjects();
+    }
   }, [game_id]);
 
-  // Groups the three under tempData to store any edits to them before saving
-  // const [tempData, setTempData] = useState({
-  //   abundance: '',
-  //   scarcity: '',
-  //   contempt: 0,
-  // });
   const [tempStats, setTempStats] = useState(stats);
   useEffect(() => {
     setTempStats(stats); // Sync tempStats with stats when stats change
@@ -92,11 +88,6 @@ export default function GameStats({ game_id, currentWeek }) { //FIXME: was { for
 
   const handleEdit = () => {
     setTempStats(stats);
-    // setTempData({
-    //   abundance: gameData.abundance,
-    //   scarcity: gameData.scarcity,
-    //   contempt: gameData.contempt,
-    // });
     setEditModalOpen(true);
   };
 
@@ -250,7 +241,7 @@ export default function GameStats({ game_id, currentWeek }) { //FIXME: was { for
                 type="text"
                 className="input input-bordered w-full"
                 value={tempStats.abundance}
-                onChange={(e) => setTempData({ ...tempStats, abundance: e.target.value })}
+                onChange={(e) => setTempStats({ ...tempStats, abundance: e.target.value })}
               />
             </div>
             <div className="mb-4">
@@ -259,7 +250,7 @@ export default function GameStats({ game_id, currentWeek }) { //FIXME: was { for
                 type="text"
                 className="input input-bordered w-full"
                 value={tempStats.scarcity}
-                onChange={(e) => setTempData({ ...tempStats, scarcity: e.target.value })}
+                onChange={(e) => setTempStats({ ...tempStats, scarcity: e.target.value })}
               />
             </div>
             <div className="mb-4">
@@ -268,7 +259,7 @@ export default function GameStats({ game_id, currentWeek }) { //FIXME: was { for
                 type="number"
                 className="input input-bordered w-full"
                 value={tempStats.contempt}
-                onChange={(e) => setTempData({ ...tempStats, contempt: parseInt(e.target.value, 10) || 0 })}
+                onChange={(e) => setTempStats({ ...tempStats, contempt: parseInt(e.target.value, 10) || 0 })}
               />
             </div>
             <div className="modal-action">
@@ -287,23 +278,23 @@ export default function GameStats({ game_id, currentWeek }) { //FIXME: was { for
       <h3 className="text-lg font-semibold mb-2">Ongoing Projects</h3>
       {projects.map((proj) => (
           <div key={proj._id} className="mb-4">
-            <p className="font-bold">{proj.title}</p>
-            <p className="text-sm italic mb-1">{proj.desc}</p>
+            <p className="font-bold">{proj.project_title || proj.pp_title}</p>
+            <p className="text-sm italic mb-1">{proj.project_desc || proj.pp_desc}</p>
             <div className="flex items-center gap-2">
               <button
                 className="btn btn-xs"
-                onClick={() => updateProjectWeeks(proj._id, Math.max(proj.project_weeks - 1, 0))}
+                onClick={() => updateProjectWeeks(proj._id, Math.max(proj.project_weeks - 1, 0 || proj.pp_weeks - 1, 0))}
               >
                 -
               </button>
-              <span>{proj.weeks}</span>
+              <span>{proj.project_weeks || proj.pp_weeks}</span>
               <button
                 className="btn btn-xs"
-                onClick={() => updateProjectWeeks(proj._id, proj.project_weeks + 1)}
+                onClick={() => updateProjectWeeks(proj._id, proj.project_weeks + 1 || proj.pp_weeks + 1)}
               >
                 +
               </button>
-              {proj.project_weeks === 0 && (
+              {proj.project_weeks || proj.pp_weeks === 0 && (
                 <button
                   className="btn btn-xs btn-secondary"
                   onClick={() => setResolveModal(proj)}
@@ -426,9 +417,9 @@ export default function GameStats({ game_id, currentWeek }) { //FIXME: was { for
             <h3 className="font-bold text-lg mb-4">Completed Projects</h3>
             {completedProjects.map((proj) => (
               <div key={proj._id} className="mb-4">
-                <p className="font-bold">{proj.title}</p>
-                <p className="italic">{proj.desc}</p>
-                <p className="text-sm">{proj.resolution}</p>
+                <p className="font-bold">{proj.project_title || proj.pp_title}</p>
+                <p className="italic">{proj.project_desc || proj.pp_desc}</p>
+                <p className="text-sm">{proj.project_resolve || proj.pp_resolve}</p>
               </div>
             ))}
             <div className="modal-action">

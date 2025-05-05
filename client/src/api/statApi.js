@@ -11,8 +11,16 @@ const statAPI = axios.create({
 
   export const createStatsEntry = async (data) => statAPI.post('/stats', data);
 
-  export const saveActionData = async (game_id, week, data) =>
-    statAPI.put(`/stats/${game_id}/week/${week}`, data);
+  // export const saveActionData = async (game_id, week, data) =>
+  //   statAPI.put(`/stats/${game_id}/week/${week}`, data);
+
+  export const saveActionData = async (game_id, stats_week, data) => {
+    return gameAPI.post('/stats/save-action', {
+      game_id,
+      stats_week,
+      ...data,
+    });
+  };
 
   export const updateStatsByGameAndWeek = (game_id, week, data) =>
     statAPI.put(`/stats/${game_id}/week/${week}`, data);
