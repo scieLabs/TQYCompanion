@@ -1,276 +1,290 @@
-import { useEffect, useState, useContext, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+// import { useEffect, useState, useContext, useRef } from 'react';
+import { useGameContext } from '../contexts/gameContext.jsx';
+// import { useParams, useNavigate } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
-import { getGameById, updateGame } from '../api/gameApi.js';
-import * as projectAPI from '../api/projectApi.js';
-import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
-import { getNextPrompt, createPrompt } from '../api/promptApi.js';
-import { createProject } from '../api/projectApi.js';
-import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
-import { handleApiError } from '../utils/errorHandler.js';
+// import GameSummary from './GameSummary.jsx';
+// import { getGameById, updateGame } from '../api/gameApi.js';
+// import * as projectAPI from '../api/projectApi.js';
+// import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
+// import { getNextPrompt, createPrompt } from '../api/promptApi.js';
+// import { createProject } from '../api/projectApi.js';
+// import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
+// import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 
 export default function GameProgress() {
-  const { game_id, week } = useParams(); // Get the game title from the URL parameters
-  const { user } = useAuthContext(); // get the logged-in user
-  const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
-  const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
 
-  const [game, setGame] = useState(null);
-  const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    discussion: '',
-    discovery: '',
-    project_title: '',
-    project_desc: '',
-    project_weeks: 1, // Start at 1, max 6
-    isDiscussion: false,
-    isDiscovery: false,
-    isProject: false,
-  });
+  const {
+    currentWeek,
+    currentSeason,
+    prompt,
+    stats,
+    ongoingProjects,
+    completedProjects,
+    loading,
+    handleNextWeek,
+    theme,
+  } = useGameContext();
+  // const { game_id, week } = useParams(); // Get the game title from the URL parameters
+  // const { user } = useAuthContext(); // get the logged-in user
+  // const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
+  // const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
 
-  const [projects, setProjects] = useState([]);
-  const [ongoingProjects, setOngoingProjects] = useState([]);
-  const [completedProjects, setCompletedProjects] = useState([]);
+  // const [game, setGame] = useState(null);
+  // const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
+  // const [loading, setLoading] = useState(true);
+  // const [formData, setFormData] = useState({
+  //   discussion: '',
+  //   discovery: '',
+  //   project_title: '',
+  //   project_desc: '',
+  //   project_weeks: 1, // Start at 1, max 6
+  //   isDiscussion: false,
+  //   isDiscovery: false,
+  //   isProject: false,
+  // });
 
-  const fetchProjects = async () => {
-    try {
-      // console.log(`Fetching all projects for game_id: ${game_id}`);
-      const response = await projectAPI.getProjectsByGame(game_id);
-      // console.log('Response from backend:', response);
-      const allProjects = response.data;
+  // const [projects, setProjects] = useState([]);
+  // const [ongoingProjects, setOngoingProjects] = useState([]);
+  // const [completedProjects, setCompletedProjects] = useState([]);
 
-      // console.log('All projects:', allProjects);
+  // const fetchProjects = async () => {
+  //   try {
+  //     // console.log(`Fetching all projects for game_id: ${game_id}`);
+  //     const response = await projectAPI.getProjectsByGame(game_id);
+  //     // console.log('Response from backend:', response);
+  //     const allProjects = response.data;
 
-      // Sort projects into ongoing and completed
-      const ongoing = allProjects.filter(
-        (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
-      );
-      const completed = allProjects.filter(
-        (proj) =>
-          proj.project_weeks === 0 &&
-          proj.pp_weeks === 0 &&
-          (proj.project_resolve || proj.pp_resolve)
-      );
+  //     // console.log('All projects:', allProjects);
 
-      setProjects(allProjects);
-      setOngoingProjects(ongoing);
-      setCompletedProjects(completed);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      if (error.response?.status === 404) {
-        console.warn('No projects found for this game.');
-        setProjects([]);
-        setOngoingProjects([]);
-        setCompletedProjects([]);
-      } else {
-        console.error('Error fetching projects:', error);
-      }
-    }
-  };
+  //     // Sort projects into ongoing and completed
+  //     const ongoing = allProjects.filter(
+  //       (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
+  //     );
+  //     const completed = allProjects.filter(
+  //       (proj) =>
+  //         proj.project_weeks === 0 &&
+  //         proj.pp_weeks === 0 &&
+  //         (proj.project_resolve || proj.pp_resolve)
+  //     );
 
-  const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
-  const [prompt, setPrompt] = useState(null);
-  const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
-  const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
-  const [loadingPrompt, setLoadingPrompt] = useState(false);
-  const navigate = useNavigate();
-  const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
+  //     setProjects(allProjects);
+  //     setOngoingProjects(ongoing);
+  //     setCompletedProjects(completed);
+  //   } catch (error) {
+  //     console.error('Error fetching projects:', error);
+  //     if (error.response?.status === 404) {
+  //       console.warn('No projects found for this game.');
+  //       setProjects([]);
+  //       setOngoingProjects([]);
+  //       setCompletedProjects([]);
+  //     } else {
+  //       console.error('Error fetching projects:', error);
+  //     }
+  //   }
+  // };
 
-  const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+  // const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
+  // const [prompt, setPrompt] = useState(null);
+  // const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
+  // const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
+  // const [loadingPrompt, setLoadingPrompt] = useState(false);
+  // const navigate = useNavigate();
+  // const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
-  useEffect(() => {
-    console.log('Current season updated:', currentSeason);
-  }, [currentSeason]);
+  // const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
 
   // useEffect(() => {
-  //   // console.log('Game ID:', game_id);
-  //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
-  //   fetchGameData();
-  // }, [game_id, currentSeason, currentWeek]);
+  //   console.log('Current season updated:', currentSeason);
+  // }, [currentSeason]);
 
-  const hasFetchedPrompt = useRef(false);
+  // // useEffect(() => {
+  // //   // console.log('Game ID:', game_id);
+  // //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+  // //   fetchGameData();
+  // // }, [game_id, currentSeason, currentWeek]);
+
+  // const hasFetchedPrompt = useRef(false);
+
+  // // useEffect(() => {
+  // //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+
+  // //   const fetchInitialData = async () => {
+  // //     await fetchGameData();
+
+  // //     // Fetch the first prompt only if it's the first week and hasn't been fetched yet
+  // //     if (currentWeek === 1 && !hasFetchedPrompt.current) {
+  // //       console.log('Fetching the first prompt for the game');
+  // //       await fetchPrompt();
+  // //       hasFetchedPrompt.current = true; // Mark as fetched
+  // //     }
+  // //   };
+
+  // //   fetchInitialData();
+  // // }, [game_id, currentSeason, currentWeek]);
 
   // useEffect(() => {
   //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
 
   //   const fetchInitialData = async () => {
+  //     // Prevent duplicate calls caused by React's Strict Mode
+  //     if (hasFetchedPrompt.current) return;
+
+  //     hasFetchedPrompt.current = true; // Mark as fetched immediately to prevent duplicate calls
+
   //     await fetchGameData();
 
   //     // Fetch the first prompt only if it's the first week and hasn't been fetched yet
-  //     if (currentWeek === 1 && !hasFetchedPrompt.current) {
+  //     if (currentWeek === 1) {
   //       console.log('Fetching the first prompt for the game');
   //       await fetchPrompt();
-  //       hasFetchedPrompt.current = true; // Mark as fetched
+  //       // hasFetchedPrompt.current = true; // Mark as fetched
   //     }
   //   };
 
   //   fetchInitialData();
   // }, [game_id, currentSeason, currentWeek]);
 
-  useEffect(() => {
-    console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+  // const fetchGameData = async () => {
+  //   try {
+  //     const gameResponse = await getGameById(game_id);
+  //     const statsResponse = await getStatsByGameAndWeek(game_id, currentWeek);
 
-    const fetchInitialData = async () => {
-      // Prevent duplicate calls caused by React's Strict Mode
-      if (hasFetchedPrompt.current) return;
+  //     setGame(gameResponse.data);
+  //     setStats(statsResponse.data);
+  //     // console.log('Fetched game:', gameResponse.data, 'Fetched stats:', statsResponse.data);
 
-      hasFetchedPrompt.current = true; // Mark as fetched immediately to prevent duplicate calls
+  //     // Fetch the latest projects
+  //     await fetchProjects();
 
-      await fetchGameData();
+  //     // Fetch the first prompt if it's the first week
+  //     // if (currentWeek === 1) {
+  //     //   console.log('Fetching the first prompt for the game');
+  //     //   await fetchPrompt();
+  //     // }
 
-      // Fetch the first prompt only if it's the first week and hasn't been fetched yet
-      if (currentWeek === 1) {
-        console.log('Fetching the first prompt for the game');
-        await fetchPrompt();
-        // hasFetchedPrompt.current = true; // Mark as fetched
-      }
-    };
-
-    fetchInitialData();
-  }, [game_id, currentSeason, currentWeek]);
-
-  const fetchGameData = async () => {
-    try {
-      const gameResponse = await getGameById(game_id);
-      const statsResponse = await getStatsByGameAndWeek(game_id, currentWeek);
-
-      setGame(gameResponse.data);
-      setStats(statsResponse.data);
-      // console.log('Fetched game:', gameResponse.data, 'Fetched stats:', statsResponse.data);
-
-      // Fetch the latest projects
-      await fetchProjects();
-
-      // Fetch the first prompt if it's the first week
-      // if (currentWeek === 1) {
-      //   console.log('Fetching the first prompt for the game');
-      //   await fetchPrompt();
-      // }
-
-      // fetchPrompt();
-    } catch (err) {
-      console.error('Error fetching game data:', err.response?.data || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     // fetchPrompt();
+  //   } catch (err) {
+  //     console.error('Error fetching game data:', err.response?.data || err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
 
-  // Fetch prompts based on the current season and ensure non-repeating prompts
+  // // Fetch prompts based on the current season and ensure non-repeating prompts
 
-  const fetchPrompt = async () => {
-    console.log('fetchPrompt called');
-    if (loadingPrompt) return; // Prevent multiple calls
-    setLoadingPrompt(true);
+  // const fetchPrompt = async () => {
+  //   console.log('fetchPrompt called');
+  //   if (loadingPrompt) return; // Prevent multiple calls
+  //   setLoadingPrompt(true);
 
-    try {
-      const response = await getNextPrompt(game_id, currentSeason);
-      const { prompt: nextPrompt, season } = response.data;
+  //   try {
+  //     const response = await getNextPrompt(game_id, currentSeason);
+  //     const { prompt: nextPrompt, season } = response.data;
 
-      console.log('Backend response:', response.data);
+  //     console.log('Backend response:', response.data);
 
-      if (nextPrompt._id === GAME_OVER_PROMPT_ID) {
-        console.warn('Game over prompt encountered.');
-        setPrompt(nextPrompt);
-        return;
-      }
+  //     if (nextPrompt._id === GAME_OVER_PROMPT_ID) {
+  //       console.warn('Game over prompt encountered.');
+  //       setPrompt(nextPrompt);
+  //       return;
+  //     }
 
-      setPrompt(nextPrompt);
+  //     setPrompt(nextPrompt);
 
-      // Update the season globally only if it has changed
-      if (season !== currentSeason) {
-        console.log(`Season changed from ${currentSeason} to ${season}`);
-        setCurrentSeason(season);
-      }
+  //     // Update the season globally only if it has changed
+  //     if (season !== currentSeason) {
+  //       console.log(`Season changed from ${currentSeason} to ${season}`);
+  //       setCurrentSeason(season);
+  //     }
 
-      // console.log('Applied theme:', seasonThemes[currentSeason]);
+  //     // console.log('Applied theme:', seasonThemes[currentSeason]);
 
-      // setShownPrompts((prev) => [...prev, nextPrompt._id]); // Track shown prompts
-    } catch (err) {
-      console.error('Error fetching prompt:', err.response?.data || err.message);
-    } finally {
-      setLoadingPrompt(false); // Reset loading state
-    }
-  };
+  //     // setShownPrompts((prev) => [...prev, nextPrompt._id]); // Track shown prompts
+  //   } catch (err) {
+  //     console.error('Error fetching prompt:', err.response?.data || err.message);
+  //   } finally {
+  //     setLoadingPrompt(false); // Reset loading state
+  //   }
+  // };
 
 
-  const handleNextWeek = async () => {
-    console.log('handleNextWeek called');
-    try {
+  // const handleNextWeek = async () => {
+  //   console.log('handleNextWeek called');
+  //   try {
 
-      if (prompt._id === GAME_OVER_PROMPT_ID) {
-        // Save the "fate of the community" to the database
-        const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
-        await updateGame(game_id, data);
-        console.log('Game Over data saved:', data);
+  //     if (prompt._id === GAME_OVER_PROMPT_ID) {
+  //       // Save the "fate of the community" to the database
+  //       const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
+  //       await updateGame(game_id, data);
+  //       console.log('Game Over data saved:', data);
 
-        // Navigate to the Game Summary page
-        navigate(`/${game_id}/summary`);
-        return; // Exit early since the game is over
-      }
+  //       // Navigate to the Game Summary page
+  //       navigate(`/${game_id}/summary`);
+  //       return; // Exit early since the game is over
+  //     }
 
-      // Save the updated projects to the database
-      await Promise.all(
-        ongoingProjects.map((proj) =>
-          projectAPI.updateProjectWeeks(proj._id, {
-            project_weeks: proj.project_weeks || 0,
-            pp_weeks: proj.pp_weeks || 0,
-          })
-        )
-      );
+  //     // Save the updated projects to the database
+  //     await Promise.all(
+  //       ongoingProjects.map((proj) =>
+  //         projectAPI.updateProjectWeeks(proj._id, {
+  //           project_weeks: proj.project_weeks || 0,
+  //           pp_weeks: proj.pp_weeks || 0,
+  //         })
+  //       )
+  //     );
 
-      await saveActionData(game_id, currentWeek, {
-        prompt_id: prompt._id,
-        week: currentWeek,
-        abundance: stats.abundance,
-        scarcity: stats.scarcity,
-        contempt: stats.contempt,
-        discovery: formData.discovery,
-        discussion: formData.discussion,
-        project_title: formData.project_title,
-        project_desc: formData.project_desc,
-        project_weeks: formData.project_weeks,
-      });
+  //     await saveActionData(game_id, currentWeek, {
+  //       prompt_id: prompt._id,
+  //       week: currentWeek,
+  //       abundance: stats.abundance,
+  //       scarcity: stats.scarcity,
+  //       contempt: stats.contempt,
+  //       discovery: formData.discovery,
+  //       discussion: formData.discussion,
+  //       project_title: formData.project_title,
+  //       project_desc: formData.project_desc,
+  //       project_weeks: formData.project_weeks,
+  //     });
 
-      // Create a new game entry for the next week
-      const nextWeek = currentWeek + 1; // Increment the week number
-      await createStatsEntry({
-        game_id,
-        week: nextWeek,
-        abundance: stats.abundance,
-        scarcity: stats.scarcity,
-        contempt: stats.contempt,
-      });
+  //     // Create a new game entry for the next week
+  //     const nextWeek = currentWeek + 1; // Increment the week number
+  //     await createStatsEntry({
+  //       game_id,
+  //       week: nextWeek,
+  //       abundance: stats.abundance,
+  //       scarcity: stats.scarcity,
+  //       contempt: stats.contempt,
+  //     });
 
-      // //reset form data for new week
-      setFormData({
-        discussion: '',
-        discovery: '',
-        project_title: '',
-        project_desc: '',
-        project_weeks: 1, // Reset project week to 1
-        isDiscussion: false,
-        isDiscovery: false,
-        isProject: false,
-      });
-      // Update the current week state
-      setCurrentWeek(nextWeek);
-      // fetchPrompt(currentSeason);
+  //     // //reset form data for new week
+  //     setFormData({
+  //       discussion: '',
+  //       discovery: '',
+  //       project_title: '',
+  //       project_desc: '',
+  //       project_weeks: 1, // Reset project week to 1
+  //       isDiscussion: false,
+  //       isDiscovery: false,
+  //       isProject: false,
+  //     });
+  //     // Update the current week state
+  //     setCurrentWeek(nextWeek);
+  //     // fetchPrompt(currentSeason);
 
-      fetchGameData(); //refresh game state
+  //     fetchGameData(); //refresh game state
 
-      // Fetch the next prompt explicitly
-      await fetchPrompt();
+  //     // Fetch the next prompt explicitly
+  //     await fetchPrompt();
 
-      // Redirect to the next week's URL
-      navigate(`/game/${game_id}/week/${nextWeek}`);
-    } catch (err) {
-      handleApiError(err, 'handleNextWeek');
-    }
-  };
+  //     // Redirect to the next week's URL
+  //     navigate(`/game/${game_id}/week/${nextWeek}`);
+  //   } catch (err) {
+  //     handleApiError(err, 'handleNextWeek');
+  //   }
+  // };
 
 
   return (

@@ -15,10 +15,16 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Middleware to handle CORS and JSON parsing
+
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173', // frontend's URL
+    origin: 'http://localhost:5173', // frontend's URL
     credentials: true, // Allow cookies and credentials
 }));
+//TODO: for deployment
+// app.use(cors({
+//     origin: process.env.CLIENT_URL || 'http://localhost:5173', // frontend's URL
+//     credentials: true, // Allow cookies and credentials
+// }));
 app.use(express.json()); // parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // parse URL-encoded bodies
 
