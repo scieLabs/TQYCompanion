@@ -1,27 +1,33 @@
 import express from 'express';
+import './db/db.js'; 
 import cors from 'cors';
 import dotenv from 'dotenv';
-import './db/db.js';
+
 import userRoutes from './routes/userRoutes.js';
+import promptRoutes from './routes/promptRoutes.js';
+import gameRoutes from './routes/gameRoutes.js';
+import statsRoutes from './routes/statsRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
-const MODE = process.env.MODE;
+const PORT = process.env.PORT || 8080;
 
-app.use(cors());
-app.use(express.json());
-app.use(`/api/v1/users`, userRoutes);
+// Middleware to handle CORS and JSON parsing
+app.use(cors({
+    origin: 'http://localhost:5173', // frontend's URL
+    credentials: true, // Allow cookies and credentials
+}));
+app.use(express.json()); // parse JSON request bodies
+app.use(express.urlencoded({ extended: true })); // parse URL-encoded bodies
 
-app.get('/', (req, res) => {
-  res.send('Server is running');
-});
 
-app.get(/.*/, (req, res) => {
-  res.status(404).send("Page doesn't exist");
-});
+app.use('/users', userRoutes);
+app.use('/prompts', promptRoutes);
+app.use('/game', gameRoutes);
+app.use('/stats', statsRoutes)
+app.use('/projects', projectRoutes)
+//FIXME: check if we have to change game to games in the route
 
-app.listen(PORT, () => {
-  console.log(`Server is 🏃 in ${MODE} mode on ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
