@@ -45,26 +45,6 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  // Fetching user from database //FIXME: old version
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await axios.get(`${API_BASE_URL}/users/check-session`, { withCredentials: true });
-  //       if (response.data.authenticated) {
-  //         setUser(response.data.user);
-  //       } else {
-  //         setUser(null);
-  //       }
-  //     } catch (err) {
-  //       console.error('Error fetching user session:', err);
-  //       setUser(null);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchUser();
-  // }, []);
 
   const login = async (credentials) => {
     setLoading(true);
@@ -95,23 +75,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  //FIXME: old version
-//   const login = async (credentials) => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//         const response = await axios.post(`${API_BASE_URL}/users/login`, credentials, { withCredentials: true });
-//         setUser(response.data.user); // Assuming the backend returns user details
-//         localStorage.setItem('user', JSON.stringify(response.data.user)) // FIXME: Copilot says: Persist user in localStorage
-//         localStorage.setItem('token', response.data.token); // Store the token
-//     } catch (err) {
-//         console.error('Login failed:', err.response?.data || err.message);
-//         setError(err.response?.data?.message || 'Login failed. Please try again.');
-//         throw err; // Re-throw the error to handle it in Login.jsx
-//     } finally {
-//         setLoading(false);
-//     }
-// };
 
 const logout = async () => {
     setLoading(true);
@@ -129,52 +92,6 @@ const logout = async () => {
     }
 };
 
- //TODO: Old version 
-//   const login = async (credentials) => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       // Replace with your backend API endpoint
-//       const response = await fetch(`${API_BASE_URL}/users/login`, {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify(credentials),
-//       });
-
-//       if (!response.ok) {
-//         throw new Error('Login failed. Please check your credentials.');
-//       }
-
-//       const data = await response.json();
-//       setUser(data.user); // Assuming the backend returns user details
-//       // Optionally persist token or user data
-//       localStorage.setItem('token', data.token); // Example for token storage
-//     } catch (err) {
-//       setError(err.message || 'Login failed. Please try again.');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-
-//   const logout = async () => {
-//     setLoading(true);
-//     try {
-//       // Replace with your backend API endpoint (if logout requires a backend call)
-//       await fetch('/logout', {
-//         method: 'POST',
-//         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-//       });
-
-//       setUser(null);
-//       setUsers(null);
-//       localStorage.removeItem('token'); // Clear token or other persisted data
-//     } catch (err) {
-//       setError('Logout failed. Please try again.');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
 
   return (
     <UserContext.Provider

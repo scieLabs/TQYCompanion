@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx';
+import { useSeason } from "../../contexts/seasonContext";
+
 
 export default function Logout() {
     const [loading, setLoading] = useState(false);
@@ -8,6 +10,8 @@ export default function Logout() {
     const [successMessage, setSuccessMessage] = useState('');
     const { logout } = useAuthContext();
 
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
 
     const handleLogout = async () => {
         setErrorMessage('');
@@ -26,29 +30,6 @@ export default function Logout() {
             setLoading(false);
         }
     };
-
-   // TODO: Old version:
-    // const handleLogout = async () => {
-    //     setErrorMessage(''); // Clear previous error messages
-    //     setSuccessMessage(''); // Clear previous success messages
-
-    //     try {
-    //         setLoading(true); // Show loading state
-    //         const response = await axios.post('/logout', {}, { withCredentials: true });
-    //         console.log('Logout successful:', response.data);
-    //         setSuccessMessage('Logout successful! Redirecting...');
-    //         logout();
-
-    //         // Optionally redirect or perform additional actions after logout
-    //         setTimeout(() => {
-    //             setLoading(false);
-    //         }, 20000); // 20 seconds delay before closing the modal
-    //     } catch (error) {
-    //         console.error('Logout failed:', error.response?.data || error.message);
-    //         setErrorMessage('Logout failed. Please try again.');
-    //         setLoading(false);
-    //     }
-    // };
 
     return (
         <div className="bg-white p-6 rounded shadow-md w-full max-w-sm mx-auto">
