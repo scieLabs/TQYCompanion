@@ -12,7 +12,7 @@ import {
 const router = express.Router();
 
 // Specific routes first
-router.get('/next', getNextPrompt); // Fetch the next available prompt
+router.post('/next', getNextPrompt); // Fetch the next available prompt
 router.get('/season/:season', getPromptsBySeason); // Fetch prompts by season
 
 // Dynamic routes
