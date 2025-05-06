@@ -36,4 +36,21 @@ router.delete("/:id", deleteUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 
+/*The Machine Spirit suggests this to  validate the JWT token and return the user's data:
+
+export const checkSession = (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ authenticated: false });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.status(200).json({ authenticated: true, user: decoded });
+  } catch (err) {
+    res.status(401).json({ authenticated: false });
+  }
+};
+*/
+
 export default router;

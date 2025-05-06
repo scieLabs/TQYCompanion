@@ -1,37 +1,54 @@
-import HomeHeader from "../components/homeHeader";
+import HomeHeader from "../components/HomeHeader";
 import Login from "../pages/modals/Login";
+import Register from "../pages/modals/NewUser";
 import { useAuthContext } from "../contexts/authContext";
 import { useState } from "react";
 import titleImage from "../assets/title.png";
 import quietYearImage from "../assets/The-Quiet-Year.webp";
 import { useNavigate } from 'react-router-dom';
+import { useSeason } from "../contexts/seasonContext";
 
 const LandingPage = () => {
     const [showLogin, setShowLogin] = useState(false);
+    const [showRegister, setShowRegister] = useState(false);
     const { user } = useAuthContext();
     const navigate = useNavigate();
 
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+
     const handleLoginClick = () => {
         setShowLogin(true);
+        setShowRegister(false);
+    };
+
+    const handleRegisterClick = () => {
+        setShowRegister(true);
+        setShowLogin(false);
     };
 
     const handleCloseModal = () => {
         setShowLogin(false);
+        setShowRegister(false);
     };
 
     const handleNewGameClick = () => {
         navigate('/new-game'); // Navigate to the NewGame page
-      };
+    };
 
     return (
         <div>
-            <HomeHeader />
+            <HomeHeader
+                onLoginClick={handleLoginClick}
+                onRegisterClick={handleRegisterClick}
+            />
+            {/* As soon as the NewGameHeader is done, we need to move this to the routing in App.jsx, just like the footer */}
             <main className="landing-page">
-            <img
-                            src={quietYearImage}
-                            alt="The Quiet Year gameplay example"
-                            className="mx-auto"
-                        />
+                <img
+                    src={quietYearImage}
+                    alt="The Quiet Year gameplay example"
+                    className="mx-auto"
+                />
                 <section className="text-center">
                     <img
                         src={titleImage}
@@ -90,14 +107,37 @@ const LandingPage = () => {
                             onClick={handleNewGameClick}
                             // onClick={() => navigate('/login')} TODO: suggested code
                             className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            >
+                        >
                             New Game
                         </button>
                     )}
                 </section>
 
-                {showLogin && <Login onClose={handleCloseModal} />}
             </main>
+            {showLogin || showRegister ? (
+                <div
+                    //TODO: remember to change pitch black background to something prettier
+                    className="modal-wrapper fixed inset-0 flex items-center justify-center bg-red bg-opacity-10 z-50"
+                    onClick={handleCloseModal}
+                >
+                    {showLogin && (
+                        <div
+                            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <Login onClose={handleCloseModal} handleRegisterClick={handleRegisterClick} />
+                        </div>
+                    )}
+                    {showRegister && (
+                        <div
+                            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <Register onClose={handleCloseModal} />
+                        </div>
+                    )}
+                </div>
+            ) : null}
         </div>
     );
 };
