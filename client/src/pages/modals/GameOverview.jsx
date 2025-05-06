@@ -20,37 +20,34 @@ export default function GameOverview({ onClose, weeks, gameTitle }) {
                         onClick={() => handleWeekClick(week)}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     >
-          {/* Display the week number for the current week object */}
-          Week {week.week} {/* Refers to the week number (e.g., Week 1, Week 2) Still gives me a headache; takes week number from week array */}
-        </button>
+                        Week {week.weekNumber} {/* Updated to use `weekNumber` from the new data structure */}
+                    </button>
                 ))}
             </div>
 
             {/* Display the selected week's summary */}
             {selectedWeek && (
                 <div className="week-summary bg-gray-100 p-4 rounded shadow-md">
-                    <h3 className="text-xl font-bold mb-2">Week {selectedWeek.week}</h3>
-                    <p>Discoveries made: {selectedWeek.discovery || 'None'}</p>
-                    <p>Discussion held: {selectedWeek.discussion || 'None'}</p>
+                    <h3 className="text-xl font-bold mb-2">Week {selectedWeek.weekNumber}</h3>
+                    <p>Discoveries made: {selectedWeek.discoveries?.join(', ') || 'None'}</p>
+                    <p>Discussions held: {selectedWeek.discussions?.join(', ') || 'None'}</p>
                     <p>Projects started and completed: {selectedWeek.projects?.join(', ') || 'None'}</p>
-                    {/* Display the projects started and completed for the selected week
-                    I am honestly not sure if the player can also see all descriptions and outcomes for this
-                    Would be easiest to check by, well, booting up a game */}
-                    <p>Abundances: {selectedWeek.abundance || 'None'}</p>
-                    <p>Scarcities: {selectedWeek.scarcity || 'None'}</p>
-                    <p>Contempt within the community: {selectedWeek.contempt || 0}</p>
                 </div>
             )}
 
-            <div>
-                <button
-                onClick={() => setSelectedWeek(null)} // Clear the selected week when clicked 
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            {/* Clear Selection Button */}
+            {selectedWeek && (
+                <div className="mt-4">
+                    <button
+                        onClick={() => setSelectedWeek(null)} // Clear the selected week when clicked
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     >
-                    Clear Selection
-                </button>
-            </div>
+                        Clear Selection
+                    </button>
+                </div>
+            )}
 
+            {/* Close Button */}
             <div className="mt-6 text-right">
                 <button
                     onClick={onClose}

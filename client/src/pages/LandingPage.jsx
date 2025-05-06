@@ -14,6 +14,9 @@ const LandingPage = () => {
     const { user } = useAuthContext();
     const navigate = useNavigate();
 
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+
     const handleLoginClick = () => {
         setShowLogin(true);
         setShowRegister(false);
@@ -113,8 +116,8 @@ const LandingPage = () => {
             </main>
             {showLogin || showRegister ? (
                 <div
-                    //remember to change pitch black background to something prettier
-                    className="modal-wrapper fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                    //TODO: remember to change pitch black background to something prettier
+                    className="modal-wrapper fixed inset-0 flex items-center justify-center bg-red bg-opacity-10 z-50"
                     onClick={handleCloseModal}
                 >
                     {showLogin && (

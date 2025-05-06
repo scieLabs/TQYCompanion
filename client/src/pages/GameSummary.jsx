@@ -3,137 +3,160 @@ import { useAuthContext } from '../path/to/authContext';
 import gameAPI from '../api/gameApi.js';
 import GameHeader from '../components/GameHeader';
 import GameOverview from './modals/GameOverview';
-import GameProgress from './GameProgress.jsx';
-import GameStats from '../components/GameStats.jsx';
+import { useParams } from 'react-router-dom';
+import Login from './modals/Login.jsx';
 
 const GameSummary = () => {
     const { user } = useAuthContext();
-    //const { gameData } = ???; //I straight up have no way of importing this without creating gameContext; 
-    // local storage sounds really dumb; 
-    // and installing some weird library would be a bit wild just for this;
-    //Maybe as props?
-    //would have to turn GameSummary into a shild component of GameProgress, though
-    //and that doesn't work if I want to be able to access the history from other places, too, like GameHistory.jsx
-    // it always boils down to GameContext
-
-    const [showOverview, setShowOverview] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [stats, setStats] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [showOverview, setShowOverview] = useState(false);
+    const { game_id } = useParams();
 
-    //TODO: CHECK IF THIS WORKS
-    //This below checks gameData for the number of projects, discussions and discoveries, counts them, and returns the total number of each
-    //and whenever anything goes wrong, it just defaults to 0, which is why we have so many 0 here
-    //I really have no clue if this works, but eh
-    const totalProjects = gameData?.weeks?.reduce((count, week) => count + (week.projects?.length || 0), 0) || 0;
-    const totalDiscussions = gameData?.weeks?.reduce((count, week) => count + (week.discussions?.length || 0), 0) || 0;
-    const totalDiscoveries = gameData?.weeks?.reduce((count, week) => count + (week.discoveries?.length || 0), 0) || 0;
+    const onLoginClick = () => {
+        setShowLogin(true);
+    };
 
+    const [gameData, setGameData] = useState({
+        gameTitle: '',
+        currentWeek: 0,
+        stats: { abundance: '', scarcity: '', contempt: 0 },
+        weeks: [],
+    });
 
     useEffect(() => {
-        setLoading(true);
-        setErrorMessage('');
-        setSuccessMessage('');
+        const fetchGameData = async () => {
+            try {
+                setLoading(true);
+                setErrorMessage('');
 
-        if (!gameData) {
-            setTimeout(() => {
-                setErrorMessage('Failed to load game data. Please try again later.');
+                // Fetch game details
+                const gameResponse = await gameAPI.get(`/game/${game_id}`);
+                const game = gameResponse.data;
+
+                // Fetch stats
+                const statsResponse = await gameAPI.get(`/stats/${game_id}`);
+                const stats = statsResponse.data;
+
+                // Fetch projects
+                const projectsResponse = await gameAPI.get(`/projects/${game_id}`);
+                const projects = projectsResponse.data;
+
+                // Combine data into the expected structure
+                const weeks = stats.map((stat) => {
+                    const weekProjects = projects.filter((project) => project.stats_week === stat.week);
+                    return {
+                        weekNumber: stat.week,
+                        projects: weekProjects.map((project) => project.project_title),
+                        discussions: stat.discussion ? [stat.discussion] : [],
+                        discoveries: stat.discovery ? [stat.discovery] : [],
+                    };
+                });
+
+                setGameData({
+                    gameTitle: game.title,
+                    currentWeek: stats.length,
+                    stats: {
+                        abundance: stats[stats.length - 1]?.abundance || 'None',
+                        scarcity: stats[stats.length - 1]?.scarcity || 'None',
+                        contempt: stats[stats.length - 1]?.contempt || 0,
+                    },
+                    weeks,
+                });
+            } catch (error) {
+                console.error('Error fetching game data:', error.message);
+                setErrorMessage(`Failed to load game data. Error: ${error.message}`);
+            } finally {
                 setLoading(false);
-            }, 1000);
-        } else {
-            setTimeout(() => {
-                setSuccessMessage('Game data loaded successfully!');
-                setLoading(false);
-            }, 1000);
-        }
-    }, [gameData]);
+            }
+        };
+
+        fetchGameData();
+    }, [game_id]);
+
+    if (loading) {
+        return <p className="loading-message text-blue-500 font-bold">Loading game data...</p>;
+    }
+
+    if (errorMessage) {
+        return <p className="error-message text-red-500 font-bold">{errorMessage}</p>;
+    }
+
+    if (!gameData || !gameData.weeks) {
+        return <p>No game data available.</p>;
+    }
+
+    const { gameTitle, currentWeek, stats: gameStats, weeks } = gameData || {};
+    const totalProjects = weeks?.reduce((count, week) => count + (week.projects?.length || 0), 0) || 0;
+    const totalDiscussions = weeks?.reduce((count, week) => count + (week.discussions?.length || 0), 0) || 0;
+    const totalDiscoveries = weeks?.reduce((count, week) => count + (week.discoveries?.length || 0), 0) || 0;
 
     return (
         <div>
             <GameHeader />
-            {user ? (
-                <div className="game-summary-container">
-                    {loading ? (
-                        <div className="loading-message text-blue-500 font-bold">
-                            <p>Loading game data...</p>
-                        </div>
-                    ) : errorMessage ? (
-                        <div className="error-message text-red-500 font-bold">
-                            <p>{errorMessage}</p>
-                        </div>
-                    ) : (
-                        <>
-                            {successMessage && (
-                                <div className="success-message text-green-500 font-bold">
-                                    <p>{successMessage}</p>
-                                </div>
-                            )}
-                            <div className="game-summary-content">
-                                {/*I also need to adjust the stuff below in the modals/GameOverview.jsx file, so that it actually shows the correct data*/}
-                                <h2>{gameData.gameTitle}</h2>
-                                {/* Going to have to pull the correct data one by one, checking what it is called in the database */}
-                                <p>Weeks before Winter came: {gameData.currentWeek}</p> {/*correct - I hope*/}
-                                <p>Projects completed: {totalProjects}</p> {/*need to check if this works - see line~15*/}
-                                <p>Discoveries made: {totalDiscussions}</p> {/*need to check if this works - see line~15*/}
-                                <p>Discussions held: {totalDiscoveries}</p> {/*need to check if this works - see line~15*/}
-                                <p>Abundances enjoyed: {gameData.stats.abundance}</p> {/*Or maybe without stats - will have to see*/}
-                                <p>Scarcities endured: {gameData.stats.scarcity}</p>{/*Or maybe without stats - will have to see*/}
-                                <p>Contempt within the Community: {gameData.stats.contempt}</p>{/*Or maybe without stats - will have to see*/}
-                                <button
-                                    onClick={() => setShowOverview(true)}
-                                    className="show-overview-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                >
-                                    Revisit a chosen week/Revisit the Year week by week
-                                </button>
-
-
-                                {/*I'll probably have to move this one around a bit, just like the modals from the header - we will see in the final version
-                    {showLogin && (
-                        <div
-                            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
-                            onClick={(e) => e.stopPropagation()}
+            {user ?
+                (<div className="game-summary-container">
+                    <div className="game-summary-content">
+                        <h2>{gameTitle}</h2>
+                        <p>Weeks before Winter came: {currentWeek}</p>
+                        <p>Projects completed: {totalProjects}</p>
+                        <p>Discoveries made: {totalDiscoveries}</p>
+                        <p>Discussions held: {totalDiscussions}</p>
+                        <p>Abundances enjoyed: {gameData?.stats?.abundance || 'None'}</p>
+                        <p>Scarcities endured: {gameData?.stats?.scarcity || 'None'}</p>
+                        <p>Contempt within the Community: {gameData?.stats?.contempt || 0}</p>
+                        <button
+                            onClick={() => setShowOverview(true)}
+                            className="show-overview-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
-                            <Login onClose={handleCloseModal} handleRegisterClick={handleRegisterClick} />
-                        </div>
-                    )}
-                                Freshly stolen from LandingPage, just needs adjustments; replaces the current showOverview, at least in aprt*/}
-                                {showOverview && (
-                                    <GameOverview
-                                        onClose={() => setShowOverview(false)}
-                                        weeks={gameData.currentWeek} // Pass weeks data
-                                        gameTitle={gameData.gameTitle} // Pass game title
-                                    />
-                                )}
-                            </div>
-                            <a
-                                href="/new-game"
-                                className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            >
-                                New Game
-                            </a>
-                            <a
-                                href="/"
-                                className="about-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            >
-                                Homepage
-                            </a>
-                        </>
-                    )}
-                </div>
-            ) : (
-                <div className="game-summary-container">
-                    <p>You need to be logged in to view the summary.</p>
+                            Revisit a chosen week/Revisit the Year week by week
+                        </button>
+                        {showOverview && gameData && (
+                            <GameOverview
+                                className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
+                                onClose={() => setShowOverview(false)}
+                                weeks={gameData.weeks || []}
+                                gameTitle={gameData.gameTitle || 'Unknown Game'}
+                            />
+                        )}
+                    </div>
+                    <a
+                        href="/new-game"
+                        className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    >
+                        New Game
+                    </a>
                     <a
                         href="/"
-                        className="login-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="about-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     >
-                        Return to Homepage
+                        Homepage
                     </a>
                 </div>
-            )}
+                ) : (
+                    <div className="game-summary-container">
+                        <p>You need to be logged in to view the summary.</p>
+                        <a
+                            href="/"
+                            className="about-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Return to Homepage
+                        </a>
+                        <button
+                            onClick={onLoginClick}
+                            className="login-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Login
+                        </button>
+                    </div>
+                )};
         </div>
     );
 };
+
 
 export default GameSummary;
 

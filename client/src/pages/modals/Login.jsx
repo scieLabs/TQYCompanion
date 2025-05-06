@@ -18,6 +18,9 @@ export default function Login({ onClose, handleRegisterClick }) {
     const [loading, setLoading] = useState(false);
     const { login } = useAuthContext();
 
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({

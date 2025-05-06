@@ -10,6 +10,9 @@ export default function Logout() {
     const [successMessage, setSuccessMessage] = useState('');
     const { logout } = useAuthContext();
 
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+
     const handleLogout = async () => {
         setErrorMessage('');
         setSuccessMessage('');
