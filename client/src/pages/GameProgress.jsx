@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import {getGameById} from '../api/gameApi.js';
+import * as projectAPI from '../api/projectApi.js';
 import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 import { createProject } from '../api/projectApi.js';
@@ -14,10 +15,11 @@ import GameHeader from '../components/GameHeader.jsx'; // Import the GameHeader 
 export default function GameProgress() {
   const { game_id, week } = useParams(); // Get the game title from the URL parameters
   const { user } = useAuthContext(); // get the logged-in user
-  const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+  const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
   const [game, setGame] = useState(null);
-  // const [stats, setStats] = useState(null);
+
+
   const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,9 +34,45 @@ export default function GameProgress() {
     isProject: false,
   });
 
-  // const [abundance, setAbundance] = useState('');
-  // const [scarcity, setScarcity] = useState('');
-  // const [contempt, setContempt] = useState(0);
+  const [projects, setProjects] = useState([]);
+  const [ongoingProjects, setOngoingProjects] = useState([]);
+  const [completedProjects, setCompletedProjects] = useState([]);
+
+  const fetchProjects = async () => {
+    try {
+      console.log(`Fetching all projects for game_id: ${game_id}`);
+      const response = await projectAPI.getProjectsByGame(game_id);
+      console.log('Response from backend:', response);
+      const allProjects = response.data;
+  
+      console.log('All projects:', allProjects);
+  
+      // Sort projects into ongoing and completed
+      const ongoing = allProjects.filter(
+        (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
+      );
+      const completed = allProjects.filter(
+        (proj) =>
+          proj.project_weeks === 0 &&
+          proj.pp_weeks === 0 &&
+          (proj.project_resolve || proj.pp_resolve)
+      );
+  
+      setProjects(allProjects);
+      setOngoingProjects(ongoing);
+      setCompletedProjects(completed);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      if (error.response?.status === 404) {
+        console.warn('No projects found for this game.');
+        setProjects([]);
+        setOngoingProjects([]);
+        setCompletedProjects([]);
+      } else {
+        console.error('Error fetching projects:', error);
+      }
+    }
+  };
 
   const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
   // const [season, setSeason] = useState('Spring');
@@ -47,13 +85,12 @@ export default function GameProgress() {
   // // Season order and prompt fetching logic
   // const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
 
+  useEffect(() => {
+    console.log('Current season updated:', currentSeason);
+  }, [currentSeason]);
 
   useEffect(() => {
-    // if (!user) {
-    //   console.error('User is not logged in.');
-    //   return;
-    // }
-    // console.log('User ID:', user._id); // Debugging: Log the user ID
+    console.log('Game ID:', game_id);
     fetchGameData(); //TODO: currently not using fetchCurrentGameStats
   }, [game_id, currentWeek]);
 
@@ -61,18 +98,16 @@ export default function GameProgress() {
     try {
       const gameResponse = await getGameById(game_id);
       const statsResponse = await getStatsByGameAndWeek(game_id, currentWeek);
-      // const { abundance, scarcity, contempt } = statsResponse.data;
-      // setAbundance(abundance);
-      // setScarcity(scarcity);
-      // setContempt(contempt);
 
       setGame(gameResponse.data);
       setStats(statsResponse.data);
       console.log('Fetched game:', gameResponse.data, 'Fetched stats:', statsResponse.data);
 
-      const season = statsResponse.data.season || 'Spring';
-      // const season = game.season || 'Spring'; // Default to Spring if season is undefined
-      fetchPrompt(season);
+      // Fetch the latest projects
+      await fetchProjects();
+
+      // const season = statsResponse.data.season || 'Spring';
+      fetchPrompt(currentSeason);
     } catch (err) {
       console.error('Error fetching game data:', err.response?.data || err.message);
     } finally {
@@ -104,7 +139,7 @@ export default function GameProgress() {
       setPrompt(selectedPrompt);
 
       // setSeason(season); // update the current season
-      setCurrentSeason(selectedPrompt.season || 'Spring'); // Update the current season in context
+      setCurrentSeason(selectedPrompt.season || season); // Update the current season in context
       setShownPrompts(prev => [...prev, selectedPrompt._id]); // Track shown prompt IDs
       // setSeasonPrompts(availablePrompts); // Store the list of available prompts for the season
       console.log('Fetching random prompt for season:', season);
@@ -112,23 +147,17 @@ export default function GameProgress() {
       console.log('API Response:', res.data);
       console.log('Fetched prompt ID:', selectedPrompt._id);
     } catch (err) {
-      console.error('Error in fetchPrompt:', err.response?.data?.message || err.message || err);
-      handleApiError(err, 'fetchPrompt');
-      // if (err.response?.status === 404) {
-      //   const nextSeason = err.response.data?.nextSeason;
-      //   if (nextSeason) {
-      //     console.warn(`No prompts found for ${season}. Switching to ${nextSeason}.`);
-      //     setCurrentSeason(nextSeason); // Update the season to the next one
-      //     fetchPrompt(nextSeason); // Fetch a prompt for the next season
-      //     console.log('Fetched prompt ID:', selectedPrompt._id);
-      //   } else {
-      //     console.error('No prompts available. Game over.');
-      //     // setGameOver(true); // Trigger the Game Over state
-      //   }
-      // } else {
-      //   console.error('Error in fetchPrompt:', err.response?.data?.message || err.message || err);
-      //   handleApiError(err, 'fetchPrompt');
-      // }
+      if (err.response?.status === 404) {
+        const nextSeasonIndex = (validSeasons.indexOf(season) + 1) % validSeasons.length;
+        const nextSeason = validSeasons[nextSeasonIndex];
+  
+        console.warn(`No prompts found for ${season}. Switching to ${nextSeason}.`);
+        setCurrentSeason(nextSeason); // Update the season to the next one
+        fetchPrompt(nextSeason); // Fetch a prompt for the next season
+      } else {
+        console.error('Error in fetchPrompt:', err.response?.data?.message || err.message || err);
+        handleApiError(err, 'fetchPrompt');
+      }
     } finally {
       setLoadingPrompt(false); // Reset loading state
     }
@@ -153,18 +182,11 @@ export default function GameProgress() {
         contempt: stats.contempt,
         discovery: formData.discovery,
         discussion: formData.discussion,
+        project_title: formData.project_title,
+        project_desc: formData.project_desc,
+        project_weeks: formData.project_weeks,
       });
 
-      // Save project data
-      if (formData.project_title) {
-        await createProject({
-          game_id,
-          stats_week: currentWeek,
-          project_title: formData.project_title,
-          project_desc: formData.project_desc,
-          project_weeks: formData.project_weeks,
-        });
-      }
         // Create a new game entry for the next week
         const nextWeek = currentWeek + 1; // Increment the week number
         await createStatsEntry({
@@ -173,16 +195,7 @@ export default function GameProgress() {
           abundance: stats.abundance,
           scarcity: stats.scarcity,
           contempt: stats.contempt,
-        });
-        // await createGameEntry({
-        //   user_id: user._id, // Copy user_id
-        //   title: game.title, // Copy game title //FIXME: instead of gameTitle
-        //   description: game.description || 'No description provided.', // Copy game description
-        //   week: nextWeek, // Set the next week
-        //   abundance: game.abundance, //FIXME: removed formData.abundance etc from all
-        //   scarcity: game.scarcity,
-        //   contempt: game.contempt,
-        // });      
+        }); 
 
       // //reset form data for new week
       setFormData({
@@ -195,13 +208,14 @@ export default function GameProgress() {
         isDiscovery: false,
         isProject: false,
       });
-
       // Update the current week state
       setCurrentWeek(nextWeek);
-      // Redirect to the next week's URL
-      navigate(`/game/${game_id}/week/${nextWeek}`);
+      // fetchPrompt(currentSeason);
 
       fetchGameData(); //refresh game state //TODO: not currentstate function
+
+      // Redirect to the next week's URL
+      navigate(`/game/${game_id}/week/${nextWeek}`);
     } catch (err) {
       handleApiError(err, 'handleNextWeek');
     }
@@ -225,6 +239,10 @@ export default function GameProgress() {
             currentSeason={currentSeason}
             stats={stats}
             setStats={setStats} 
+            ongoingProjects={ongoingProjects}
+            completedProjects={completedProjects}
+            setOngoingProjects={setOngoingProjects}
+            setCompletedProjects={setCompletedProjects}
               //pass the dynamic game title and data to GameStats + season
             />
         </div>

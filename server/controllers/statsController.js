@@ -1,4 +1,5 @@
 import Stats from '../models/statsSchema.js';
+import Project from '../models/projectSchema.js';
 
 export const getStatsByGameAndWeek = async (req, res) => {
   const { game_id, week } = req.params;
@@ -26,24 +27,80 @@ export const createStatsEntry = async (req, res) => {
   }
 };
 
+// export const saveActionData = async (req, res) => {
+//     const { game_id, week } = req.params;
+//     const updates = req.body;
+  
+//     try {
+//       const stats = await Stats.findOneAndUpdate(
+//         { game_id, week },
+//         { $set: updates },
+//         { new: true }
+//       );
+  
+//       if (!stats) return res.status(404).json({ message: 'Stats not found.' });
+//       res.json(stats);
+//     } catch (err) {
+//       console.error('Error saving action data:', err);
+//       res.status(500).json({ message: 'Error saving action data.', error: err.message });
+//     }
+//   };
 export const saveActionData = async (req, res) => {
-    const { game_id, week } = req.params;
-    const updates = req.body;
-  
-    try {
-      const stats = await Stats.findOneAndUpdate(
-        { game_id, week },
-        { $set: updates },
-        { new: true }
+  const {
+    game_id,
+    stats_week,
+    discussion,
+    discovery,
+    p_discussion,
+    p_discovery,
+    project_title,
+    project_desc,
+    project_weeks,
+    pp_title,
+    pp_desc,
+    pp_weeks,
+  } = req.body;
+
+  try {
+    // Save to the stats schema
+    if (discussion || discovery || p_discussion || p_discovery) {
+      await Stats.findOneAndUpdate(
+        { game_id, week: stats_week },
+        {
+          $set: {
+            discussion,
+            discovery,
+            p_discussion,
+            p_discovery,
+          },
+        },
+        { new: true, upsert: true } // Create a new document if it doesn't exist
       );
-  
-      if (!stats) return res.status(404).json({ message: 'Stats not found.' });
-      res.json(stats);
-    } catch (err) {
-      console.error('Error saving action data:', err);
-      res.status(500).json({ message: 'Error saving action data.', error: err.message });
     }
-  };
+
+    // Save to the projects schema
+    if (project_title || pp_title) {
+      const newProject = new Project({
+        game_id,
+        stats_week,
+        project_title,
+        project_desc,
+        project_weeks,
+        pp_title,
+        pp_desc,
+        pp_weeks,
+      });
+
+      await newProject.save();
+    }
+
+    res.status(200).json({ message: 'Action data saved successfully.' });
+  } catch (error) {
+    console.error('Error saving action data:', error);
+    res.status(500).json({ message: 'Error saving action data.', error: error.message });
+  }
+};
+
 
   // Update stats by game and week
 export const updateStatsByGameAndWeek = async (req, res) => {

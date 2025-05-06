@@ -27,7 +27,7 @@ app.use('/users', userRoutes);
 app.use('/prompts', promptRoutes);
 app.use('/game', gameRoutes);
 app.use('/stats', statsRoutes)
-app.use('/project', projectRoutes)
+app.use('/projects', projectRoutes)
 //FIXME: check if we have to change game to games in the route
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

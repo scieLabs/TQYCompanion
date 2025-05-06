@@ -4,25 +4,42 @@ export const getProjectsByGame = async (req, res) => {
   const { game_id } = req.params;
 
   try {
+    console.log(`Fetching all projects for game_id: ${game_id}`);
     const projects = await Project.find({ game_id });
-    res.json(projects);
-  } catch (err) {
-    console.error('Error fetching projects:', err);
-    res.status(500).json({ message: 'Error fetching projects.', error: err.message });
+
+    if (!projects || projects.length === 0) {
+      console.warn('No projects found for this game.');
+      return res.status(404).json({ message: 'No projects found for this game.' });
+    }
+
+    console.log('All projects:', projects);
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    res.status(500).json({ message: 'Error fetching projects.', error: error.message });
   }
 };
 
 //TODO: should include pp_* ??? and resolution?? as an update
 export const createProject = async (req, res) => {
-    try {
-      const newProject = new Project(req.body);
-      const savedProject = await newProject.save();
-      res.status(201).json(savedProject);
-    } catch (err) {
-      console.error('Error creating project:', err);
-      res.status(500).json({ message: 'Error creating project.', error: err.message });
-    }
-  };
+  const { game_id, title, description, weeks } = req.body;
+
+  try {
+    const newProject = new Project({
+      game_id,
+      title,
+      description,
+      project_weeks: weeks,
+    });
+
+    await newProject.save();
+
+    res.status(201).json(newProject);
+  } catch (error) {
+    console.error('Error creating project:', error);
+    res.status(500).json({ message: 'Error creating project.', error: error.message });
+  }
+};
 
 
 // Fetch ongoing projects
@@ -30,11 +47,18 @@ export const getOngoingProjects = async (req, res) => {
   const { game_id } = req.params;
 
   try {
+    console.log(`Fetching ongoing projects for game_id: ${game_id}`);
+    
     const ongoingProjects = await Project.find({
       game_id,
       $or: [{ project_weeks: { $gt: 0 } }, { pp_weeks: { $gt: 0 } }],
     });
 
+    if (!ongoingProjects || ongoingProjects.length === 0) {
+      return res.status(404).json({ message: 'No ongoing projects found for this game.' });
+    }
+
+    console.log(`Ongoing projects found: ${ongoingProjects.length}`);
     res.status(200).json(ongoingProjects);
   } catch (error) {
     console.error('Error fetching ongoing projects:', error);
@@ -47,11 +71,13 @@ export const getCompletedProjects = async (req, res) => {
   const { game_id } = req.params;
 
   try {
+    console.log(`Fetching completed projects for game_id: ${game_id}`);
     const completedProjects = await Project.find({
       game_id,
       $or: [{ project_weeks: 0 }, { pp_weeks: 0 }],
     });
 
+    console.log(`Completed projects found: ${completedProjects.length}`);
     res.status(200).json(completedProjects);
   } catch (error) {
     console.error('Error fetching completed projects:', error);
@@ -101,5 +127,32 @@ export const resolveProject = async (req, res) => {
   } catch (error) {
     console.error('Error resolving project:', error);
     res.status(500).json({ message: 'Error resolving project.', error: error.message });
+  }
+};
+
+export const updateProjectResolution = async (req, res) => {
+  const { id } = req.params;
+  const { project_resolve, pp_resolve } = req.body;
+
+  try {
+    const project = await Project.findById(id);
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found.' });
+    }
+
+    if (project.project_weeks === 0 && project_resolve) {
+      project.project_resolve = project_resolve;
+    }
+
+    if (project.pp_weeks === 0 && pp_resolve) {
+      project.pp_resolve = pp_resolve;
+    }
+
+    await project.save();
+    res.status(200).json(project);
+  } catch (error) {
+    console.error('Error updating project resolution:', error);
+    res.status(500).json({ message: 'Error updating project resolution.', error: error.message });
   }
 };
