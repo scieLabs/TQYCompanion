@@ -15,17 +15,6 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
 
   const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
 
-  // const saveActionData = async (field, value) => {
-  //   try {
-  //     await statAPI.saveActionData(game_id, currentWeek, { [field]: value });
-  //     console.log(`Saved ${field}:`, value);
-  //     console.log('Saving action data:', { gameTitle, week, data });
-  //   } catch (err) {
-  //     console.error(`Error saving ${field}:`, err.message);
-  //     handleApiError(err, 'saveActionData');
-  //   }
-  // };
-
   const saveActionData = async () => {
     try {
       const data = {
@@ -39,7 +28,7 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
       };
   
       await statAPI.saveActionData(game_id, currentWeek, data);
-      console.log('Conditional action data saved:', data);
+      // console.log('Conditional action data saved:', data);
 
           // Close the modal
       setFormData((prev) => ({
@@ -54,7 +43,20 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
     }
   };
 
-
+  if (prompt && prompt._id === GAME_OVER_PROMPT_ID) {
+    // Render the textarea for "fate of the community" when Game Over is triggered
+    return (
+      <div>
+        <label className="block font-bold">What is the fate of the community?</label>
+        <textarea
+          className="textarea textarea-bordered w-full"
+          value={formData.end || ''}
+          onChange={(e) => updateField('end', e.target.value)}
+          placeholder="Describe the fate of the community..."
+        />
+      </div>
+    );
+  }
 
   const renderActionForm = () => {
     //displays individual actions
@@ -147,8 +149,6 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
 
   return (
     <div>
-      {/* Render always visible action form */}
-      {renderActionForm()}
 
       {/* Conditionally show the modal buttons */}
       {isDiscussion && (
@@ -175,6 +175,9 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
           Open Project Modal
         </button>
       )}
+
+      {/* Render always visible action form */}
+      {renderActionForm()}
 
       {/* Modal rendering logic will go here */}
       {formData.showDiscussionModal && isDiscussion && ( //FIXME: used to be action.isDiscussion

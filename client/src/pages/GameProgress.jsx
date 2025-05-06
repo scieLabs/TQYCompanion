@@ -1,8 +1,8 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
-import {getGameById} from '../api/gameApi.js';
+import {getGameById, updateGame} from '../api/gameApi.js';
 import * as projectAPI from '../api/projectApi.js';
 import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
@@ -16,11 +16,9 @@ export default function GameProgress() {
   const { user } = useAuthContext(); // get the logged-in user
   const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+  
   const [game, setGame] = useState(null);
-
-
   const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
-  const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     discussion: '',
@@ -39,12 +37,12 @@ export default function GameProgress() {
 
   const fetchProjects = async () => {
     try {
-      console.log(`Fetching all projects for game_id: ${game_id}`);
+      // console.log(`Fetching all projects for game_id: ${game_id}`);
       const response = await projectAPI.getProjectsByGame(game_id);
-      console.log('Response from backend:', response);
+      // console.log('Response from backend:', response);
       const allProjects = response.data;
   
-      console.log('All projects:', allProjects);
+      // console.log('All projects:', allProjects);
   
       // Sort projects into ongoing and completed
       const ongoing = allProjects.filter(
@@ -74,24 +72,65 @@ export default function GameProgress() {
   };
 
   const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
-  // const [season, setSeason] = useState('Spring');
+  const [prompt, setPrompt] = useState(null);
   const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
   const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
   const [loadingPrompt, setLoadingPrompt] = useState(false);
   const navigate = useNavigate();
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
-  // // Season order and prompt fetching logic
-  // const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+  const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
 
   useEffect(() => {
     console.log('Current season updated:', currentSeason);
   }, [currentSeason]);
 
-  useEffect(() => {
-    console.log('Game ID:', game_id);
-    fetchGameData(); //TODO: currently not using fetchCurrentGameStats
-  }, [game_id, currentWeek]);
+  // useEffect(() => {
+  //   // console.log('Game ID:', game_id);
+  //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+  //   fetchGameData();
+  // }, [game_id, currentSeason, currentWeek]);
+
+  const hasFetchedPrompt = useRef(false);
+
+// useEffect(() => {
+//   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+
+//   const fetchInitialData = async () => {
+//     await fetchGameData();
+
+//     // Fetch the first prompt only if it's the first week and hasn't been fetched yet
+//     if (currentWeek === 1 && !hasFetchedPrompt.current) {
+//       console.log('Fetching the first prompt for the game');
+//       await fetchPrompt();
+//       hasFetchedPrompt.current = true; // Mark as fetched
+//     }
+//   };
+
+//   fetchInitialData();
+// }, [game_id, currentSeason, currentWeek]);
+
+useEffect(() => {
+  console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+
+  const fetchInitialData = async () => {
+    // Prevent duplicate calls caused by React's Strict Mode
+    if (hasFetchedPrompt.current) return;
+
+    hasFetchedPrompt.current = true; // Mark as fetched immediately to prevent duplicate calls
+
+    await fetchGameData();
+
+    // Fetch the first prompt only if it's the first week and hasn't been fetched yet
+    if (currentWeek === 1) {
+      console.log('Fetching the first prompt for the game');
+      await fetchPrompt();
+      // hasFetchedPrompt.current = true; // Mark as fetched
+    }
+  };
+
+  fetchInitialData();
+}, [game_id, currentSeason, currentWeek]);
 
   const fetchGameData = async () => {
     try {
@@ -100,13 +139,18 @@ export default function GameProgress() {
 
       setGame(gameResponse.data);
       setStats(statsResponse.data);
-      console.log('Fetched game:', gameResponse.data, 'Fetched stats:', statsResponse.data);
+      // console.log('Fetched game:', gameResponse.data, 'Fetched stats:', statsResponse.data);
 
       // Fetch the latest projects
       await fetchProjects();
 
-      // const season = statsResponse.data.season || 'Spring';
-      fetchPrompt(currentSeason);
+      // Fetch the first prompt if it's the first week
+      // if (currentWeek === 1) {
+      //   console.log('Fetching the first prompt for the game');
+      //   await fetchPrompt();
+      // }
+
+      // fetchPrompt();
     } catch (err) {
       console.error('Error fetching game data:', err.response?.data || err.message);
     } finally {
@@ -116,63 +160,68 @@ export default function GameProgress() {
   
 
   // Fetch prompts based on the current season and ensure non-repeating prompts
-  
-  const fetchPrompt = async (season) => {
+
+  const fetchPrompt = async () => {
+    console.log('fetchPrompt called');
     if (loadingPrompt) return; // Prevent multiple calls
-    setLoadingPrompt(true); // Set loading to true
+    setLoadingPrompt(true);
 
     try {
-      console.log('Fetching prompt for season:', season);
-      const res = await getNextPrompt(season); // Pass season to API call
-      const selectedPrompt = res.data;
+      const response = await getNextPrompt(game_id, currentSeason);
+      const { prompt: nextPrompt, season } = response.data;
 
-      //FIXME: whatever this is
-      if (selectedPrompt._id === GAME_OVER_PROMPT_ID) {
+      console.log('Backend response:', response.data);
+
+      if (nextPrompt._id === GAME_OVER_PROMPT_ID) {
         console.warn('Game over prompt encountered.');
-        setPrompt(selectedPrompt); // Set the Game Over prompt
-        // setGameOver(true); // Trigger the Game Over state
+        setPrompt(nextPrompt);
         return;
       }
-  
-      // Set the prompt for this week
-      setPrompt(selectedPrompt);
 
-      // setSeason(season); // update the current season
-      setCurrentSeason(selectedPrompt.season || season); // Update the current season in context
-      setShownPrompts(prev => [...prev, selectedPrompt._id]); // Track shown prompt IDs
-      // setSeasonPrompts(availablePrompts); // Store the list of available prompts for the season
-      console.log('Fetching random prompt for season:', season);
-      console.log('Fetched random prompt:', selectedPrompt);
-      console.log('API Response:', res.data);
-      console.log('Fetched prompt ID:', selectedPrompt._id);
+      setPrompt(nextPrompt);
+
+    // Update the season globally only if it has changed
+    if (season !== currentSeason) {
+      console.log(`Season changed from ${currentSeason} to ${season}`);
+      setCurrentSeason(season);
+    }
+
+    // console.log('Applied theme:', seasonThemes[currentSeason]);
+
+      // setShownPrompts((prev) => [...prev, nextPrompt._id]); // Track shown prompts
     } catch (err) {
-      if (err.response?.status === 404) {
-        const nextSeasonIndex = (validSeasons.indexOf(season) + 1) % validSeasons.length;
-        const nextSeason = validSeasons[nextSeasonIndex];
-  
-        console.warn(`No prompts found for ${season}. Switching to ${nextSeason}.`);
-        setCurrentSeason(nextSeason); // Update the season to the next one
-        fetchPrompt(nextSeason); // Fetch a prompt for the next season
-      } else {
-        console.error('Error in fetchPrompt:', err.response?.data?.message || err.message || err);
-        handleApiError(err, 'fetchPrompt');
-      }
+      console.error('Error fetching prompt:', err.response?.data || err.message);
     } finally {
       setLoadingPrompt(false); // Reset loading state
     }
   };
-
-  // Switch to the next season once all prompts for the current season have been exhausted
-  // const switchSeason = () => {
-  //   const currentSeasonIndex = seasons.indexOf(season);
-  //   const nextSeason = seasons[(currentSeasonIndex + 1) % seasons.length]; // determine the next season; Loop back to Spring after Winter
-  //   // setSeason(nextSeason); //update season again
-  //   setCurrentSeason(nextSeason); //update season in context
-  //   fetchPrompt(currentWeek, nextSeason); // Fetch prompts for the next season
-  // };
+  
   
   const handleNextWeek = async () => {
+    console.log('handleNextWeek called');
     try {
+
+      if (prompt._id === GAME_OVER_PROMPT_ID) {
+        // Save the "fate of the community" to the database
+        const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
+        await updateGame(game_id, data);
+        console.log('Game Over data saved:', data);
+  
+        // Navigate to the Game Summary page
+        navigate(`/${game_id}/summary`);
+        return; // Exit early since the game is over
+      }
+
+      // Save the updated projects to the database
+      await Promise.all(
+        ongoingProjects.map((proj) =>
+          projectAPI.updateProjectWeeks(proj._id, {
+            project_weeks: proj.project_weeks || 0,
+            pp_weeks: proj.pp_weeks || 0,
+          })
+        )
+      );
+
       await saveActionData(game_id, currentWeek, {
         prompt_id: prompt._id,
         week: currentWeek,
@@ -211,7 +260,10 @@ export default function GameProgress() {
       setCurrentWeek(nextWeek);
       // fetchPrompt(currentSeason);
 
-      fetchGameData(); //refresh game state //TODO: not currentstate function
+      fetchGameData(); //refresh game state
+
+      // Fetch the next prompt explicitly
+      await fetchPrompt();
 
       // Redirect to the next week's URL
       navigate(`/game/${game_id}/week/${nextWeek}`);
@@ -226,13 +278,8 @@ export default function GameProgress() {
       <div className={`flex`}> 
         <div className={`w-1/4 pr-4`}>
           <GameStats 
-            // formData={formData} 
-            // setFormData={setFormData}
             game_id={game_id}
             currentWeek={currentWeek}
-            // abundance={stats?.abundance} 
-            // scarcity={stats?.scarcity} 
-            // contempt={stats?.contempt}
             currentSeason={currentSeason}
             stats={stats}
             setStats={setStats} 
@@ -240,7 +287,6 @@ export default function GameProgress() {
             completedProjects={completedProjects}
             setOngoingProjects={setOngoingProjects}
             setCompletedProjects={setCompletedProjects}
-              //pass the dynamic game title and data to GameStats + season
             />
         </div>
         <div className={`w-3/4 ${theme}`}>
@@ -253,20 +299,17 @@ export default function GameProgress() {
               dangerouslySetInnerHTML={{ __html: prompt.prompt }}
               ></p>
               <ActionModal 
-                prompt={prompt} //FIXME: action or prompt?
+                prompt={prompt}
                 game_id={game_id}
                 stats={stats}
                 setStats={setStats}  
                 formData={formData} 
                 setFormData={setFormData} 
-                // seasonTheme={seasonThemes[currentSeason]}
-                currentSeason={currentSeason} // Pass currentSeason as a prop
-                currentWeek={currentWeek} // Pass currentWeek as a prop
+                currentSeason={currentSeason}
+                currentWeek={currentWeek}
                 isDiscussion={prompt?.isDiscussion || false}
                 isDiscovery={prompt?.isDiscovery || false}
                 isProject={prompt?.isProject || false}
-                // gameTitle={game?.Title} // Pass gameTitle as a prop //FIXME: from just gameTitle
-                // Pass the prompt, form data, and seasonal themAction
                 />
               <button className="btn btn-primary mt-6" onClick={handleNextWeek}>
                 {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
@@ -278,26 +321,3 @@ export default function GameProgress() {
     </div>
   );
 }
-
-
-//TODO: CHECK THE FOLLOWING PIECE OF CODE SUGGESTED FROM COPILOT:
-
-// import { useLocation } from 'react-router-dom';
-// import { useAuthContext } from '../contexts/authContext';
-
-// export default function GameProgress() {
-//   const { state } = useLocation(); // Access the passed state
-//   const { user } = useAuthContext(); // Access the logged-in user from authContext
-
-//   const game = state?.game; // Get the game data from the passed state
-
-//   return (
-//     <div>
-//       <h1>Welcome, {user?.username}</h1>
-//       <h2>Game Progress for: {game?.title}</h2>
-//       <p>Description: {game?.description}</p>
-//       <p>Abundance: {game?.abundance}</p>
-//       <p>Scarcity: {game?.scarcity}</p>
-//     </div>
-//   );
-// }
