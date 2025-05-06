@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuthContext } from '../contexts/authContext';
 import { useSeason } from '../contexts/seasonContext.jsx';
-import LogOut from '../pages/modals/LogOut';
+import Logout from '../pages/modals/LogOut';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -16,9 +16,6 @@ const GameHeader = () => {
   const [gameTitle, setGameTitle] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
-
-  const activeLink = ({ isActive }) =>
-    isActive ? 'btn btn-ghost text-primary font-bold' : 'btn btn-ghost';
 
   const isGameProgressPage = location.pathname.includes('/game'); // Check if the current page is the game progress page
 
@@ -49,42 +46,6 @@ const GameHeader = () => {
     }
   };
 
-  const handleLogoutClick = (e) => {
-    e.preventDefault();
-    setShowLogOutModal(true)
-  };
-
-  // const handleLogoutClick = () => {
-  //   const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
-  //   if (confirmLeave) {
-  //     LogOut();
-  //     // const notLoggedIn = window.confirm('You are not logged in. Would you like to log in to play?');
-  //     navigate('/');
-
-  //   }
-  // };
-
-
-  //FIXME: Suggestion from copilot:
-  // const handleNavigation = (type) => {
-  //   setPopupType(type);
-  //   setShowPopup(true);
-  // };
-
-  // const handlePopupConfirm = () => {
-  //   if (popupType === 'home') {
-  //     navigate('/'); // Navigate to the home page
-  //   } else if (popupType === 'logout') {
-  //     logout(); // Log out the user
-  //     navigate('/'); // Redirect to the landing page
-  //   }
-  //   setShowPopup(false); // Close the modal
-  // };
-
-  // const handlePopupCancel = () => {
-  //   setShowPopup(false); // Close the modal without taking any action
-  // };
-
   return (
     <header
       className={`game-header w-full ${theme.headerBg} ${theme.textColor} py-4 px-6 flex flex-col items-center`}
@@ -101,16 +62,16 @@ const GameHeader = () => {
       {/* Navigation and User Info */}
       <div className="flex justify-between w-full mt-4">
         <nav className="flex space-x-4">
-          <div className="navbar-start">
-          <NavLink 
-            to="/" 
-            className={activeLink}
+          <a
+            href="/"
+            className="hover:underline"
             onClick={(e) => {
               e.preventDefault();
               handleNavigation('/')
-            }}>
+            }}
+          >
             Home
-          </NavLink>
+          </a>
           <a
             href="rules.pdf"
             target="_blank"
@@ -120,39 +81,28 @@ const GameHeader = () => {
           >
             Rules
           </a>
-          </div>
         </nav>
         <div className="flex space-x-4">
           <div className="user-info flex space-x-4">
             <span className="username">{user.username}</span>
           </div>
-          <NavLink
-            to="/"
-            className={activeLink}
+          <a
+            href="#"
+            className="hover:underline"
             onClick={(e) => {
               e.preventDefault();
-              handleLogoutClick('/')
-            }}>
-              Log Out
-              <LogOut />
-            </NavLink>
-            {showLogOutModal && (
-              <LogoutModal onClose={() => setLogoutModalOpen(false)} />
-            )}
+              console.log('Log Out button clicked');
+              setShowLogOutModal(true); // Show the logout modal
+              console.log('showLogOutModal:', showLogOutModal);
+            }}
+          >
+            Log Out
+          </a>
         </div>
       </div>
-
-
-      {/* 
-      Popup Modal (Commented out for now)
-      {showPopup && (
-        <LeaveSessionModal
-        actionType={popupType} // Determines the type of action (home or logout)
-        onConfirm={handlePopupConfirm} // Called when the user confirms the action
-        onCancel={handlePopupCancel} // Called when the user cancels the action
-        />
-      } 
-      */}
+      {showLogOutModal && (
+        <Logout onClose={() => setShowLogOutModal(false)} />
+      )}
     </header>
   );
 };
