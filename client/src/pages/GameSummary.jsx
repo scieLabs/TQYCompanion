@@ -1,88 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { useAuthContext } from '../path/to/authContext';
-import gameAPI from '../api/gameApi.js';
 import GameHeader from '../components/GameHeader';
 import GameOverview from './modals/GameOverview';
-import { useParams } from 'react-router-dom';
 import Login from './modals/Login.jsx';
 
-const GameSummary = () => {
-    const { user } = useAuthContext();
-    const [showLogin, setShowLogin] = useState(false);
-    const [stats, setStats] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState('');
+const GameSummary = ({ game, stats, projects, currentWeek }) => {
     const [showOverview, setShowOverview] = useState(false);
-    const { game_id } = useParams();
 
-    const onLoginClick = () => {
-        setShowLogin(true);
-    };
+    if (!game || !stats || !projects) {
+        return <p>No game data available.</p>;
+    }
 
-    const [gameData, setGameData] = useState({
-        gameTitle: '',
-        currentWeek: 0,
-        stats: { abundance: '', scarcity: '', contempt: 0 },
-        weeks: [],
-    });
-
-    useEffect(() => {
-        const fetchGameData = async () => {
-            try {
-                setLoading(true);
-                setErrorMessage('');
-
-                // Fetch game details
-                const gameResponse = await gameAPI.get(`/game/${game_id}`);
-                const game = gameResponse.data;
-
-                // Fetch stats
-                const statsResponse = await gameAPI.get(`/stats/${game_id}`);
-                const stats = statsResponse.data;
-
-                // Fetch projects
-                const projectsResponse = await gameAPI.get(`/projects/${game_id}`);
-                const projects = projectsResponse.data;
-
-                // Combine data into the expected structure
-                const weeks = stats.map((stat) => {
-                    const weekProjects = projects.filter((project) => project.stats_week === stat.week);
-                    return {
-                        weekNumber: stat.week,
-                        projects: weekProjects.map((project) => project.project_title),
-                        discussions: stat.discussion ? [stat.discussion] : [],
-                        discoveries: stat.discovery ? [stat.discovery] : [],
-                    };
-                });
-                
-                // Set the game data state and deconstruct the stats
-                setGameData({
-                    gameTitle: game.title,
-                    currentWeek: stats.length,
-                    stats: {
-                        abundance: stats[stats.length - 1]?.abundance || 'None',
-                        scarcity: stats[stats.length - 1]?.scarcity || 'None',
-                        contempt: stats[stats.length - 1]?.contempt || 0,
-                    },
-                    weeks,
-                });
-            } catch (error) {
-                console.error('Error fetching game data:', error.message);
-                setErrorMessage(`Failed to load game data. Error: ${error.message}`);
-            } finally {
-                setLoading(false);
-            }
+    // Combine and count the stats
+    const weeks = projects.reduce((acc, project) => {
+        const week = acc.find((w) => w.weekNumber === project.stats_week) || {
+            weekNumber: project.stats_week,
+            projects: [],
+            discussions: [],
+            discoveries: [],
         };
+        week.projects.push(project.project_title);
+        if (!acc.includes(week)) acc.push(week);
+        return acc;
+    }, []);
 
-        fetchGameData();
-    }, [game_id]); 
-    // Fetch game data when the component mounts or game_id changes; 
-    // should only change if the user changes games; 
-    // ensures that the data is fetched only once or when the player changes games
+    const totalProjects = weeks.reduce((count, week) => count + week.projects.length, 0);
+    const totalDiscussions = weeks.reduce((count, week) => count + week.discussions.length, 0);
+    const totalDiscoveries = weeks.reduce((count, week) => count + week.discoveries.length, 0);
+
 
     if (loading) {
-        return <p className="loading-message text-blue-500 font-bold">Loading game data...</p>;
+        return <p className="loading-message text-blue-500 font-bold">Loading game summary...</p>;
     }
 
     if (errorMessage) {
@@ -92,12 +39,6 @@ const GameSummary = () => {
     if (!gameData || !gameData.weeks) {
         return <p>No game data available.</p>;
     }
-
-    // Combine and count the stats;
-    const { gameTitle, currentWeek, stats: gameStats, weeks } = gameData || {};
-    const totalProjects = weeks?.reduce((count, week) => count + (week.projects?.length || 0), 0) || 0;
-    const totalDiscussions = weeks?.reduce((count, week) => count + (week.discussions?.length || 0), 0) || 0;
-    const totalDiscoveries = weeks?.reduce((count, week) => count + (week.discoveries?.length || 0), 0) || 0;
 
     return (
         <div>
