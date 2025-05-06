@@ -12,89 +12,12 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
   const { user } = useAuthContext(); //change if needed
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {}; // Get the theme for the current season
-  // const [gameData, setGameData] = useState({
-  //   abundance: '',
-  //   scarcity: '',
-  //   contempt: 0,
-  //   projects: [],  // Include a field for projects
-  //   pp: []
-  // });
+
   const [projects, setProjects] = useState([]);
   const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [resolveModal, setResolveModal] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
-  // const [ongoingProjects, setOngoingProjects] = useState([]);
-  // const [completedProjects, setCompletedProjects] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     try {
-  //       // Fetch ongoing projects
-  //       console.log(`Fetching projects for game_id: ${game_id}`);
-  //       const projectsResponse = await projectAPI.getOngoingProjects(game_id);
-  //       console.log('Ongoing projects:', projectsResponse.data);
-  //       setProjects(projectsResponse.data);
-
-  //       // Fetch completed projects
-  //       const completedResponse = await projectAPI.getCompletedProjects(game_id);
-  //       console.log('Completed projects:', completedResponse.data);
-  //       setCompletedProjects(completedResponse.data);
-
-  //     } catch (error) {
-  //       if (error.response?.status === 404) {
-  //         console.warn('No ongoing projects found.');
-  //         setProjects([]); // Set an empty array if no ongoing projects are found
-  //       } else {
-  //         console.error('Error fetching projects:', error);
-  //       }
-  //     }
-  //   };
-
-  //   if (game_id) {
-  //     fetchProjects();
-  //   }
-  // }, [game_id]);
-
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     try {
-  //       console.log(`Fetching all projects for game_id: ${game_id}`);
-  //       const response = await projectAPI.getProjectsByGame(game_id);
-  //       console.log('Response from backend:', response);
-  //       const allProjects = response.data;
-
-  //       console.log('All projects:', allProjects);
-
-  //       // Sort projects into ongoing and completed
-  //       const ongoing = allProjects.filter(
-  //         (proj) => (proj.project_weeks > 0 || proj.pp_weeks > 0)
-  //       );
-  //       const completed = allProjects.filter(
-  //         (proj) => (proj.project_weeks === 0 || proj.pp_weeks === 0)
-  //       );
-
-  //       setProjects(allProjects);
-  //       setOngoingProjects(ongoing);
-  //       setCompletedProjects(completed);
-  //     } catch (error) {
-  //       console.error('Error fetching projects:', error);
-  //       if (error.response?.status === 404) {
-  //         console.warn('No projects found for this game.');
-  //         setProjects([]);
-  //         setOngoingProjects([]);
-  //         setCompletedProjects([]);
-  //     } else {
-  //       console.error('Error fetching projects:', error);
-  //     }
-  //   }
-  // };
-
-  //   if (game_id) {
-  //     console.log('Game ID:', game_id);
-  //     fetchProjects();
-  //   }
-  // }, [game_id]);
 
   const [tempStats, setTempStats] = useState(stats);
   useEffect(() => {
@@ -143,30 +66,6 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
     }
   };
 
-  //   const updateProjectWeeks = async (projectId, weeks) => {
-  //     try {
-  //       await projectAPI.updateProjectWeeks(projectId, weeks);
-  //       setProjects((prev) =>
-  //         prev.map((proj) => (proj._id === projectId ? { ...proj, weeks } : proj))
-  //       );
-  //     } catch (error) {
-  //       console.error('Error updating project weeks:', error);
-  //       handleApiError(error, 'updateProjectWeeks');
-  //     }
-  //   };
-
-
-  // const handleResolve = async (projectId, resolution) => {
-  //   try {
-  //     await projectAPI.resolveProject(projectId, resolution);
-  //     setProjects((prev) => prev.filter((proj) => proj._id !== projectId));
-  //     const completedResponse = await projectAPI.getCompletedProjects(game_id);
-  //     setCompletedProjects(completedResponse.data);
-  //   } catch (error) {
-  //     console.error('Error resolving project:', error);
-  //     handleApiError(error, 'handleResolve');
-  //   }
-  // };
 
   const updateProjectWeeks = async (project_id, weeks) => {
     try {
@@ -182,30 +81,11 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
         )
       );
 
-      // If the project is completed (weeks === 0), move it to the completed list
-      // if (weeks === 0) {
-      //   setOngoingProjects((prev) => prev.filter((proj) => proj._id !== project_id));
-      //   setCompletedProjects((prev) => [
-      //     ...prev,
-      //     ongoingProjects.find((proj) => proj._id === project_id),
-      //   ]);
-      // }
-
-          // If the project is completed (weeks === 0), open the Resolve modal
-      // if (weeks === 0) {
-      //   const projectToResolve = ongoingProjects.find((proj) => proj._id === project_id);
-      //   setResolveModal(projectToResolve);
-      // }
-
     } catch (error) {
       console.error('Error updating project weeks:', error);
     }
   };
 
-  // const handleResolve = (title, type, resolution) => {
-  //   console.log(`Resolving project: ${title}, type: ${type}, resolution: ${resolution}`);
-  //   setResolveModal(null);
-  // };
 
   const handleResolve = async () => {
     try {
@@ -230,30 +110,6 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
       console.error('Error resolving project:', error);
     }
   };
-
-  // const handleResolve = (title, type, resolution) => {
-  //   console.log(`Resolving project: ${title}, type: ${type}, resolution: ${resolution}`);
-  //   setResolveModal(null);
-  // };
-
-
-  // Combine projects and personal projects, filter for ongoing ones, and sort by weeks remaining
-  // const ongoingProjects = [...gameData.projects, ...gameData.pp]
-  // .filter(p => p.title && p.weeks > 0)
-  // .sort((a, b) => a.weeks - b.weeks);
-
-  // // Combine projects and personal projects, filter for completed ones
-  // const completedProjects = [...gameData.projects, ...gameData.pp]
-  // .filter(p => p.title && p.weeks === 0 && p.resolve);
-
-  // const saveGameData = async (gameTitle, week, formData) => {
-  //   try {
-  //     await gameAPI.put(`/game/title/${gameTitle}/week/${week}`, formData);
-  //     // Save the current game data for the given gameTitle and week.
-  //   } catch (error) {
-  //     handleApiError(error, 'saveGameData');
-  //   }
-  // };
 
 
   return (
