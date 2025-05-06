@@ -111,83 +111,92 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
     }
   };
 
-
   return (
-    <div className={`p-4 rounded-lg ${theme.statsBg} ${theme.statsText}`}>
-      {/* Display Abundance and Scarcity */}
-      <div className="flex justify-between mb-4">
-        <div className="flex-1 text-center">
-          <p className="font-semibold text-lg">Abundances</p>
-          <p>{stats.abundance || 'No data available'}</p>
-        </div>
-        <div className="flex-1 text-center">
-          <p className="font-semibold text-lg">Scarcities</p>
-          <p>{stats.scarcity || 'No data available'}</p>
-        </div>
-      </div>
+    <div className={`p-4 rounded-lg min-h-screen flex flex-col justify-between ${theme.statsBg} ${theme.statsText}`}>
 
-      {/* Display Contempt */}
-      <div className="text-center mb-4">
-        <p className="font-semibold text-lg">Contempt</p>
-        <p>{stats.contempt}</p>
-      </div>
+      <div>
+        {/* Display Abundance and Scarcity */}
+        <div className="flex justify-between mb-4">
+          <div className="flex-1 text-center">
+            <p className="font-semibold text-lg">Abundances</p>
+            <p>{stats.abundance || 'No data available'}</p>
+          </div>
+          <div className="flex-1 text-center">
+            <p className="font-semibold text-lg">Scarcities</p>
+            <p>{stats.scarcity || 'No data available'}</p>
+          </div>
+        </div>
 
-            {/* Edit Button */}
-      <div className="text-center">
-        <button
-          onClick={handleEdit}
-          className={`btn btn-primary ${theme.statsBtnBg} ${theme.statsBtnText} ${theme.statsBtnBgHover}`}>
-          Edit Resources
-        </button>
+        {/* Display Contempt */}
+        <div className="text-center mb-4">
+          <p className="font-semibold text-lg">Contempt</p>
+          <p>{stats.contempt}</p>
+        </div>
+
+              {/* Edit Button */}
+        <div className="text-center">
+          <button
+            onClick={handleEdit}
+            className={`btn border-hidden shadow-sm ${theme.statsBtnBg} ${theme.statsBtnText} ${theme.statsBtnBgHover}`}>
+            Edit Resources
+          </button>
+        </div>
+
       </div>
 
       {/* Edit Modal */}
       {editModalOpen && (
         <dialog id="editModal" className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Edit Resources</h3>
-            <div className="mb-4">
-              <label className="block font-bold mb-1">Abundance</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                value={tempStats.abundance}
-                onChange={(e) => setTempStats({ ...tempStats, abundance: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-bold mb-1">Scarcity</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                value={tempStats.scarcity}
-                onChange={(e) => setTempStats({ ...tempStats, scarcity: e.target.value })}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-bold mb-1">Contempt</label>
-              <input
-                type="number"
-                className="input input-bordered w-full"
-                value={tempStats.contempt}
-                onChange={(e) => setTempStats({ ...tempStats, contempt: parseInt(e.target.value, 10) || 0 })}
-              />
-            </div>
-            <div className="modal-action">
-              <button className="btn btn-primary" onClick={handleSave}>
-                Save
-              </button>
-              <button className="btn" onClick={() => setEditModalOpen(false)}>
-                Cancel
-              </button>
+          <div className="modal-box p-0">
+            <header className={`p-4 text-center ${theme.headerBg} ${theme.headerText}`}>
+              <h3 className="font-bold text-lg mb-">Edit Resources</h3>
+            </header>
+
+            <div className={`m-6 p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+              <div className="mb-4 p-6">
+                <label className="block font-bold mb-1">Abundance</label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={tempStats.abundance}
+                  onChange={(e) => setTempStats({ ...tempStats, abundance: e.target.value })}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-bold mb-1">Scarcity</label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={tempStats.scarcity}
+                  onChange={(e) => setTempStats({ ...tempStats, scarcity: e.target.value })}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-bold mb-1">Contempt</label>
+                <input
+                  type="number"
+                  className="input input-bordered w-full"
+                  value={tempStats.contempt}
+                  onChange={(e) => setTempStats({ ...tempStats, contempt: parseInt(e.target.value, 10) || 0 })}
+                />
+              </div>
+              <div className="modal-action">
+                <button className="btn btn-primary" onClick={handleSave}>
+                  Save
+                </button>
+                <button className="btn" onClick={() => setEditModalOpen(false)}>
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </dialog>
       )}
 
+      <div>
       {/* Ongoing projects */}
-        <h3 className="text-lg font-semibold mb-2">Ongoing Projects</h3>
-        <div className="max-h-64 overflow-y-auto border border-gray-300 rounded p-2">
+        <h3 className="text-lg font-semibold mb-2 text-center">Ongoing Projects</h3>
+        <div className="max-h-full overflow-y-auto border border-gray-300 rounded p-2">
         {ongoingProjects.length > 0 ? (
           ongoingProjects.map((proj) => (
             <div key={proj._id} className="mb-4">
@@ -216,7 +225,7 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                   </>
                 ) : (
                   <button
-                    className="btn btn-xs btn-secondary"
+                    className={`btn btn-xs btn-secondary border-none shadow-sm ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
                     onClick={() => setResolveModal(proj)}
                   >
                     Resolve
@@ -264,9 +273,17 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
           </div>
         </dialog>
       )}
+      </div>
 
 
-      <button className="btn btn-sm mt-2" onClick={() => setShowCompleted(true)}>Completed Projects</button>
+      <div className="flex justify-center items-center mt-4">
+        <button 
+          className={`btn border-hidden shadow-sm ${theme.statsBtnBg} ${theme.statsBtnText} ${theme.statsBtnBgHover}`}
+          onClick={() => setShowCompleted(true)}
+        >
+          Completed Projects
+        </button>
+      </div>
 
       {showCompleted && (
         <dialog id="completedProjectsModal" className="modal modal-open">

@@ -41,8 +41,8 @@ export const SeasonProvider = ({ children }) => {
       // GameStats sidebar
       statsBg: 'bg-[#ffb7b7]',
       statsText: 'text-[#f4eeee]',
-      statsBtnBg: 'bg-[#ffdbaa]',
-      statsBtnBgHover: 'hover:bg-[#97be5a]',
+      statsBtnBg: 'bg-[#97be5a]',
+      statsBtnBgHover: 'hover:bg-[#ffdbaa]',
       statsBtnText: 'text-[#f4eeee]', // TODO: change to body text colour later
   
       //footer
@@ -118,14 +118,14 @@ export const SeasonProvider = ({ children }) => {
       nextWeekBtnBgHover: 'hover:bg-[#7c444f]', //Next week button hover
       nextWeekBtnText: 'text-[#f9ebd9]',
   
-      pWeeksBtnBg: 'bg-[#7c444f]', //the + and - buttons for setting project duration
+      pWeeksBtnBg: 'bg-[#7c444f] shadow-sm', //the + and - buttons for setting project duration
       pWeeksBtnBgHover: 'hover:bg-[#d44747]', //hover for above
       pWeeksBtnText: 'text-[#f9ebd9]',
   
       // GameStats sidebar
       statsBg: 'bg-[#f39e60]',
       statsText: 'text-[#f9ebd9]',
-      statsBtnBg: 'bg-[#7c444f]',
+      statsBtnBg: 'bg-[#7c444f] shadow-sm',
       statsBtnBgHover: 'hover:bg-[#d44747]',
       statsBtnText: 'text-[#f9ebd9]',
   

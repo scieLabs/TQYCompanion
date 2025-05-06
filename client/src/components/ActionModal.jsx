@@ -61,91 +61,60 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
   const renderActionForm = () => {
     //displays individual actions
     return (
-      <div className="space-y-4">
-        <div>
-          <label className="block font-bold">Discover something new</label>
+      <div className="flex flex-row justify-between space-x-6 mx-8">
+
+        <div className="w-1/3 flex flex-col items-center">
+          <label className="block font-bold mb-2 text-center">Discover something new</label>
           <textarea
-            className={`textarea textarea-bordered w-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
+            className={`textarea textarea-bordered w-full h-64 ${theme.bodyInputBg} ${theme.bodyInputText}`}
+            placeholder="Introduce a new situation. It might be a problem, opportunity, or a bit of both."
             value={formData.discovery || ''}
             onChange={(e) => updateField('discovery', e.target.value)}
           />
-            {/* <button
-                className="btn btn-primary mt-4"
-                onClick={() =>
-                saveActionData(gameTitle, currentWeek, { discovery: formData.discovery })
-                }
-            >
-                Save Discovery
-            </button> */}
         </div>
-        <div>
-          <label className="block font-bold">Hold a discussion</label>
+
+        <div className="w-1/3 flex flex-col items-center">
+          <label className="block font-bold mb-2 text-center">Hold a discussion</label>
           <textarea
-            className="textarea textarea-bordered w-full"
+            className={`textarea textarea-bordered w-full h-64 ${theme.bodyInputBg} ${theme.bodyInputText}`}
+            placeholder="A discussion never results in a decision or summation process. Everyone weighs in, and then it’s over."
             value={formData.discussion || ''}
             onChange={(e) => updateField('discussion', e.target.value)}
           />
-            {/* <button
-                className="btn btn-primary mt-4"
-                onClick={() =>
-                saveActionData(gameTitle, currentWeek, { discussion: formData.discussion })
-                }
-            >
-                Save Discussion
-            </button> */}
         </div>
-        <div>
-          <label className="block font-bold">Start a project</label>
-          <input
-            className="input input-bordered w-full"
-            placeholder="Title"
-            value={formData.project_title || ''}
-            onChange={(e) => updateField('project_title', e.target.value)}
-          />
-          <textarea
-            className="textarea textarea-bordered w-full mt-2"
-            placeholder="Description"
-            value={formData.project_desc || ''}
-            onChange={(e) => updateField('project_desc', e.target.value)}
-          />
-          <div className="flex items-center space-x-2 mt-2">
-            <span className="font-bold">Weeks:</span>
-            <button className="btn btn-sm" onClick={() => updateField('project_weeks', Math.max(1, (formData.project_weeks || 1) - 1))}>-</button>
-            <span>{formData.project_weeks || 1}</span>
-            <button className="btn btn-sm" onClick={() => updateField('project_weeks', Math.min(6, (formData.project_weeks || 1) + 1))}>+</button>
+
+        <div className="w-1/3 flex flex-col items-center">
+          <label className="block font-bold text-center mb-2">Start a project</label>
+          <div className="w-full flex flex-col justify-between h-64">
+            <input
+              className={`input input-bordered w-full mb-2 ${theme.bodyInputBg} ${theme.bodyInputText}`}
+              placeholder="A catchy title for tracking purposes."
+              value={formData.project_title || ''}
+              onChange={(e) => updateField('project_title', e.target.value)}
+            />
+            <textarea
+              className={`textarea textarea-bordered w-full h-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
+              placeholder="Choose a situation and declare what the community will do to resolve it. Do you have the necessary tools and expertise to do this? As a group, decide how many weeks the project would reasonably take to complete (1-6)."
+              value={formData.project_desc || ''}
+              onChange={(e) => updateField('project_desc', e.target.value)}
+            />
           </div>
-          {/* <button
-                className="btn btn-primary mt-4"
-                onClick={() =>
-                saveActionData(gameTitle, currentWeek, {
-                    project_title: formData.project_title,
-                    project_desc: formData.project_desc,
-                    project_weeks: formData.project_weeks,
-                })
-                }
-            >
-                Save Project
-            </button> */}
+          <div className="flex items-center justify-end space-x-2 mt-2 w-full">
+            <span className="font-bold">Weeks:</span>
+            <button 
+              className={`btn btn-sm text-lg ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+              onClick={() => updateField('project_weeks', Math.max(1, (formData.project_weeks || 1) - 1))}>-</button>
+            <span
+              // className={`${theme.bodyInputBg} ${theme.bodyInputText}`}
+              >{formData.project_weeks || 1}</span>
+            <button 
+              className={`btn btn-sm text-lg ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+              onClick={() => updateField('project_weeks', Math.min(6, (formData.project_weeks || 1) + 1))}>+</button>
+          </div>
         </div>
       </div>
     );
   };
-
-  if (action && action._id.toString() === GAME_OVER_PROMPT_ID) {
-    return (
-      <div>
-        <label className="block font-bold">Enter Epilogue</label>
-        <textarea
-          className="textarea textarea-bordered w-full"
-          value={formData.end || ''}
-          onChange={(e) => updateField('end', e.target.value)}
-        />
-        <button className="btn btn-error mt-2" 
-        onClick={() => navigate("/summary")}
-        >Game Over</button>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -153,26 +122,26 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
       {/* Conditionally show the modal buttons */}
       {isDiscussion && (
         <button
-          className="btn btn-sm mt-4"
+          className={`btn btn-sm mt-4 ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
           onClick={() => setFormData(prev => ({ ...prev, showDiscussionModal: true }))}
         >
-          Open Discussion Modal
+          Hold a Discussion
         </button>
       )}
       {isDiscovery && (
         <button
-          className="btn btn-sm mt-4"
+          className={`btn btn-sm mt-4 shadow-sm ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
           onClick={() => setFormData(prev => ({ ...prev, showDiscoveryModal: true }))}
         >
-          Open Discovery Modal
+          Discover Something New
         </button>
       )}
       {isProject && (
         <button
-          className="btn btn-sm mt-4"
+          className={`btn btn-sm mt-4 shadow-sm ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
           onClick={() => setFormData(prev => ({ ...prev, showProjectModal: true }))}
         >
-          Open Project Modal
+          Start a Project
         </button>
       )}
 
