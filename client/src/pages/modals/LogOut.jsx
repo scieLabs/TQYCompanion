@@ -19,7 +19,7 @@ export default function Logout({onClose}) {
         try {
             setLoading(true);
             await logout(); // Use the logout function from authContext
-            console.log('Logout successful:', response.data);
+            console.log('Logout successful:');
             setSuccessMessage('You are logged out! Redirecting to home page...');
             setTimeout(() => {
                 setLoading(false);
