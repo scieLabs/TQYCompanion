@@ -15,8 +15,8 @@ const projectAPI = axios.create({
   export const getCompletedProjects = (game_id) =>
     projectAPI.get(`/projects/${game_id}/completed`);
   
-  export const updateProjectWeeks = (project_id, weeks) =>
-    projectAPI.put(`/projects/${project_id}/weeks`, { weeks });
+  export const updateProjectWeeks = (project_id, { project_weeks, pp_weeks }) =>
+    projectAPI.put(`/projects/${project_id}/weeks`, { project_weeks, pp_weeks });
   
   export const resolveProject = (project_id, resolution) =>
     projectAPI.put(`/projects/${project_id}/resolve`, { resolution });

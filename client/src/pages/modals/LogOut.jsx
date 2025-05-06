@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuthContext } from '../../contexts/authContext.jsx';
+import { useSeason } from "../../contexts/seasonContext";
 import { useNavigate } from 'react-router-dom';
 
 export default function Logout({onClose}) {
@@ -10,6 +11,8 @@ export default function Logout({onClose}) {
     const [successMessage, setSuccessMessage] = useState('');
 
 
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
 
     const handleLogout = async () => {
         // const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
@@ -30,7 +33,8 @@ export default function Logout({onClose}) {
             setErrorMessage(error.message || 'Logout failed. Please try again.');
             setLoading(false);
         }
-    }
+    };
+
 
     return (
         <div >

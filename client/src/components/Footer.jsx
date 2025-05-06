@@ -7,7 +7,7 @@ const Footer = () => {
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {};
 
-    return <footer className={`width-full ${theme.footerBg} ${theme.footerText} py-4 px-6 flex justify-between items-center`}>
+    return <footer className={`width-full ${theme.footerBg} ${theme.footerText} py-4 px-6 flex justify-between items-center mt-auto`}>
       <div className="text-sm">The Quiet Year Companion, 2025</div>
       <div className="flex space-x-4">
         <a href="https://buriedwithoutceremony.com/the-quiet-year" className={`${theme.footerTextHover}`}>❯❯ © Buried Without Ceremony ❮❮</a>

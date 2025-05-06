@@ -11,21 +11,23 @@ import { SeasonProvider } from './contexts/seasonContext.jsx';
 import { AuthProvider } from './contexts/authContext.jsx';
 import ProtectedRoute from './layouts/authLayout.jsx'; // Import the ProtectedRoute function
 
+
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <SeasonProvider>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route
-              path="/new-game"
-              element={
-                <ProtectedRoute>
-                  <CreateNewGame />
-                </ProtectedRoute>
-              }
-            />
+          <SeasonProvider>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route
+                path="/new-game"
+                element={
+                  <ProtectedRoute>
+
+                    <CreateNewGame />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/game/:game_id/week/:week"
                 element={
@@ -33,10 +35,19 @@ function App() {
                     <GameProgress />
                   </ProtectedRoute>
                 }
-            />
-          </Routes>
-          <Footer />
-        </SeasonProvider>
+              />
+              {/* TODO: Add the correct path for the summary page 
+              <Route
+                path="/game/:game_id/summary/"
+                element={
+                  <ProtectedRoute>
+                    <GameSummary />
+                  </ProtectedRoute>
+                }
+              />*/}
+            </Routes>
+            <Footer />
+          </SeasonProvider>
       </AuthProvider>
     </Router>
   );
