@@ -1,6 +1,6 @@
 // for gameplay, not the landing page
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink,Link } from 'react-router-dom';
 import { useAuthContext } from '../contexts/authContext';
 import { useSeason } from '../contexts/seasonContext.jsx';
 import Logout from '../pages/modals/LogOut';
@@ -11,7 +11,7 @@ const GameHeader = () => {
   const { user } = useAuthContext();
   const { currentSeason = 'Spring', seasonThemes = {} } = useSeason();
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' };
-  const [showLogOutModal, setShowLogOutModal] = useState(false);
+  const [showLogOutModal, setShowLogOutModal] = useState(true);
   // const [popupType, setPopupType] = useState('');
   const [gameTitle, setGameTitle] = useState('');
   const location = useLocation();
@@ -86,8 +86,19 @@ const GameHeader = () => {
           <div className="user-info flex space-x-4">
             <span className="username">{user.username}</span>
           </div>
-          <a
-            href="#"
+          <button
+            className="hover:underline"
+            onClick={() => {
+              console.log('Log Out button clicked');
+              setShowLogOutModal(!showLogOutModal); // Show the logout modal
+              console.log('showLogOutModal:', showLogOutModal);
+            }}
+          >
+            {/* {showLogOutModal&&`Log Out`} */}
+            Log Out
+          </button>
+          {/* <Link
+            to="/logout"
             className="hover:underline"
             onClick={(e) => {
               e.preventDefault();
@@ -97,11 +108,13 @@ const GameHeader = () => {
             }}
           >
             Log Out
-          </a>
+          </Link> */}
         </div>
       </div>
       {showLogOutModal && (
+        // <Logout  />
         <Logout onClose={() => setShowLogOutModal(false)} />
+        // <h1>Hello there!</h1>
       )}
     </header>
   );
