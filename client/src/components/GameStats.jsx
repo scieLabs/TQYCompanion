@@ -97,12 +97,22 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
   
       // Save the resolution to the backend
       await projectAPI.resolveProject(resolveModal._id, resolution);
+
+      //     // Calculate the week the project finished and how many weeks it took
+      // const finishedWeek = currentWeek;
+      // const startedWeek = resolveModal.stats_week || 0; // Default to 0 if stats_week is not available
+      // const weeksTaken = finishedWeek - startedWeek;
   
       // Update the lists
       setOngoingProjects((prev) => prev.filter((proj) => proj._id !== resolveModal._id));
       setCompletedProjects((prev) => [
         ...prev,
-        { ...resolveModal, project_resolve: resolveModal.project_resolve, pp_resolve: resolveModal.pp_resolve },
+        { ...resolveModal,
+          project_resolve: resolveModal.project_resolve,
+          pp_resolve: resolveModal.pp_resolve,
+          // finished_week: finishedWeek, // Add finished week
+          // weeks_taken: weeksTaken, // Add weeks taken
+         },
       ]);
   
       setResolveModal(null); // Close the modal
@@ -117,13 +127,16 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
       <div>
         {/* Display Abundance and Scarcity */}
         <div className="flex justify-between mb-4">
-          <div className="flex-1 text-center">
+          <div className="flex-1 text-center p-2 max-h-32 overflow-y-auto">
             <p className="font-semibold text-lg">Abundances</p>
-            <p>{stats.abundance || 'No data available'}</p>
+            <p className='text-sm'>{stats.abundance || 'No data available'}</p>
+
           </div>
           <div className="flex-1 text-center">
-            <p className="font-semibold text-lg">Scarcities</p>
-            <p>{stats.scarcity || 'No data available'}</p>
+            <div className="flex-1 text-center p-2 max-h-32 overflow-y-auto">
+              <p className="font-semibold text-lg">Scarcities</p>
+              <p className='text-sm'>{stats.scarcity || 'No data available'}</p>
+            </div>
           </div>
         </div>
 
@@ -152,12 +165,12 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
               <h3 className="font-bold text-lg mb-">Edit Resources</h3>
             </header>
 
-            <div className={`m-6 p-6 ${theme.bodyBg} ${theme.bodyText}`}>
-              <div className="mb-4 p-6">
+            <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+              <div className="mb-4">
                 <label className="block font-bold mb-1">Abundance</label>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
+                  className={`input input-bordered w-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
                   value={tempStats.abundance}
                   onChange={(e) => setTempStats({ ...tempStats, abundance: e.target.value })}
                 />
@@ -166,7 +179,7 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                 <label className="block font-bold mb-1">Scarcity</label>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
+                  className={`input input-bordered w-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
                   value={tempStats.scarcity}
                   onChange={(e) => setTempStats({ ...tempStats, scarcity: e.target.value })}
                 />
@@ -175,16 +188,20 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                 <label className="block font-bold mb-1">Contempt</label>
                 <input
                   type="number"
-                  className="input input-bordered w-full"
+                  className={`input input-bordered w-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
                   value={tempStats.contempt}
                   onChange={(e) => setTempStats({ ...tempStats, contempt: parseInt(e.target.value, 10) || 0 })}
                 />
               </div>
               <div className="modal-action">
-                <button className="btn btn-primary" onClick={handleSave}>
+                <button
+                  className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                  onClick={handleSave}>
                   Save
                 </button>
-                <button className="btn" onClick={() => setEditModalOpen(false)}>
+                <button
+                  className="btn border-none shadow-md"
+                  onClick={() => setEditModalOpen(false)}>
                   Cancel
                 </button>
               </div>
@@ -195,13 +212,17 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
 
       <div>
       {/* Ongoing projects */}
-        <h3 className="text-lg font-semibold mb-2 text-center">Ongoing Projects</h3>
-        <div className="max-h-full overflow-y-auto border border-gray-300 rounded p-2">
+        <h3 className="text-lg font-semibold mb-3 text-center">Ongoing Projects</h3>
+        <div className="max-h-120 overflow-y-auto p-2">
         {ongoingProjects.length > 0 ? (
           ongoingProjects.map((proj) => (
-            <div key={proj._id} className="mb-4">
-              <p className="font-bold">{proj.project_title || proj.pp_title}</p>
-              <p className="text-sm italic mb-1">{proj.project_desc || proj.pp_desc}</p>
+            <div key={proj._id} className="flex items-center justify-between mb-4">
+
+              <div className="w-3/4 break-words">
+                <p className="font-bold">{proj.project_title || proj.pp_title}</p>
+                <p className="text-sm italic mb-1">{proj.project_desc || proj.pp_desc}</p>
+              </div>
+
               <div className="flex items-center gap-2">
                 {proj.project_weeks > 0 || proj.pp_weeks > 0 ? (
                   <>
@@ -225,7 +246,7 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                   </>
                 ) : (
                   <button
-                    className={`btn btn-xs btn-secondary border-none shadow-sm ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
+                    className={`btn btn-xs btn-secondary border-none shadow-sm ${theme.nextWeekBtnBg} ${theme.statsBtnBgHover}`}
                     onClick={() => setResolveModal(proj)}
                   >
                     Resolve
@@ -242,33 +263,42 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
             {/* Resolve Modal */}
         {resolveModal && (
         <dialog id="resolveModal" className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Resolve Project</h3>
-            <p className="font-bold">{resolveModal.project_title || resolveModal.pp_title}</p>
-            <p className="italic mb-4">{resolveModal.project_desc || resolveModal.pp_desc}</p>
-            <textarea
-              className="textarea textarea-bordered w-full"
-              placeholder="Enter resolution"
-              value={resolveModal.project_resolve || resolveModal.pp_resolve || ''}
-              // onChange={(e) => setResolveModal({ ...resolveModal, resolution: e.target.value })}
-              onChange={(e) =>
-                setResolveModal({
-                  ...resolveModal,
-                  project_resolve: resolveModal.project_weeks === 0 ? e.target.value : undefined,
-                  pp_resolve: resolveModal.pp_weeks === 0 ? e.target.value : undefined,
-                })
-              }
-            />
-            <div className="modal-action">
-              <button
-                className="btn btn-primary"
-                onClick={handleResolve}
-              >
-                Save
-              </button>
-              <button className="btn" onClick={() => setResolveModal(null)}>
-                Cancel
-              </button>
+          <div className="modal-box p-0">
+
+            <header className={`p-4 text-center ${theme.headerBg} ${theme.headerText}`}>
+              <h3 className="font-bold text-lg mb-4">Resolve Project</h3>
+            </header>
+
+            <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+              <div className="mb-4 max-h-80 break-words overflow-y-auto">
+                <p className="font-bold mb-2">{resolveModal.project_title || resolveModal.pp_title}</p>
+                <p className="italic mb-4">{resolveModal.project_desc || resolveModal.pp_desc}</p>
+              </div>
+
+              <textarea
+                className={`textarea textarea-bordered w-full h-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
+                placeholder="How does the project resolve?"
+                value={resolveModal.project_resolve || resolveModal.pp_resolve || ''}
+                // onChange={(e) => setResolveModal({ ...resolveModal, resolution: e.target.value })}
+                onChange={(e) =>
+                  setResolveModal({
+                    ...resolveModal,
+                    project_resolve: resolveModal.project_weeks === 0 ? e.target.value : undefined,
+                    pp_resolve: resolveModal.pp_weeks === 0 ? e.target.value : undefined,
+                  })
+                }
+              />
+              <div className="modal-action">
+                <button
+                  className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                  onClick={handleResolve}
+                >
+                  Save
+                </button>
+                <button className="btn border-none shadow-md" onClick={() => setResolveModal(null)}>
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </dialog>
@@ -287,26 +317,49 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
 
       {showCompleted && (
         <dialog id="completedProjectsModal" className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Completed Projects</h3>
-            {completedProjects.length > 0 ? (
-              completedProjects.map((proj) => (
-                <div key={proj._id} className="mb-4">
-                  <p className="font-bold">{proj.project_title || proj.pp_title}</p>
-                  <p className="italic">{proj.project_desc || proj.pp_desc}</p>
-                  <p className="text-sm">{proj.project_resolve || proj.pp_resolve}</p>
+          <div className="modal-box p-0">
+
+            <header className={`p-4 text-center ${theme.headerBg} ${theme.headerText}`}>
+              <h3 className="font-bold text-lg mb-4">Completed Projects</h3>  
+            </header>
+
+            <div className={`p-6 ${theme.bodyBg} ${theme.bodyText} `}>
+              <div className="max-h-120 break-words overflow-y-auto pr-4">
+                {completedProjects.length > 0 ? (
+                  completedProjects.map((proj, index) => (
+                    <div key={proj._id} className="mb-4">
+                      <p className="font-bold text-sm mb-2">Project #{index + 1}</p>
+                      <p className="text-sm mb-2 italic">Started in week: {proj.stats_week || 'Unknown'}</p>
+                      <div className={`p-3 mb-3 rounded border textarea textarea-bordered w-full h-full ${theme.bodyInputBg} ${theme.bodyInputText}`}>
+                        <p className="text-sm mb-2 font-bold">Title:</p>
+                        <p className="font-bold mb-2 uppercase">{proj.project_title || proj.pp_title}</p>
+                      </div>
+                      <div className={`p-3 mb-3 rounded border textarea textarea-bordered w-full h-full ${theme.bodyInputBg} ${theme.bodyInputText}`}>
+                        <p className="text-sm mb-2 font-bold">Description:</p>
+                        <p className="italic text-sm mb-2">{proj.project_desc || proj.pp_desc}</p>
+                      </div>
+                      <div className={`p-3 mb-3 rounded border textarea textarea-bordered w-full h-full ${theme.bodyInputBg} ${theme.bodyInputText}`}>
+                        <p className="text-sm font-bold">Resolution:</p>
+                        <p className="text-sm mb-4">{proj.project_resolve || proj.pp_resolve}</p>
+                      </div>
+
+                      {index < completedProjects.length - 1 && (
+                        <hr className="border-t border-gray-300 my-4" />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p>No completed projects.</p>
+                )}
                 </div>
-              ))
-            ) : (
-              <p>No completed projects.</p>
-            )}
-            <div className="modal-action">
-              <button
-                className="btn"
-                onClick={() => setShowCompleted(false)}
-              >
-                Close
-              </button>
+              <div className="modal-action">
+                <button
+                  className="btn"
+                  onClick={() => setShowCompleted(false)}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </dialog>

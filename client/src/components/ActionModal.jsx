@@ -61,6 +61,8 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
   const renderActionForm = () => {
     //displays individual actions
     return (
+      <div>
+      <h2 className="text-center my-8 uppercase font-lg font-bold underline">Choose One</h2>
       <div className="flex flex-row justify-between space-x-6 mx-8">
 
         <div className="w-1/3 flex flex-col items-center">
@@ -87,8 +89,10 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
           <label className="block font-bold text-center mb-2">Start a project</label>
           <div className="w-full flex flex-col justify-between h-64">
             <input
+              type="text"
+              maxLength="30"
               className={`input input-bordered w-full mb-2 ${theme.bodyInputBg} ${theme.bodyInputText}`}
-              placeholder="A catchy title for tracking purposes."
+              placeholder="A catchy title."
               value={formData.project_title || ''}
               onChange={(e) => updateField('project_title', e.target.value)}
             />
@@ -112,6 +116,7 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
               onClick={() => updateField('project_weeks', Math.min(6, (formData.project_weeks || 1) + 1))}>+</button>
           </div>
         </div>
+      </div>
       </div>
     );
   };
