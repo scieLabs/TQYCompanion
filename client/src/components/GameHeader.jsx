@@ -11,7 +11,7 @@ const GameHeader = () => {
   const { user } = useAuthContext();
   const { currentSeason = 'Spring', seasonThemes = {} } = useSeason();
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' };
-  const [showLogOutModal, setShowLogOutModal] = useState(true);
+  const [showLogOutModal, setShowLogOutModal] = useState(false);
   // const [popupType, setPopupType] = useState('');
   const [gameTitle, setGameTitle] = useState('');
   const location = useLocation();
@@ -114,7 +114,7 @@ const GameHeader = () => {
       {showLogOutModal && (
         // <Logout  />
         <Logout onClose={() => setShowLogOutModal(false)} />
-        // <h1>Hello there!</h1>
+        // 
       )}
     </header>
   );
