@@ -55,7 +55,8 @@ const GameSummary = () => {
                         discoveries: stat.discovery ? [stat.discovery] : [],
                     };
                 });
-
+                
+                // Set the game data state and deconstruct the stats
                 setGameData({
                     gameTitle: game.title,
                     currentWeek: stats.length,
@@ -75,7 +76,10 @@ const GameSummary = () => {
         };
 
         fetchGameData();
-    }, [game_id]);
+    }, [game_id]); 
+    // Fetch game data when the component mounts or game_id changes; 
+    // should only change if the user changes games; 
+    // ensures that the data is fetched only once or when the player changes games
 
     if (loading) {
         return <p className="loading-message text-blue-500 font-bold">Loading game data...</p>;
@@ -89,6 +93,7 @@ const GameSummary = () => {
         return <p>No game data available.</p>;
     }
 
+    // Combine and count the stats;
     const { gameTitle, currentWeek, stats: gameStats, weeks } = gameData || {};
     const totalProjects = weeks?.reduce((count, week) => count + (week.projects?.length || 0), 0) || 0;
     const totalDiscussions = weeks?.reduce((count, week) => count + (week.discussions?.length || 0), 0) || 0;
@@ -114,6 +119,7 @@ const GameSummary = () => {
                         >
                             Revisit a chosen week/Revisit the Year week by week
                         </button>
+                        {/* TODO: Show the GameOverview modal when the button is clicked - will require some additions, but need to see it first*/}
                         {showOverview && gameData && (
                             <GameOverview
                                 className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
