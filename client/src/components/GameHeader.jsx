@@ -1,5 +1,6 @@
 // for gameplay, not the landing page
 import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useAuthContext } from '../contexts/authContext';
 import { useSeason } from '../contexts/seasonContext.jsx';
 import LogOut from '../pages/modals/LogOut';
@@ -15,6 +16,9 @@ const GameHeader = () => {
   const [gameTitle, setGameTitle] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
+
+  const activeLink = ({ isActive }) =>
+    isActive ? 'btn btn-ghost text-primary font-bold' : 'btn btn-ghost';
 
   const isGameProgressPage = location.pathname.includes('/game'); // Check if the current page is the game progress page
 
@@ -97,16 +101,16 @@ const GameHeader = () => {
       {/* Navigation and User Info */}
       <div className="flex justify-between w-full mt-4">
         <nav className="flex space-x-4">
-          <a
-            href="/"
+          <div className="navbar-start">
+          <NavLink 
+            to="/" 
+            className={activeLink}
             onClick={(e) => {
               e.preventDefault();
-              handleNavigation('/');
-            }}
-            className="hover:underline"
-          >
+              handleNavigation('/')
+            }}>
             Home
-          </a>
+          </NavLink>
           <a
             href="rules.pdf"
             target="_blank"
@@ -116,21 +120,25 @@ const GameHeader = () => {
           >
             Rules
           </a>
+          </div>
         </nav>
         <div className="flex space-x-4">
           <div className="user-info flex space-x-4">
             <span className="username">{user.username}</span>
           </div>
-          <a
-            href="/"
-            className="hover:underline"
-            onClick={handleLogoutClick}
-            >
+          <NavLink
+            to="/"
+            className={activeLink}
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogoutClick('/')
+            }}>
               Log Out
-            </a>
+              <LogOut />
+            </NavLink>
             {showLogOutModal && (
               <LogoutModal onClose={() => setLogoutModalOpen(false)} />
-            )};
+            )}
         </div>
       </div>
 

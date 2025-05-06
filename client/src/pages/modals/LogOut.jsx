@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 export default function Logout() {
     const [loading, setLoading] = useState(false);

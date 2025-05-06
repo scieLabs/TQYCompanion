@@ -5,8 +5,7 @@ import { useAuthContext } from '../contexts/authContext';
 import GameHeader from '../components/GameHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import createGameEntry from '../api/gameApi.js';
-import createStatsEntry from '../api/statApi.js';
+
 
 const gameAPI = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
