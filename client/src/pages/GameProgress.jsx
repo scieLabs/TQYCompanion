@@ -337,6 +337,5 @@ export default function GameProgress() {
         </div>
       </div>
     </div>
-    </div>
   );
 }
