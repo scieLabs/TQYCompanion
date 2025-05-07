@@ -8,7 +8,7 @@ import * as statAPI from '../api/statApi.js';
 import * as projectAPI from '../api/projectApi.js'; 
 
 
-export default function GameStats({ game_id, currentWeek, ongoingProjects, completedProjects, setOngoingProjects, setCompletedProjects }) { //FIXME: was { formData, setFormData, currentWeek, gameTitle }
+export default function GameStats({ game_id, currentWeek, fetchProjects, ongoingProjects, completedProjects, setOngoingProjects, setCompletedProjects }) { //FIXME: was { formData, setFormData, currentWeek, gameTitle }
   const { user } = useAuthContext(); //change if needed
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {}; // Get the theme for the current season
@@ -24,7 +24,15 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
     setTempStats(stats); // Sync tempStats with stats when stats change
   }, [stats]);
 
+  useEffect(() => {
+    console.log('Updated ongoingProjects:', ongoingProjects);
+  }, [ongoingProjects]);
 
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id]);
 
   // Fetch the game data including abundance, scarcity, contempt, projects, and pp
   useEffect(() => {
@@ -97,6 +105,7 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
   
       // Save the resolution to the backend
       await projectAPI.resolveProject(resolveModal._id, resolution);
+      console.log('Resolution saved:', resolution);
 
       //     // Calculate the week the project finished and how many weeks it took
       // const finishedWeek = currentWeek;
@@ -105,15 +114,29 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
   
       // Update the lists
       setOngoingProjects((prev) => prev.filter((proj) => proj._id !== resolveModal._id));
-      setCompletedProjects((prev) => [
-        ...prev,
-        { ...resolveModal,
-          project_resolve: resolveModal.project_resolve,
-          pp_resolve: resolveModal.pp_resolve,
-          // finished_week: finishedWeek, // Add finished week
-          // weeks_taken: weeksTaken, // Add weeks taken
-         },
-      ]);
+      // setCompletedProjects((prev) => [
+      //   ...prev,
+      //   { ...resolveModal,
+      //     project_resolve: resolveModal.project_resolve,
+      //     pp_resolve: resolveModal.pp_resolve,
+      //     // finished_week: finishedWeek, // Add finished week
+      //     // weeks_taken: weeksTaken, // Add weeks taken
+      //    },
+      // ]);
+      setCompletedProjects((prev) => {
+        const updatedCompleted = [
+          ...prev,
+          {
+            ...resolveModal,
+            project_resolve: resolution.project_resolve,
+            pp_resolve: resolution.pp_resolve,
+          },
+        ];
+        console.log('Updated completedProjects:', updatedCompleted);
+        return updatedCompleted;
+      });
+
+      await fetchProjects(); 
   
       setResolveModal(null); // Close the modal
     } catch (error) {
@@ -200,7 +223,7 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                   Save
                 </button>
                 <button
-                  className="btn border-none shadow-md"
+                  className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
                   onClick={() => setEditModalOpen(false)}>
                   Cancel
                 </button>
@@ -227,7 +250,7 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                 {proj.project_weeks > 0 || proj.pp_weeks > 0 ? (
                   <>
                     <button
-                      className="btn btn-xs"
+                      className="btn btn-xs border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
                       onClick={() =>
                         updateProjectWeeks(proj._id, Math.max((proj.project_weeks || proj.pp_weeks) - 1, 0))
                       }
@@ -236,7 +259,7 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                     </button>
                     <span>{proj.project_weeks || proj.pp_weeks}</span>
                     <button
-                      className="btn btn-xs"
+                      className="btn btn-xs border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
                       onClick={() =>
                         updateProjectWeeks(proj._id, (proj.project_weeks || proj.pp_weeks) + 1)
                       }
@@ -295,7 +318,8 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                 >
                   Save
                 </button>
-                <button className="btn border-none shadow-md" onClick={() => setResolveModal(null)}>
+                <button className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                  onClick={() => setResolveModal(null)}>
                   Cancel
                 </button>
               </div>
@@ -354,7 +378,7 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
                 </div>
               <div className="modal-action">
                 <button
-                  className="btn"
+                  className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
                   onClick={() => setShowCompleted(false)}
                 >
                   Close

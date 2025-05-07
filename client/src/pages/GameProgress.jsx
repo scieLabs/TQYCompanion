@@ -36,42 +36,6 @@ export default function GameProgress() {
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
 
-  const fetchProjects = async () => {
-    try {
-      // console.log(`Fetching all projects for game_id: ${game_id}`);
-      const response = await projectAPI.getProjectsByGame(game_id);
-      // console.log('Response from backend:', response);
-      const allProjects = response.data;
-
-      // console.log('All projects:', allProjects);
-
-      // Sort projects into ongoing and completed
-      const ongoing = allProjects.filter(
-        (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
-      );
-      const completed = allProjects.filter(
-        (proj) =>
-          proj.project_weeks === 0 &&
-          proj.pp_weeks === 0 &&
-          (proj.project_resolve || proj.pp_resolve)
-      );
-
-      setProjects(allProjects);
-      setOngoingProjects(ongoing);
-      setCompletedProjects(completed);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      if (error.response?.status === 404) {
-        console.warn('No projects found for this game.');
-        setProjects([]);
-        setOngoingProjects([]);
-        setCompletedProjects([]);
-      } else {
-        console.error('Error fetching projects:', error);
-      }
-    }
-  };
-
   const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
   const [prompt, setPrompt] = useState(null);
   const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
@@ -86,11 +50,64 @@ export default function GameProgress() {
     console.log('Current season updated:', currentSeason);
   }, [currentSeason]);
 
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever game_id or currentWeek changes
+
+  useEffect(() => {
+    console.log('Updated ongoingProjects:', ongoingProjects);
+  }, [ongoingProjects]);
+  
+  useEffect(() => {
+    console.log('Updated completedProjects:', completedProjects);
+  }, [completedProjects]);
+
   // useEffect(() => {
   //   // console.log('Game ID:', game_id);
   //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
   //   fetchGameData();
   // }, [game_id, currentSeason, currentWeek]);
+
+  const fetchProjects = async () => {
+    try {
+      console.log(`Fetching all projects for game_id: ${game_id}`);
+      const response = await projectAPI.getProjectsByGame(game_id);
+      // console.log('Response from backend:', response);
+      const allProjects = response.data;
+      
+      // console.log('All projects:', allProjects);
+      // Sort projects into ongoing and completed
+      const ongoing = allProjects.filter(
+        (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
+      );
+      
+      const completed = allProjects.filter(
+        (proj) =>
+          (proj.project_weeks === 0 || proj.pp_weeks === 0) && 
+          (proj.project_resolve || proj.pp_resolve)
+      );
+
+      // console.log('Ongoing projects:', ongoing);
+      // console.log('Completed projects:', completed);
+
+      setProjects(allProjects);
+      setOngoingProjects(ongoing);
+      setCompletedProjects(completed);
+      console.log('Fetched projects:', { ongoing, completed });
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      if (error.response?.status === 404) {
+        console.warn('No projects found for this game.');
+        setProjects([]);
+        setOngoingProjects([]);
+        setCompletedProjects([]);
+      } else {
+        console.error('Error fetching projects:', error);
+      }
+    }
+  };
 
   const hasFetchedPrompt = useRef(false);
 
@@ -132,6 +149,12 @@ export default function GameProgress() {
 
     fetchInitialData();
   }, [game_id, currentSeason, currentWeek]);
+
+useEffect(() => {
+  if (game_id) {
+    fetchProjects();
+  }
+}, [game_id, currentWeek]); // Call fetchProjects whenever currentWeek changes
 
   const fetchGameData = async () => {
     try {
@@ -261,7 +284,7 @@ export default function GameProgress() {
       setCurrentWeek(nextWeek);
       // fetchPrompt(currentSeason);
 
-      fetchGameData(); //refresh game state
+      await fetchGameData(); //refresh game state
 
       // Fetch the next prompt explicitly
       await fetchPrompt();
@@ -288,8 +311,10 @@ export default function GameProgress() {
             completedProjects={completedProjects}
             setOngoingProjects={setOngoingProjects}
             setCompletedProjects={setCompletedProjects}
-          />
+            fetchProjects={fetchProjects} 
+           />
         </div>
+        
         <div className={`w-3/4`}>
           <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
           {prompt && prompt._id && (
@@ -314,6 +339,8 @@ export default function GameProgress() {
                 isDiscussion={prompt?.isDiscussion || false}
                 isDiscovery={prompt?.isDiscovery || false}
                 isProject={prompt?.isProject || false}
+                fetchProjects={fetchProjects}
+                setOngoingProjects={setOngoingProjects}
                 />
 
 
