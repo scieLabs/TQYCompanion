@@ -2,6 +2,7 @@ import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
+import GameSummary from '../pages/GameSummary.jsx';
 import { getGameById, updateGame } from '../api/gameApi.js';
 import * as projectAPI from '../api/projectApi.js';
 import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';

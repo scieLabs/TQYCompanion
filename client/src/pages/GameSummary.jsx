@@ -3,7 +3,7 @@ import GameHeader from '../components/GameHeader';
 import GameOverview from './modals/GameOverview';
 import Login from './modals/Login.jsx';
 
-const GameSummary = ({ game, stats, projects, currentWeek }) => {
+const GameSummary = ({ game, stats, projects, loading, errorMessage, gameData, currentWeek }) => {
     const [showOverview, setShowOverview] = useState(false);
 
     if (!game || !stats || !projects) {
