@@ -94,21 +94,8 @@ const GameHeader = () => {
               console.log('showLogOutModal:', showLogOutModal);
             }}
           >
-            {/* {showLogOutModal&&`Log Out`} */}
             Log Out
           </button>
-          {/* <Link
-            to="/logout"
-            className="hover:underline"
-            onClick={(e) => {
-              e.preventDefault();
-              console.log('Log Out button clicked');
-              setShowLogOutModal(true); // Show the logout modal
-              console.log('showLogOutModal:', showLogOutModal);
-            }}
-          >
-            Log Out
-          </Link> */}
         </div>
       </div>
       {showLogOutModal && (

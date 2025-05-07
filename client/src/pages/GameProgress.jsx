@@ -276,65 +276,68 @@ export default function GameProgress() {
 
 
   return (
-    <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
-      <div className={`flex`}>
-        <div className={`w-1/4 pr-4`}>
-          <GameStats
-            game_id={game_id}
-            currentWeek={currentWeek}
-            currentSeason={currentSeason}
-            stats={stats}
-            setStats={setStats}
-            ongoingProjects={ongoingProjects}
-            completedProjects={completedProjects}
-            setOngoingProjects={setOngoingProjects}
-            setCompletedProjects={setCompletedProjects}
-          />
-        </div>
-        <div className={`w-3/4`}>
-          <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
-          {prompt && prompt._id && (
-            <div>
-              <div className="text-center mb-8">
-                <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
-                <p
-                className="mb-8 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: prompt.prompt }}
-                ></p>
-            </div>
+    <div>
+      <GameHeader />
+      <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
+        <div className={`flex`}>
+          <div className={`w-1/4 pr-4`}>
+            <GameStats
+              game_id={game_id}
+              currentWeek={currentWeek}
+              currentSeason={currentSeason}
+              stats={stats}
+              setStats={setStats}
+              ongoingProjects={ongoingProjects}
+              completedProjects={completedProjects}
+              setOngoingProjects={setOngoingProjects}
+              setCompletedProjects={setCompletedProjects}
+            />
+          </div>
+          <div className={`w-3/4`}>
+            <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
+            {prompt && prompt._id && (
+              <div>
+                <div className="text-center mb-8">
+                  <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
+                  <p
+                    className="mb-8 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: prompt.prompt }}
+                  ></p>
+                </div>
 
-              <ActionModal 
-                prompt={prompt}
-                game_id={game_id}
-                stats={stats}
-                setStats={setStats}
-                formData={formData}
-                setFormData={setFormData}
-                currentSeason={currentSeason}
-                currentWeek={currentWeek}
-                isDiscussion={prompt?.isDiscussion || false}
-                isDiscovery={prompt?.isDiscovery || false}
-                isProject={prompt?.isProject || false}
+                <ActionModal
+                  prompt={prompt}
+                  game_id={game_id}
+                  stats={stats}
+                  setStats={setStats}
+                  formData={formData}
+                  setFormData={setFormData}
+                  currentSeason={currentSeason}
+                  currentWeek={currentWeek}
+                  isDiscussion={prompt?.isDiscussion || false}
+                  isDiscovery={prompt?.isDiscovery || false}
+                  isProject={prompt?.isProject || false}
                 />
 
 
-            <div className="text-center">
-              <button
-                className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
-                onClick={handleNextWeek}
-              >
-                {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
-              </button>
-              <GameSummary
-                game={game}
-                stats={stats}
-                projects={projects}
-                currentWeek={currentWeek}
-                loading={loading}
-              />
-            </div>
-            </div>
-          )}
+                <div className="text-center">
+                  <button
+                    className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
+                    onClick={handleNextWeek}
+                  >
+                    {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
+                  </button>
+                  <GameSummary
+                    game={game}
+                    stats={stats}
+                    projects={projects}
+                    currentWeek={currentWeek}
+                    loading={loading}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
