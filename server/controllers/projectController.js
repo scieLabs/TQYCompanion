@@ -22,7 +22,7 @@ export const getProjectsByGame = async (req, res) => {
 
 //TODO: should include pp_* ??? and resolution?? as an update
 export const createProject = async (req, res) => {
-  const { game_id, title, description, weeks } = req.body;
+  const { game_id, title, description, weeks, stats_week } = req.body;
 
   try {
     const newProject = new Project({
@@ -30,6 +30,7 @@ export const createProject = async (req, res) => {
       title,
       description,
       project_weeks: weeks,
+      stats_week,
     });
 
     await newProject.save();

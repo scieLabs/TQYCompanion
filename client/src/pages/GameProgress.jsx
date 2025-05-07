@@ -58,6 +58,7 @@ export default function GameProgress() {
       setProjects(allProjects);
       setOngoingProjects(ongoing);
       setCompletedProjects(completed);
+      console.log('Fetched projects:', { ongoing, completed });
     } catch (error) {
       console.error('Error fetching projects:', error);
       if (error.response?.status === 404) {
@@ -313,6 +314,8 @@ useEffect(() => {
                 isDiscussion={prompt?.isDiscussion || false}
                 isDiscovery={prompt?.isDiscovery || false}
                 isProject={prompt?.isProject || false}
+                fetchProjects={fetchProjects}
+                setOngoingProjects={setOngoingProjects}
                 />
 
 

@@ -24,7 +24,9 @@ export default function GameStats({ game_id, currentWeek, ongoingProjects, compl
     setTempStats(stats); // Sync tempStats with stats when stats change
   }, [stats]);
 
-
+  useEffect(() => {
+    console.log('Updated ongoingProjects:', ongoingProjects);
+  }, [ongoingProjects]);
 
   // Fetch the game data including abundance, scarcity, contempt, projects, and pp
   useEffect(() => {

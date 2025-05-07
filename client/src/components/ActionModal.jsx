@@ -6,7 +6,7 @@ import * as projectAPI from '../api/projectApi.js';
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; 
 
-export default function ActionModal({ action, game_id, currentWeek, prompt, stats, setStats, formData, setFormData, isDiscussion, isDiscovery, isProject }) {
+export default function ActionModal({ action, game_id, currentWeek, fetchProjects, setOngoingProjects, prompt, stats, setStats, formData, setFormData, isDiscussion, isDiscovery, isProject }) {
   
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
@@ -30,12 +30,32 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
       await statAPI.saveActionData(game_id, currentWeek, data);
       // console.log('Conditional action data saved:', data);
 
-          // Save project to the backend if it's a "Start a Project" action
-      if (formData.project_title && formData.project_desc && formData.project_weeks) {
-        const projectResponse = await projectAPI.createProject(projectData);
+      // Save project to the backend if it's a "Start a Project" action
+      if (formData.pp_title && formData.pp_desc && formData.pp_weeks) {
+        const projectData = {
+          game_id,
+          stats_week: currentWeek,
+          project_title: formData.pp_title,
+          project_desc: formData.pp_desc,
+          project_weeks: formData.pp_weeks,
+        };
 
-      // Immediately add the project to ongoingProjects
-        setOngoingProjects((prev) => [...prev, projectResponse.data]);
+        console.log('Creating project with data:', projectData);
+        console.log('Current week:', currentWeek);
+
+        try {
+          const projectResponse = await projectAPI.createProject(projectData);
+          console.log('Project created successfully:', projectResponse.data);
+  
+          // Immediately add the project to ongoingProjects
+          setOngoingProjects((prev) => [...prev, projectResponse.data]);
+  
+          // Fetch updated projects to ensure the list is refreshed
+          await fetchProjects();
+        } catch (projectError) {
+          console.error('Error creating project:', projectError.response?.data || projectError.message);
+          // Optionally, notify the user that the project was saved but encountered an issue
+        }
       }
 
           // Close the modal
