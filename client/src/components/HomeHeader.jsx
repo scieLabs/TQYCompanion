@@ -11,13 +11,13 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
     const { user } = useAuthContext();
     const navigate = useNavigate();
     const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
-    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
 
 
     const handleNewGameClick = () => {
         navigate('/new-game'); // Navigate to the NewGame page
     };
-//{``}
+    //{``}
     return (
         <header
             className={`home-header 
@@ -28,8 +28,8 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
             <nav className="flex space-x-4">
                 <a href="/"
                     className={`about-button 
-                    ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
-                    py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                        ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
+                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
                     About
                 </a>
@@ -38,12 +38,19 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`rules-button 
-                    ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                        ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                     py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
                     View Rules
                 </a>
             </nav>
+            <h1
+                className={`game-title text-5xl font-bold 
+                    ${theme.headerText} ${theme.headerBg}`}
+                style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }} // Optional: Add a shadow effect to the text
+            >
+                THE QUIET YEAR
+            </h1>
             <div className="header-content flex space-x-4">
                 {!user && (
                     <>
@@ -51,16 +58,16 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                             onClick={onLoginClick}
                             className={`login-button 
                                 ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`} 
-                                >
+                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                        >
                             Login
                         </button>
                         <button
                             onClick={onRegisterClick}
                             className={`register-button 
-                    ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                    py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
-                    >
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                        >
                             Register
                         </button>
                     </>
