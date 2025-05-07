@@ -10,8 +10,10 @@ import rulesPdf from "../assets/rules.pdf";
 const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
     const { user } = useAuthContext();
     const navigate = useNavigate();
+    const [showLogOutModal, setShowLogOutModal] = useState(false);
+
     const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
-    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
 
 
     const handleNewGameClick = () => {
@@ -57,7 +59,16 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                 )}
                 {user && (
                     <>
-                        <Logout />
+                        <button
+                            className="hover:underline"
+                            onClick={() => {
+                                console.log('Log Out button clicked');
+                                setShowLogOutModal(!showLogOutModal); // Show the logout modal
+                                console.log('showLogOutModal:', showLogOutModal);
+                            }}
+                        >
+                            Log Out
+                        </button>
                         <button
                             onClick={handleNewGameClick}
                             className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -67,6 +78,11 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                     </>
                 )}
             </div>
+            {showLogOutModal && (
+                    // <Logout  />
+                    <Logout onClose={() => setShowLogOutModal(false)} />
+                    // 
+                  )}
         </header>
     );
 };
