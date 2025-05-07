@@ -74,10 +74,11 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
   if (prompt && prompt._id === GAME_OVER_PROMPT_ID) {
     // Render the textarea for "fate of the community" when Game Over is triggered
     return (
-      <div>
-        <label className="block font-bold">What is the fate of the community?</label>
+      <div className="flex flex-col items-center justify-center">
+        <label className={`block font-bold ${theme.bodyText} mb-2`}>
+          What is the fate of the community?</label>
         <textarea
-          className="textarea textarea-bordered w-full"
+          className={`textarea textarea-bordered w-full h-64 ${theme.bodyInputBg} ${theme.bodyInputText}`}
           value={formData.end || ''}
           onChange={(e) => updateField('end', e.target.value)}
           placeholder="Describe the fate of the community..."
