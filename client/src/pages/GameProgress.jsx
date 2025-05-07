@@ -10,6 +10,7 @@ import { createProject } from '../api/projectApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
+import GameSummary from './GameSummary.jsx'; // Import the GameSummary component
 
 export default function GameProgress() {
   const { game_id, week } = useParams(); // Get the game title from the URL parameters

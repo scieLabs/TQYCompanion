@@ -17,15 +17,19 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
     const handleNewGameClick = () => {
         navigate('/new-game'); // Navigate to the NewGame page
     };
-
+//{``}
     return (
         <header
-            className="home-header ${theme.headerBg} ${theme.headerText} width-full py-4 px-6 flex justify-between items-center "
+            className={`home-header 
+                ${theme.headerBg} ${theme.headerText} ${theme.headerTextHover} ${theme.headerBg}
+                width-full py-4 px-6 flex justify-between items-center`}
             role="banner"
         >
             <nav className="flex space-x-4">
                 <a href="/"
-                    className="about-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    className={`about-button 
+                    ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
+                    py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
                     About
                 </a>
@@ -33,7 +37,9 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                     href={rulesPdf}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rules-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    className={`rules-button 
+                    ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                    py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
                     View Rules
                 </a>
@@ -43,14 +49,18 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                     <>
                         <button
                             onClick={onLoginClick}
-                            className="login-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
+                            className={`login-button 
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`} 
+                                >
                             Login
                         </button>
                         <button
                             onClick={onRegisterClick}
-                            className="register-button bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
+                            className={`register-button 
+                    ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                    py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                    >
                             Register
                         </button>
                     </>
@@ -60,8 +70,9 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                         <Logout />
                         <button
                             onClick={handleNewGameClick}
-                            className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
+                            className={`new-game-button 
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}>
                             New Game
                         </button>
                     </>
