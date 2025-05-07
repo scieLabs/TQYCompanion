@@ -18,8 +18,8 @@ const projectAPI = axios.create({
   export const updateProjectWeeks = (project_id, { project_weeks, pp_weeks }) =>
     projectAPI.put(`/projects/${project_id}/weeks`, { project_weeks, pp_weeks });
   
-  export const resolveProject = (project_id, resolution) =>
-    projectAPI.put(`/projects/${project_id}/resolve`, { resolution });
+  export const resolveProject = (project_id, {project_resolve, pp_resolve}) =>
+    projectAPI.put(`/projects/${project_id}/resolve`, { project_resolve, pp_resolve });
 
   // export const updateProject = (projectId, updatedProject) => {
   //   return axios.put(`/projects/${projectId}`, updatedProject);

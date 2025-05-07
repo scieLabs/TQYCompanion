@@ -35,25 +35,62 @@ export default function GameProgress() {
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
 
+  const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
+  const [prompt, setPrompt] = useState(null);
+  const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
+  const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
+  const [loadingPrompt, setLoadingPrompt] = useState(false);
+  const navigate = useNavigate();
+  const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
+
+  const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+
+  useEffect(() => {
+    console.log('Current season updated:', currentSeason);
+  }, [currentSeason]);
+
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever game_id or currentWeek changes
+
+  useEffect(() => {
+    console.log('Updated ongoingProjects:', ongoingProjects);
+  }, [ongoingProjects]);
+  
+  useEffect(() => {
+    console.log('Updated completedProjects:', completedProjects);
+  }, [completedProjects]);
+
+  // useEffect(() => {
+  //   // console.log('Game ID:', game_id);
+  //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+  //   fetchGameData();
+  // }, [game_id, currentSeason, currentWeek]);
+
   const fetchProjects = async () => {
     try {
-      // console.log(`Fetching all projects for game_id: ${game_id}`);
+      console.log(`Fetching all projects for game_id: ${game_id}`);
       const response = await projectAPI.getProjectsByGame(game_id);
       // console.log('Response from backend:', response);
       const allProjects = response.data;
   
-      // console.log('All projects:', allProjects);
+      console.log('All projects:', allProjects);
   
       // Sort projects into ongoing and completed
       const ongoing = allProjects.filter(
         (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
       );
+      
       const completed = allProjects.filter(
         (proj) =>
-          proj.project_weeks === 0 &&
-          proj.pp_weeks === 0 &&
+          (proj.project_weeks === 0 || proj.pp_weeks === 0) && 
           (proj.project_resolve || proj.pp_resolve)
       );
+
+      console.log('Ongoing projects:', ongoing);
+      console.log('Completed projects:', completed);
   
       setProjects(allProjects);
       setOngoingProjects(ongoing);
@@ -71,26 +108,6 @@ export default function GameProgress() {
       }
     }
   };
-
-  const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
-  const [prompt, setPrompt] = useState(null);
-  const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
-  const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
-  const [loadingPrompt, setLoadingPrompt] = useState(false);
-  const navigate = useNavigate();
-  const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
-
-  const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
-
-  useEffect(() => {
-    console.log('Current season updated:', currentSeason);
-  }, [currentSeason]);
-
-  // useEffect(() => {
-  //   // console.log('Game ID:', game_id);
-  //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
-  //   fetchGameData();
-  // }, [game_id, currentSeason, currentWeek]);
 
   const hasFetchedPrompt = useRef(false);
 
@@ -132,6 +149,12 @@ useEffect(() => {
 
   fetchInitialData();
 }, [game_id, currentSeason, currentWeek]);
+
+useEffect(() => {
+  if (game_id) {
+    fetchProjects();
+  }
+}, [game_id, currentWeek]); // Call fetchProjects whenever currentWeek changes
 
   const fetchGameData = async () => {
     try {
@@ -261,7 +284,7 @@ useEffect(() => {
       setCurrentWeek(nextWeek);
       // fetchPrompt(currentSeason);
 
-      fetchGameData(); //refresh game state
+      await fetchGameData(); //refresh game state
 
       // Fetch the next prompt explicitly
       await fetchPrompt();
@@ -288,6 +311,7 @@ useEffect(() => {
             completedProjects={completedProjects}
             setOngoingProjects={setOngoingProjects}
             setCompletedProjects={setCompletedProjects}
+            fetchProjects={fetchProjects} 
             />
         </div>
         <div className={`w-3/4`}>

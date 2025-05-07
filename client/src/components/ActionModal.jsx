@@ -205,7 +205,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
                 Save
               </button>
               <button
-                className="btn border-none shadow-md"
+                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
                 onClick={() => setFormData((prev) => ({ ...prev, showDiscussionModal: false }))}
               >
                 Cancel
@@ -238,7 +238,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
                 Save
               </button>
               <button
-                className="btn border-none shadow-md"
+                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
                 onClick={() => setFormData((prev) => ({ ...prev, showDiscoveryModal: false }))}
               >
                 Cancel
@@ -274,14 +274,14 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
             <div className="flex items-center space-x-2 mt-4">
               <span className="font-bold">Weeks:</span>
               <button
-                className={`btn btn-sm text-lg ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                className={`btn btn-xs ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
                 onClick={() => updateField('pp_weeks', Math.max(1, (formData.pp_weeks || 1) - 1))}
               >
                 -
               </button>
               <span>{formData.pp_weeks || 1}</span>
               <button
-                className={`btn btn-sm text-lg ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                className={`btn btn-xs ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
                 onClick={() => updateField('pp_weeks', Math.min(6, (formData.pp_weeks || 1) + 1))}
               >
                 +
@@ -295,7 +295,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
                 Save
               </button>
               <button
-                className="btn border-none shadow-md"
+                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
                 onClick={() => setFormData((prev) => ({ ...prev, showProjectModal: false }))}
               >
                 Cancel
