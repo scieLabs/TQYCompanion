@@ -33,6 +33,7 @@ const LandingPage = () => {
     };
 
     const handleNewGameClick = () => {
+        setCurrentSeason('Spring'); // Reset the season to Spring when starting a new game
         navigate('/new-game'); // Navigate to the NewGame page
     };
 

@@ -36,10 +36,11 @@ export default function Logout({onClose}) {
     };
 
 
+
     return (
         <div >
         {/* <div className="popup-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"> */}
-            <div className="bg-black-500 p-6 rounded shadow-lg text-center">
+            <div className={`${theme.headerBg} ${theme.headerText}bg-black-500 p-6 rounded shadow-lg text-center`}>
                 {/* <h2 className="text-2xl font-bold mb-4">Logout</h2> */}
                 <p className="mb-4">Are you sure you want to log out?</p>
                 {errorMessage && (

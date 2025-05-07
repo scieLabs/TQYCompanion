@@ -48,7 +48,7 @@ const GameHeader = () => {
 
   return (
     <header
-      className={`game-header w-full ${theme.headerBg} ${theme.textColor} py-4 px-6 flex flex-col items-center`}
+      className={`game-header w-full ${theme.headerBg} ${theme.headerText} py-4 px-6 flex flex-col items-center`}
       role="banner"
     >
       {/* App Title */}
