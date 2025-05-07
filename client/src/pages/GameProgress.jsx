@@ -290,16 +290,19 @@ export default function GameProgress() {
             setCompletedProjects={setCompletedProjects}
           />
         </div>
-        <div className={`w-3/4 ${theme}`}>
-          <h2 className="text-2xl font-bold mb-2">Week {currentWeek}, {currentSeason}</h2>
+        <div className={`w-3/4`}>
+          <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
           {prompt && prompt._id && (
             <div>
-              <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
-              <p
-                className="mb-4"
+              <div className="text-center mb-8">
+                <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
+                <p
+                className="mb-8 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: prompt.prompt }}
-              ></p>
-              <ActionModal
+                ></p>
+            </div>
+
+              <ActionModal 
                 prompt={prompt}
                 game_id={game_id}
                 stats={stats}
@@ -311,8 +314,14 @@ export default function GameProgress() {
                 isDiscussion={prompt?.isDiscussion || false}
                 isDiscovery={prompt?.isDiscovery || false}
                 isProject={prompt?.isProject || false}
-              />
-              <button className="btn btn-primary mt-6" onClick={handleNextWeek}>
+                />
+
+
+            <div className="text-center">
+              <button
+                className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
+                onClick={handleNextWeek}
+              >
                 {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
               </button>
               <GameSummary
@@ -322,6 +331,7 @@ export default function GameProgress() {
                 currentWeek={currentWeek}
                 loading={loading}
               />
+            </div>
             </div>
           )}
         </div>
