@@ -79,14 +79,21 @@ export const getNextPrompt = async (req, res) => {
       // Transition to the next season
       const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
       const currentSeasonIndex = seasons.indexOf(currentSeason);
+
+      if (currentSeasonIndex === -1) {
+        return res.status(400).json({ message: 'Invalid current season.' });
+      }
+
       const nextSeason = seasons[(currentSeasonIndex + 1) % seasons.length];
 
-      // Reset shownPrompts for the new season
-      await Game.findByIdAndUpdate(
+      // Reset shownPrompts for the new season and update the currentSeason in the Game document
+      const updatedGame = await Game.findByIdAndUpdate(
         game_id,
-        { shownPrompts: [] },
+        { shownPrompts: [], currentSeason: nextSeason }, // Update currentSeason here
         { new: true }
       );
+
+      console.log(`Updated game for season transition:`, updatedGame);
 
       // Fetch prompts for the next season
       const nextSeasonPrompts = await Prompt.find({ season: nextSeason });
@@ -97,15 +104,23 @@ export const getNextPrompt = async (req, res) => {
 
         // Atomically update the shownPrompts list in the database
         console.log(`Adding prompt ${selectedPrompt._id} to shownPrompts for game ${game_id}`);
-        const updatedGame = await Game.findByIdAndUpdate(
+        const updatedGameWPrompt = await Game.findByIdAndUpdate(
           game_id,
           { $addToSet: { shownPrompts: selectedPrompt._id } },
           { new: true }
         );
-        console.log(`Updated shownPrompts for game ${game_id}:`, updatedGame.shownPrompts);
+        console.log(`Updated shownPrompts for game ${game_id}:`, updatedGameWPrompt.shownPrompts);
 
         console.log(`Selected prompt for ${nextSeason}: ${selectedPrompt._id}`);
-        return res.status(200).json({ prompt: selectedPrompt, season: nextSeason });
+        return res.status(200).json({
+          prompt: {
+            ...selectedPrompt.toObject(),
+            isProject: selectedPrompt.isProject || false,
+            isDiscussion: selectedPrompt.isDiscussion || false,
+            isDiscovery: selectedPrompt.isDiscovery || false,
+          },
+          season: nextSeason,
+        });
       }
 
       return res.status(404).json({ message: 'No prompts available for the next season.' });
@@ -131,8 +146,18 @@ export const getNextPrompt = async (req, res) => {
       );
       console.log(`Updated shownPrompts for game ${game_id}:`, updatedGame.shownPrompts);
 
-      console.log(`Selected prompt: ${selectedPrompt._id}`);
-      return res.status(200).json({ prompt: selectedPrompt, season: currentSeason });
+    //   console.log(`Selected prompt: ${selectedPrompt._id}`);
+    //   return res.status(200).json({ prompt: selectedPrompt, season: currentSeason });
+    // }
+      return res.status(200).json({
+        prompt: {
+          ...selectedPrompt.toObject(),
+          isProject: selectedPrompt.isProject || false,
+          isDiscussion: selectedPrompt.isDiscussion || false,
+          isDiscovery: selectedPrompt.isDiscovery || false,
+        },
+        season: currentSeason,
+      });
     }
 
     return res.status(404).json({ message: 'No remaining prompts for the current season.' });

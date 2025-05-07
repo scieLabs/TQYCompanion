@@ -46,9 +46,14 @@ export const createStatsEntry = async (req, res) => {
 //     }
 //   };
 export const saveActionData = async (req, res) => {
+  const { game_id, week } = req.params;
   const {
-    game_id,
-    stats_week,
+    // game_id,
+    prompt_id,
+    // stats_week,
+    abundance,
+    scarcity,
+    contempt,
     discussion,
     discovery,
     p_discussion,
@@ -65,9 +70,13 @@ export const saveActionData = async (req, res) => {
     // Save to the stats schema
     if (discussion || discovery || p_discussion || p_discovery) {
       await Stats.findOneAndUpdate(
-        { game_id, week: stats_week },
+        { game_id, week },
         {
           $set: {
+            prompt_id,
+            abundance,
+            scarcity,
+            contempt,
             discussion,
             discovery,
             p_discussion,
@@ -82,7 +91,7 @@ export const saveActionData = async (req, res) => {
     if (project_title || pp_title) {
       const newProject = new Project({
         game_id,
-        stats_week,
+        stats_week: week,
         project_title,
         project_desc,
         project_weeks,

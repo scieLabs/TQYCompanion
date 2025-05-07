@@ -6,45 +6,64 @@ import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; 
 import * as statAPI from '../api/statApi.js';
 import * as projectAPI from '../api/projectApi.js'; 
+import { useGameContext } from '../contexts/gameContext.jsx';
 
 
-export default function GameStats({ game_id, currentWeek, ongoingProjects, completedProjects, setOngoingProjects, setCompletedProjects }) { //FIXME: was { formData, setFormData, currentWeek, gameTitle }
+export default function GameStats() { //FIXME: was { formData, setFormData, currentWeek, gameTitle }
+  const { game_id, gameId, stats, loading, setStats, currentWeek, ongoingProjects, completedProjects, setOngoingProjects, setCompletedProjects } = useGameContext();
   const { user } = useAuthContext(); //change if needed
   const { currentSeason, seasonThemes } = useSeason(); // Access season context
   const theme = seasonThemes[currentSeason] || {}; // Get the theme for the current season
 
   const [projects, setProjects] = useState([]);
-  const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
+  // const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [resolveModal, setResolveModal] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
 
   const [tempStats, setTempStats] = useState(stats);
+
+  // console.log('Stats in GameStats:', stats);
+
+  useEffect(() => {
+    console.log('GameStats Props:', {
+      game_id,
+      currentWeek,
+      stats,
+      ongoingProjects,
+      completedProjects,
+    });
+  }, [game_id, currentWeek, stats, ongoingProjects, completedProjects]);
+
   useEffect(() => {
     setTempStats(stats); // Sync tempStats with stats when stats change
   }, [stats]);
 
-
-
-  // Fetch the game data including abundance, scarcity, contempt, projects, and pp
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        
-        // Fetch stats for the current game and week
-        const statsResponse = await statAPI.getStatsByGameAndWeek(game_id, currentWeek);
-        setStats(statsResponse.data);
-        
-      } catch (error) {
-        console.error('Error fetching game data:', error);
-        handleApiError(error, 'fetchGameData');
-      }
-    };
-    console.log('GameStats Props:', { game_id, currentWeek });
-    if (game_id && currentWeek) { //FIXME: changed gameTitle to game here and below
-      fetchStats();
+    if (!game_id) {
+      console.error('Error: Game ID is not available.');
     }
-  }, [game_id, currentWeek]); //FIXME: took out "user" and "setFormData" with the formData commented out above
+  }, [game_id]);
+
+  // // Fetch the game data including abundance, scarcity, contempt, projects, and pp
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     try {
+        
+  //       // Fetch stats for the current game and week
+  //       const statsResponse = await statAPI.getStatsByGameAndWeek(game_id, currentWeek);
+  //       setStats(statsResponse.data);
+        
+  //     } catch (error) {
+  //       console.error('Error fetching game data:', error);
+  //       handleApiError(error, 'fetchGameData');
+  //     }
+  //   };
+  //   console.log('GameStats Props:', { game_id, currentWeek });
+  //   if (game_id && currentWeek) { //FIXME: changed gameTitle to game here and below
+  //     fetchStats();
+  //   }
+  // }, [game_id, currentWeek]); //FIXME: took out "user" and "setFormData" with the formData commented out above
 
   const handleChange = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));

@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import createGameEntry from '../api/gameApi.js';
 import createStatsEntry from '../api/statApi.js';
+import { useGameContext } from '../contexts/gameContext.jsx';
 
 const gameAPI = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
@@ -16,6 +17,7 @@ const gameAPI = axios.create({
 export default function CreateNewGame() {
     // Authentication and user context
     const { user, loading } = useAuthContext();
+    const { setGameId, setCurrentWeek, fetchPrompt, stats, setStats } = useGameContext();
     // console.log('CreateNewGame user:', user);
     // const token = user?.token; // Assuming the token is stored in the user object
     
@@ -86,10 +88,34 @@ export default function CreateNewGame() {
             }
           );
 
-          // console.log('Game created:', response.data.game);
+          console.log('API response:', response.data); // Debug the API response
+
+          const { game } = response.data; // Extract the `game` object
+          const game_id = game._id; // Extract the `_id` field as `game_id`
+
+          // Set the game_id in the context
+          setGameId(game_id);
+          setCurrentWeek(1); // Set the initial week to 1
+              // Set initial stats in the gameContext
+          setStats({
+            abundance,
+            scarcity,
+            contempt: 0, // Default contempt to 0 if not provided
+          });
+
+          // console.log('Initial stats set in context:', {
+          //   abundance,
+          //   scarcity,
+          //   contempt: 0,
+          // });
+
+          await fetchPrompt(game_id);
+          
+
+          console.log('Game created:', response.data.game, game_id);
           // console.log('Initial stats created:', response.data.stats);
 
-          return response.data; // Return the data object directly
+          return game_id;
         } catch (err) {
           console.error('Error creating game:', err.response?.data || err.message);
           setError(err.response?.data?.error || 'Failed to create the game. Please try again.');
@@ -106,11 +132,14 @@ export default function CreateNewGame() {
         }
         try {
           // console.log('Starting spring with game data...');
-          const { game } = await handleCreateGame();
+          const game_id = await handleCreateGame();
           // console.log('Navigating to game progress page for game:', game);
+          if (!game_id) {
+            throw new Error('Game ID is undefined. Failed to create the game.');
+          }
 
           // Navigate to the game progress page
-          navigate(`/game/${game._id}/week/1`);
+          navigate(`/game/${game_id}/week/1`);
 
           //FIXME: yet another old version
           // const newGame = await handleCreateGame();

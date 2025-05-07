@@ -22,19 +22,27 @@ export const getProjectsByGame = async (req, res) => {
 
 //TODO: should include pp_* ??? and resolution?? as an update
 export const createProject = async (req, res) => {
-  const { game_id, title, description, weeks } = req.body;
+  const { game_id, stats_week, project_title, project_desc, project_weeks, pp_title, pp_desc, pp_weeks } = req.body;
+
+  if (!game_id || !stats_week) {
+    return res.status(400).json({ message: 'Missing required fields.' });
+  }
 
   try {
     const newProject = new Project({
       game_id,
-      title,
-      description,
-      project_weeks: weeks,
+      stats_week,
+      project_title,
+      project_desc,
+      project_weeks,
+      pp_title,
+      pp_desc,
+      pp_weeks,
     });
 
-    await newProject.save();
-
-    res.status(201).json(newProject);
+    const savedProject = await newProject.save();
+    res.status(201).json(savedProject);
+    
   } catch (error) {
     console.error('Error creating project:', error);
     res.status(500).json({ message: 'Error creating project.', error: error.message });

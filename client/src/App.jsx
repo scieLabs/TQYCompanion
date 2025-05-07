@@ -8,6 +8,7 @@ import CreateNewGame from './pages/NewGame.jsx';
 import { SeasonProvider } from './contexts/seasonContext.jsx';
 import { AuthProvider } from './contexts/authContext.jsx';
 import ProtectedRoute from './layouts/authLayout.jsx'; // Import the ProtectedRoute function
+import { GameProvider } from './contexts/gameContext.jsx';
 
 
 function App() {
@@ -15,36 +16,38 @@ function App() {
     <Router>
       <AuthProvider>
           <SeasonProvider>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route
-                path="/new-game"
-                element={
-                  <ProtectedRoute>
+            <GameProvider>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route
+                  path="/new-game"
+                  element={
+                    <ProtectedRoute>
 
-                    <CreateNewGame />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/game/:game_id/week/:week"
-                element={
-                  <ProtectedRoute>
-                    <GameProgress />
-                  </ProtectedRoute>
-                }
-              />
-              {/* TODO: Add the correct path for the summary page 
-              <Route
-                path="/game/:game_id/summary/"
-                element={
-                  <ProtectedRoute>
-                    <GameSummary />
-                  </ProtectedRoute>
-                }
-              />*/}
-            </Routes>
-            <Footer />
+                      <CreateNewGame />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/game/:game_id/week/:week"
+                  element={
+                    <ProtectedRoute>
+                      <GameProgress />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* TODO: Add the correct path for the summary page 
+                <Route
+                  path="/game/:game_id/summary/"
+                  element={
+                    <ProtectedRoute>
+                      <GameSummary />
+                    </ProtectedRoute>
+                  }
+                />*/}
+              </Routes>
+              <Footer />
+            </GameProvider>
           </SeasonProvider>
       </AuthProvider>
     </Router>

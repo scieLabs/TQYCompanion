@@ -1,21 +1,23 @@
-// import { useEffect, useState, useContext, useRef } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { useGameContext } from '../contexts/gameContext.jsx';
-// import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 // import GameSummary from './GameSummary.jsx';
 // import { getGameById, updateGame } from '../api/gameApi.js';
 // import * as projectAPI from '../api/projectApi.js';
 // import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
-// import { getNextPrompt, createPrompt } from '../api/promptApi.js';
+import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 // import { createProject } from '../api/projectApi.js';
 // import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 // import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 
 export default function GameProgress() {
+  // const { game_id, week } = useParams(); 
 
   const {
+    game_id,
     currentWeek,
     currentSeason,
     prompt,
@@ -25,7 +27,28 @@ export default function GameProgress() {
     loading,
     handleNextWeek,
     theme,
+    formData,
+    setFormData,
+    setPrompt,
+    GAME_OVER_PROMPT_ID
   } = useGameContext();
+
+  const navigate = useNavigate();
+
+  // const fetchPrompt = async () => {
+  //   try {
+  //     const response = await getNextPrompt(game_id, currentSeason); // Fetch the next prompt
+  //     setPrompt(response.data.prompt);
+  //   } catch (err) {
+  //     console.error('Error fetching prompt:', err.response?.data || err.message);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (!prompt) {
+  //     fetchPrompt(); // Fetch the first prompt if not already set
+  //   }
+  // }, [prompt, game_id, currentSeason]);
   // const { game_id, week } = useParams(); // Get the game title from the URL parameters
   // const { user } = useAuthContext(); // get the logged-in user
   // const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
@@ -292,20 +315,20 @@ export default function GameProgress() {
       <div className={`flex`}>
         <div className={`w-1/4 pr-4`}>
           <GameStats
-            game_id={game_id}
-            currentWeek={currentWeek}
-            currentSeason={currentSeason}
-            stats={stats}
-            setStats={setStats}
-            ongoingProjects={ongoingProjects}
-            completedProjects={completedProjects}
-            setOngoingProjects={setOngoingProjects}
-            setCompletedProjects={setCompletedProjects}
+            // game_id={game_id}
+            // currentWeek={currentWeek}
+            // currentSeason={currentSeason}
+            // stats={stats}
+            // setStats={setStats}
+            // ongoingProjects={ongoingProjects}
+            // completedProjects={completedProjects}
+            // setOngoingProjects={setOngoingProjects}
+            // setCompletedProjects={setCompletedProjects}
           />
         </div>
         <div className={`w-3/4`}>
           <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
-          {prompt && prompt._id && (
+          {prompt && (
             <div>
               <div className="text-center mb-8">
                 <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
@@ -316,17 +339,17 @@ export default function GameProgress() {
             </div>
 
               <ActionModal 
-                prompt={prompt}
-                game_id={game_id}
-                stats={stats}
-                setStats={setStats}
-                formData={formData}
-                setFormData={setFormData}
-                currentSeason={currentSeason}
-                currentWeek={currentWeek}
-                isDiscussion={prompt?.isDiscussion || false}
-                isDiscovery={prompt?.isDiscovery || false}
-                isProject={prompt?.isProject || false}
+                // prompt={prompt}
+                // game_id={game_id}
+                // stats={stats}
+                // setStats={setStats}
+                // formData={formData}
+                // setFormData={setFormData}
+                // currentSeason={currentSeason}
+                // currentWeek={currentWeek}
+                // isDiscussion={prompt?.isDiscussion || false}
+                // isDiscovery={prompt?.isDiscovery || false}
+                // isProject={prompt?.isProject || false}
                 />
 
 
@@ -335,15 +358,15 @@ export default function GameProgress() {
                 className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
                 onClick={handleNextWeek}
               >
-                {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
+                {prompt._id === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
               </button>
-              <GameSummary
-                game={game}
-                stats={stats}
-                projects={projects}
-                currentWeek={currentWeek}
-                loading={loading}
-              />
+              {/* <GameSummary
+                // game={game}
+                // stats={stats}
+                // projects={projects}
+                // currentWeek={currentWeek}
+                // loading={loading}
+              /> */}
             </div>
             </div>
           )}
