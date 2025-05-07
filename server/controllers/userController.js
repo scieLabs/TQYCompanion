@@ -108,12 +108,12 @@ export const loginUser = asyncHandler(async (req, res) => {
       email: user.email,
     },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '14d' }
   );
 
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'development',
+    secure: process.env.NODE_ENV === 'development', //TODO: Change to true in production
     maxAge: 24 * 60 * 60 * 1000,
   });
 

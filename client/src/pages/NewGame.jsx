@@ -28,7 +28,7 @@ export default function CreateNewGame() {
       }
       if (!loading && !user) {
         console.error('User is not logged in.');
-        navigate('/login');
+        navigate('/');
       } else {
         console.log('User object in NewGame:', user); // Debugging: Log the full user object
         console.log('User ID:', user._id); // Debugging: Log the user ID
