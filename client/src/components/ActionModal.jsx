@@ -30,6 +30,14 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
       await statAPI.saveActionData(game_id, currentWeek, data);
       // console.log('Conditional action data saved:', data);
 
+          // Save project to the backend if it's a "Start a Project" action
+      if (formData.project_title && formData.project_desc && formData.project_weeks) {
+        const projectResponse = await projectAPI.createProject(projectData);
+
+      // Immediately add the project to ongoingProjects
+        setOngoingProjects((prev) => [...prev, projectResponse.data]);
+      }
+
           // Close the modal
       setFormData((prev) => ({
         ...prev,
@@ -123,123 +131,160 @@ export default function ActionModal({ action, game_id, currentWeek, prompt, stat
 
   return (
     <div>
-
-      {/* Conditionally show the modal buttons */}
-      {isDiscussion && (
-        <button
-          className={`btn btn-sm mt-4 ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
-          onClick={() => setFormData(prev => ({ ...prev, showDiscussionModal: true }))}
-        >
-          Hold a Discussion
-        </button>
-      )}
-      {isDiscovery && (
-        <button
-          className={`btn btn-sm mt-4 shadow-sm ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
-          onClick={() => setFormData(prev => ({ ...prev, showDiscoveryModal: true }))}
-        >
-          Discover Something New
-        </button>
-      )}
-      {isProject && (
-        <button
-          className={`btn btn-sm mt-4 shadow-sm ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
-          onClick={() => setFormData(prev => ({ ...prev, showProjectModal: true }))}
-        >
-          Start a Project
-        </button>
-      )}
+      <div className="flex flex-col items-center">
+        {/* Conditionally show the modal buttons */}
+        {isDiscussion && (
+          <button
+            className={`btn btn-sm mt-4 shadow-sm border-none ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+            onClick={() => setFormData(prev => ({ ...prev, showDiscussionModal: true }))}
+          >
+            Hold a Discussion
+          </button>
+        )}
+        {isDiscovery && (
+          <button
+            className={`btn btn-sm mt-4 shadow-sm border-none ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+            onClick={() => setFormData(prev => ({ ...prev, showDiscoveryModal: true }))}
+          >
+            Discover Something New
+          </button>
+        )}
+        {isProject && (
+          <button
+            className={`btn btn-sm mt-4 shadow-sm border-none ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+            onClick={() => setFormData(prev => ({ ...prev, showProjectModal: true }))}
+          >
+            Start a Project
+          </button>
+        )}
+      </div>
 
       {/* Render always visible action form */}
       {renderActionForm()}
 
       {/* Modal rendering logic will go here */}
-      {formData.showDiscussionModal && isDiscussion && ( //FIXME: used to be action.isDiscussion
-        <div className="modal modal-open mt-4">
-          <label className="block font-bold">Prompt Discussion</label>
-          <textarea
-            className="textarea textarea-bordered w-full"
-            value={formData.p_discussion || ''}
-            onChange={(e) => updateField('p_discussion', e.target.value)}
-          />
-            <div>
-                <button
-                    className="btn btn-primary mt-4"
-                    // onClick={() => saveActionData({ p_discussion: formData.p_discussion })
-                    onClick={() => saveActionData()
-                    //FIXME: old with props
-                    // onClick={() =>
-                    //     saveActionData(gameTitle, currentWeek, { p_discussion: formData.p_discussion })
-                    }
-                    >
-                    Save Prompt Discussion
-                </button>
-            </div>
-        </div>
-      )}
+      {formData.showDiscussionModal && isDiscussion && (
+      <div className="modal modal-open mt-4">
+        <div className="modal-box p-0">
+          <header className={`p-4 text-center ${theme.headerBg} ${theme.headerText}`}>
+            <h3 className="font-bold text-lg">Hold a Discussion</h3>
+          </header>
 
-      {formData.showDiscoveryModal && isDiscovery && (
-        <div className="modal modal-open mt-4">
-          <label className="block font-bold">Prompt Discovery</label>
-          <textarea
-            className="textarea textarea-bordered w-full"
-            value={formData.p_discovery || ''}
-            onChange={(e) => updateField('p_discovery', e.target.value)}
-          />
-        <div>
-            <button
-                className="btn btn-primary mt-4"
-                // onClick={() =>
-                // //FIXME: props removed
-                //     saveActionData({ p_discovery: formData.p_discovery })
-                // }
+          <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+            <textarea
+              className={`textarea textarea-bordered w-full h-64 ${theme.bodyInputBg} ${theme.bodyInputText}`}
+              placeholder="A discussion never results in a decision or summation process. Everyone weighs in, and then it’s over."
+              value={formData.p_discussion || ''}
+              onChange={(e) => updateField('p_discussion', e.target.value)}
+            />
+            <div className="modal-action">
+              <button
+                className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
                 onClick={() => saveActionData()}
-                >
-                Save Prompt Discovery
-            </button>
+              >
+                Save
+              </button>
+              <button
+                className="btn border-none shadow-md"
+                onClick={() => setFormData((prev) => ({ ...prev, showDiscussionModal: false }))}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
-        </div>
-      )}
+      </div>
+    )}
 
-      {formData.showProjectModal && isProject && (
-        <div className="modal modal-open mt-4">
-          <label className="block font-bold">Prompt Project</label>
-          <input
-            className="input input-bordered w-full"
-            placeholder="Title"
-            value={formData.pp_title || ''}
-            onChange={(e) => updateField('pp_title', e.target.value)}
-          />
-          <textarea
-            className="textarea textarea-bordered w-full mt-2"
-            placeholder="Description"
-            value={formData.pp_desc || ''}
-            onChange={(e) => updateField('pp_desc', e.target.value)}
-          />
-          <div className="flex items-center space-x-2 mt-2">
-            <span className="font-bold">Weeks:</span>
-            <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.max(1, (formData.pp_weeks || 1) - 1))}>-</button>
-            <span>{formData.pp_weeks || 1}</span>
-            <button className="btn btn-sm" onClick={() => updateField('pp_weeks', Math.min(6, (formData.pp_weeks || 1) + 1))}>+</button>
+    {formData.showDiscoveryModal && isDiscovery && (
+      <div className="modal modal-open mt-4">
+        <div className="modal-box">
+          <header className={`p-4 text-center ${theme.headerBg} ${theme.headerText}`}>
+            <h3 className="font-bold text-lg">Discover Something New</h3>
+          </header>
+
+          <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+            <textarea
+              className={`textarea textarea-bordered w-full h-64 ${theme.bodyInputBg} ${theme.bodyInputText}`}
+              placeholder="Introduce a new situation. It might be a problem, opportunity, or a bit of both."
+              value={formData.p_discovery || ''}
+              onChange={(e) => updateField('p_discovery', e.target.value)}
+            />
+            <div className="modal-action">
+              <button
+                className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                onClick={() => saveActionData()}
+              >
+                Save
+              </button>
+              <button
+                className="btn border-none shadow-md"
+                onClick={() => setFormData((prev) => ({ ...prev, showDiscoveryModal: false }))}
+              >
+                Cancel
+            </button>
             </div>
-            <div>
-                <button
-                    className="btn btn-primary mt-4"
-                    // onClick={() =>
-                    // //FIXME: props removed
-                    //     saveActionData({
-                    //     pp_title: formData.pp_title,
-                    //     pp_desc: formData.pp_desc,
-                    //     pp_weeks: formData.pp_weeks,
-                    //     })
-                    // }
-                    onClick={() => saveActionData()}
-                    >
-                    Save Project
-                </button>
-            </div>
+          </div>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    )}
+
+    {formData.showProjectModal && isProject && (
+      <div className="modal modal-open mt-4">
+        <div className="modal-box p-0">
+          <header className={`p-4 text-center ${theme.headerBg} ${theme.headerText}`}>
+            <h3 className="font-bold text-lg">Start a Project</h3>
+          </header>
+        
+        <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+            <input
+              type="text"
+              maxLength="30"
+              className={`input input-bordered w-full mb-2 ${theme.bodyInputBg} ${theme.bodyInputText}`}
+              placeholder="A catchy title."
+              value={formData.pp_title || ''}
+              onChange={(e) => updateField('pp_title', e.target.value)}
+            />
+            <textarea
+              className={`textarea textarea-bordered w-full h-64 ${theme.bodyInputBg} ${theme.bodyInputText}`}
+              placeholder="Choose a situation and declare what the community will do to resolve it. Do you have the necessary tools and expertise to do this? As a group, decide how many weeks the project would reasonably take to complete (1-6)."
+              value={formData.pp_desc || ''}
+              onChange={(e) => updateField('pp_desc', e.target.value)}
+            />
+            <div className="flex items-center space-x-2 mt-4">
+              <span className="font-bold">Weeks:</span>
+              <button
+                className={`btn btn-sm text-lg ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                onClick={() => updateField('pp_weeks', Math.max(1, (formData.pp_weeks || 1) - 1))}
+              >
+                -
+              </button>
+              <span>{formData.pp_weeks || 1}</span>
+              <button
+                className={`btn btn-sm text-lg ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                onClick={() => updateField('pp_weeks', Math.min(6, (formData.pp_weeks || 1) + 1))}
+              >
+                +
+              </button>
+            </div>
+            <div className="modal-action">
+              <button
+                className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                onClick={() => saveActionData()}
+              >
+                Save
+              </button>
+              <button
+                className="btn border-none shadow-md"
+                onClick={() => setFormData((prev) => ({ ...prev, showProjectModal: false }))}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
 }
