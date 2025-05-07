@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
-import {getGameById, updateGame} from '../api/gameApi.js';
+import { getGameById, updateGame } from '../api/gameApi.js';
 import * as projectAPI from '../api/projectApi.js';
 import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
@@ -10,13 +10,14 @@ import { createProject } from '../api/projectApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
+import GameHeader from '../components/GameHeader.jsx'; // Import the GameHeader component
 
 export default function GameProgress() {
   const { game_id, week } = useParams(); // Get the game title from the URL parameters
   const { user } = useAuthContext(); // get the logged-in user
   const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
-  const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
-  
+  const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
+
   const [game, setGame] = useState(null);
   const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
   const [loading, setLoading] = useState(true);
@@ -75,9 +76,8 @@ export default function GameProgress() {
       const response = await projectAPI.getProjectsByGame(game_id);
       // console.log('Response from backend:', response);
       const allProjects = response.data;
-  
-      console.log('All projects:', allProjects);
-  
+      
+      // console.log('All projects:', allProjects);
       // Sort projects into ongoing and completed
       const ongoing = allProjects.filter(
         (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
@@ -89,9 +89,9 @@ export default function GameProgress() {
           (proj.project_resolve || proj.pp_resolve)
       );
 
-      console.log('Ongoing projects:', ongoing);
-      console.log('Completed projects:', completed);
-  
+      // console.log('Ongoing projects:', ongoing);
+      // console.log('Completed projects:', completed);
+
       setProjects(allProjects);
       setOngoingProjects(ongoing);
       setCompletedProjects(completed);
@@ -111,44 +111,44 @@ export default function GameProgress() {
 
   const hasFetchedPrompt = useRef(false);
 
-// useEffect(() => {
-//   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+  // useEffect(() => {
+  //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
 
-//   const fetchInitialData = async () => {
-//     await fetchGameData();
+  //   const fetchInitialData = async () => {
+  //     await fetchGameData();
 
-//     // Fetch the first prompt only if it's the first week and hasn't been fetched yet
-//     if (currentWeek === 1 && !hasFetchedPrompt.current) {
-//       console.log('Fetching the first prompt for the game');
-//       await fetchPrompt();
-//       hasFetchedPrompt.current = true; // Mark as fetched
-//     }
-//   };
+  //     // Fetch the first prompt only if it's the first week and hasn't been fetched yet
+  //     if (currentWeek === 1 && !hasFetchedPrompt.current) {
+  //       console.log('Fetching the first prompt for the game');
+  //       await fetchPrompt();
+  //       hasFetchedPrompt.current = true; // Mark as fetched
+  //     }
+  //   };
 
-//   fetchInitialData();
-// }, [game_id, currentSeason, currentWeek]);
+  //   fetchInitialData();
+  // }, [game_id, currentSeason, currentWeek]);
 
-useEffect(() => {
-  console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+  useEffect(() => {
+    console.log('useEffect triggered: game_id, currentSeason, currentWeek');
 
-  const fetchInitialData = async () => {
-    // Prevent duplicate calls caused by React's Strict Mode
-    if (hasFetchedPrompt.current) return;
+    const fetchInitialData = async () => {
+      // Prevent duplicate calls caused by React's Strict Mode
+      if (hasFetchedPrompt.current) return;
 
-    hasFetchedPrompt.current = true; // Mark as fetched immediately to prevent duplicate calls
+      hasFetchedPrompt.current = true; // Mark as fetched immediately to prevent duplicate calls
 
-    await fetchGameData();
+      await fetchGameData();
 
-    // Fetch the first prompt only if it's the first week and hasn't been fetched yet
-    if (currentWeek === 1) {
-      console.log('Fetching the first prompt for the game');
-      await fetchPrompt();
-      // hasFetchedPrompt.current = true; // Mark as fetched
-    }
-  };
+      // Fetch the first prompt only if it's the first week and hasn't been fetched yet
+      if (currentWeek === 1) {
+        console.log('Fetching the first prompt for the game');
+        await fetchPrompt();
+        // hasFetchedPrompt.current = true; // Mark as fetched
+      }
+    };
 
-  fetchInitialData();
-}, [game_id, currentSeason, currentWeek]);
+    fetchInitialData();
+  }, [game_id, currentSeason, currentWeek]);
 
 useEffect(() => {
   if (game_id) {
@@ -181,7 +181,7 @@ useEffect(() => {
       setLoading(false);
     }
   };
-  
+
 
   // Fetch prompts based on the current season and ensure non-repeating prompts
 
@@ -204,13 +204,13 @@ useEffect(() => {
 
       setPrompt(nextPrompt);
 
-    // Update the season globally only if it has changed
-    if (season !== currentSeason) {
-      console.log(`Season changed from ${currentSeason} to ${season}`);
-      setCurrentSeason(season);
-    }
+      // Update the season globally only if it has changed
+      if (season !== currentSeason) {
+        console.log(`Season changed from ${currentSeason} to ${season}`);
+        setCurrentSeason(season);
+      }
 
-    // console.log('Applied theme:', seasonThemes[currentSeason]);
+      // console.log('Applied theme:', seasonThemes[currentSeason]);
 
       // setShownPrompts((prev) => [...prev, nextPrompt._id]); // Track shown prompts
     } catch (err) {
@@ -219,8 +219,8 @@ useEffect(() => {
       setLoadingPrompt(false); // Reset loading state
     }
   };
-  
-  
+
+
   const handleNextWeek = async () => {
     console.log('handleNextWeek called');
     try {
@@ -230,7 +230,7 @@ useEffect(() => {
         const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
         await updateGame(game_id, data);
         console.log('Game Over data saved:', data);
-  
+
         // Navigate to the Game Summary page
         navigate(`/${game_id}/summary`);
         return; // Exit early since the game is over
@@ -259,15 +259,15 @@ useEffect(() => {
         project_weeks: formData.project_weeks,
       });
 
-        // Create a new game entry for the next week
-        const nextWeek = currentWeek + 1; // Increment the week number
-        await createStatsEntry({
-          game_id,
-          week: nextWeek,
-          abundance: stats.abundance,
-          scarcity: stats.scarcity,
-          contempt: stats.contempt,
-        }); 
+      // Create a new game entry for the next week
+      const nextWeek = currentWeek + 1; // Increment the week number
+      await createStatsEntry({
+        game_id,
+        week: nextWeek,
+        abundance: stats.abundance,
+        scarcity: stats.scarcity,
+        contempt: stats.contempt,
+      });
 
       // //reset form data for new week
       setFormData({
@@ -298,22 +298,23 @@ useEffect(() => {
 
 
   return (
-    <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}> 
-      <div className={`flex`}> 
+    <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
+      <div className={`flex`}>
         <div className={`w-1/4 pr-4`}>
-          <GameStats 
+          <GameStats
             game_id={game_id}
             currentWeek={currentWeek}
             currentSeason={currentSeason}
             stats={stats}
-            setStats={setStats} 
+            setStats={setStats}
             ongoingProjects={ongoingProjects}
             completedProjects={completedProjects}
             setOngoingProjects={setOngoingProjects}
             setCompletedProjects={setCompletedProjects}
             fetchProjects={fetchProjects} 
-            />
+           />
         </div>
+        
         <div className={`w-3/4`}>
           <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
           {prompt && prompt._id && (
@@ -330,9 +331,9 @@ useEffect(() => {
                 prompt={prompt}
                 game_id={game_id}
                 stats={stats}
-                setStats={setStats}  
-                formData={formData} 
-                setFormData={setFormData} 
+                setStats={setStats}
+                formData={formData}
+                setFormData={setFormData}
                 currentSeason={currentSeason}
                 currentWeek={currentWeek}
                 isDiscussion={prompt?.isDiscussion || false}
@@ -350,6 +351,13 @@ useEffect(() => {
               >
                 {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
               </button>
+              <GameSummary
+                game={game}
+                stats={stats}
+                projects={projects}
+                currentWeek={currentWeek}
+                loading={loading}
+              />
             </div>
             </div>
           )}

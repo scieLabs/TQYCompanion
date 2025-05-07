@@ -1,24 +1,32 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx';
+import { useSeason } from "../../contexts/seasonContext";
+import { useNavigate } from 'react-router-dom';
 
-export default function Logout() {
+export default function Logout({onClose}) {
+    const { logout } = useAuthContext();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const { logout } = useAuthContext();
 
+
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
 
     const handleLogout = async () => {
+        // const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
         setErrorMessage('');
         setSuccessMessage('');
-    
+        // if (confirmLeave) {
         try {
             setLoading(true);
             await logout(); // Use the logout function from authContext
-            setSuccessMessage('Logout successful!');
+            console.log('Logout successful:');
+            setSuccessMessage('You are logged out! Redirecting to home page...');
             setTimeout(() => {
                 setLoading(false);
+                navigate('/');
             }, 2000);
         } catch (error) {
             console.error('Logout failed:', error);
@@ -27,49 +35,35 @@ export default function Logout() {
         }
     };
 
-   // TODO: Old version:
-    // const handleLogout = async () => {
-    //     setErrorMessage(''); // Clear previous error messages
-    //     setSuccessMessage(''); // Clear previous success messages
-
-    //     try {
-    //         setLoading(true); // Show loading state
-    //         const response = await axios.post('/logout', {}, { withCredentials: true });
-    //         console.log('Logout successful:', response.data);
-    //         setSuccessMessage('Logout successful! Redirecting...');
-    //         logout();
-
-    //         // Optionally redirect or perform additional actions after logout
-    //         setTimeout(() => {
-    //             setLoading(false);
-    //         }, 20000); // 20 seconds delay before closing the modal
-    //     } catch (error) {
-    //         console.error('Logout failed:', error.response?.data || error.message);
-    //         setErrorMessage('Logout failed. Please try again.');
-    //         setLoading(false);
-    //     }
-    // };
 
     return (
-        <div className="bg-white p-6 rounded shadow-md w-full max-w-sm mx-auto">
-            <h2 className="text-2xl font-bold mb-4">Logout</h2>
-            {errorMessage && (
-                <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
-            )}
-            {successMessage && (
-                <div className="text-green-500 text-sm mb-4">{successMessage}</div>
-            )}
-            <button
-                className={`bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                type="button"
-                onClick={handleLogout}
-                disabled={loading}
-                aria-label="Logout"
-            >
-                {loading ? 'Logging out...' : 'Logout'}
-            </button>
+        <div >
+        {/* <div className="popup-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"> */}
+            <div className="bg-black-500 p-6 rounded shadow-lg text-center">
+                {/* <h2 className="text-2xl font-bold mb-4">Logout</h2> */}
+                <p className="mb-4">Are you sure you want to log out?</p>
+                {errorMessage && (
+                    <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
+                )}
+                {successMessage && (
+                    <div className="text-green-500 text-sm mb-4">{successMessage}</div>
+                )}
+                <div className="flex justify-center space-x-4">
+                    <button
+                        onClick={handleLogout}
+                        className="btn btn-primary"
+                        disabled={loading}
+                    >
+                        {loading ? 'Logging out...' : 'Log Out'}
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="btn btn-secondary"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
         </div>
     );
-}
+};
