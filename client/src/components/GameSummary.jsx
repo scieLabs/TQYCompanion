@@ -24,11 +24,19 @@ const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage
     const weeks = projects.reduce((acc, project) => {
         const week = acc.find((w) => w.weekNumber === project.stats_week) || {
             weekNumber: project.stats_week,
+            discoveries: [stats.discovery, stats.p_discovery].filter(Boolean),
+            discussions: [stats.discussion, stats.p_discussion].filter(Boolean),
+            abundance: stats.abundance,
+            scarcity: stats.scarcity,
+            contempt: stats.contempt,
             projects: [],
-            discussions: [],
-            discoveries: [],
         };
-        week.projects.push(project.project_title);
+        week.projects.push({
+            title: project.project_title || project.pp_title,
+            description: project.project_desc || project.pp_desc,
+            weeksRemaining: project.project_weeks || project.pp_weeks,
+            resolution: project.project_resolve || project.pp_resolve,
+        });
         if (!acc.includes(week)) acc.push(week);
         return acc;
     }, []);
