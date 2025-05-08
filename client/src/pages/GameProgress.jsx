@@ -251,7 +251,7 @@ export default function GameProgress() {
       if (prompt._id === GAME_OVER_PROMPT_ID) {
         // Save the "fate of the community" to the database
         const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
-        await updateGame(game_id, data);
+        await updateGame(game_id, { currentWeek, isFinished: true }, data);
         console.log('Game Over data saved:', data);
 
         // Show the game summary modal
