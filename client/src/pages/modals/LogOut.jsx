@@ -37,33 +37,44 @@ export default function Logout({onClose}) {
 
 
     return (
-        <div >
-        {/* <div className="popup-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"> */}
-            <div className="bg-black-500 p-6 rounded shadow-lg text-center">
-                {/* <h2 className="text-2xl font-bold mb-4">Logout</h2> */}
-                <p className="mb-4">Are you sure you want to log out?</p>
-                {errorMessage && (
-                    <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
+        <div>
+            <h2 className="text-2xl font-bold mb-4">Logout</h2>
+            {errorMessage && (
+                    <div className={`
+                            text-red-500 text-sm mb-4`}>
+                                {errorMessage}
+                                </div>
                 )}
                 {successMessage && (
-                    <div className="text-green-500 text-sm mb-4">{successMessage}</div>
+                    <div className={`
+                            text-green-500 text-sm mb-4`}>
+                                {successMessage}
+                                </div>
                 )}
                 <div className="flex justify-center space-x-4">
-                    <button
-                        onClick={handleLogout}
-                        className="btn btn-primary"
-                        disabled={loading}
-                    >
-                        {loading ? 'Logging out...' : 'Log Out'}
-                    </button>
-                    <button
+            <button
+                className={`
+                    login-button flex justify-center items-center mt-4
+                    ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                    py-2 px-4 rounded hover:cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+                    `}
+                type="button"
+                onClick={handleLogout}
+                disabled={loading}
+            >
+                {loading ? 'Logging out...' : 'Logout'}
+            </button>
+            <button
                         onClick={onClose}
-                        className="btn btn-secondary"
+                        className={`
+                            login-button flex justify-center items-center mt-4
+                            ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                            py-2 px-4 rounded hover:cursor-pointer
+                            `}
                     >
                         Cancel
                     </button>
-                </div>
-            </div>
+                    </div>
         </div>
     );
 };
