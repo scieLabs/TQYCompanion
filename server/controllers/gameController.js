@@ -266,7 +266,7 @@ export const updateGameByTitle = async (req, res) => {
     const game = await Game.findOneAndUpdate({ title }, updates, { new: true });
     if (!game) return res.status(404).json({message: 'Game not found'});
     res.json(game);
-  } catch (err) {
+  } catch (err) { v
     res.status(500).json({message: 'Error updating game by title'});
   }
 };
@@ -281,6 +281,45 @@ export const updateGameEntry = async (req, res) => {
   }
 };
 
+export const updateGameProgress = async (req, res) => {
+  try {
+    const { game_id } = req.params;
+    const { week, isFinished } = req.body;
+
+    const game = await Game.findByIdAndUpdate(
+      game_id,
+      {
+        week,
+        isFinished,
+        isActive: !isFinished, // Set isActive to false if the game is finished
+        updatedAt: Date.now(),
+      },
+      { new: true }
+    );
+
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found.' });
+    }
+
+    res.json(game);
+  } catch (error) {
+    console.error('Error updating game progress:', error);
+    res.status(500).json({ message: 'Failed to update game progress.' });
+  }
+};
+
+// Fetch all active games
+export const getActiveGames = async (req, res) => {
+    try {
+        const userId = req.user._id; 
+        const activeGames = await Game.find({ user_id: userId, isActive: true }).sort({ updatedAt: -1 });
+        res.json(activeGames);
+    } catch (error) {
+        console.error('Error fetching active games:', error);
+        res.status(500).json({ message: 'Failed to fetch active games.' });
+    }
+};
+
 // Delete a game by title
 export const deleteGameByTitle = async (req, res) => {
   const { title } = req.params;
@@ -293,9 +332,15 @@ export const deleteGameByTitle = async (req, res) => {
   }
 };
 
+// Delete a specific game by ID
 export const deleteGameEntry = async (req, res) => {
   try {
+    // const gameId = req.params.id;
+    // const userId = req.user._id;
+
     const deleted = await Game.findByIdAndDelete(req.params.id);
+    // const deleted = await Game.findOneAndDelete({ _id: gameId, user_id: userId });
+
     if (!deleted) return res.status(404).json({ message: 'Game not found' });
     res.json({ message: 'Game deleted' });
   } catch (err) {
@@ -303,6 +348,22 @@ export const deleteGameEntry = async (req, res) => {
   }
 };
 
+export const deleteGameById = async (req, res) => {
+  try {
+    const gameId = req.params.id;
+    const userId = req.user._id;
+
+    const game = await Game.findOneAndDelete({ _id: gameId, user_id: userId });
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found or not authorized to delete.' });
+    }
+
+    res.json({ message: 'Game deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting game:', error);
+    res.status(500).json({ message: 'Failed to delete game.' });
+  }
+};
 
 // Projects
 

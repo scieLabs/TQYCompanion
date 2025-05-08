@@ -5,6 +5,7 @@ import {
   getGameById,
   getGameByTitle,
   getGameByTitleAndWeek,
+  getActiveGames,
   createGameEntry,
   saveActionData,
   updateGameByTitle,
@@ -18,13 +19,16 @@ import {
 } from '../controllers/gameController.js';
 
 const router = express.Router();
+//import { authenticateUser } from '../middleware/authMiddleware.js';
 
-// Game routes (Copilot's suggestions:)
+// Game routes
 router.get('/', getAllGames); // Get all games
 router.get('/latest', getLatestGame); // Get the latest game for a user
 router.get('/game/title/:title/week/:week', getGameByTitleAndWeek);
 router.get('/:id', getGameById); // Get a game by ID
 router.get('/title/:title', getGameByTitle); // Get a game by title
+// Fetch all active games for the logged-in user
+router.get('/active', getActiveGames);
 router.get('/title/:title/projects', getAllProjectsByTitle);
 router.get('/title/:title/completed', getCompletedProjects);
 

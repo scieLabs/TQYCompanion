@@ -2,7 +2,7 @@ import HomeHeader from "../components/HomeHeader";
 import Login from "../pages/modals/Login";
 import Register from "../pages/modals/NewUser";
 import { useAuthContext } from "../contexts/authContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import titleImage from "../assets/title.png";
 import quietYearImage from "../assets/The-Quiet-Year.webp";
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ const LandingPage = () => {
     const navigate = useNavigate();
 
     const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
-    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
 
     const handleLoginClick = () => {
         setShowLogin(true);
@@ -33,7 +33,14 @@ const LandingPage = () => {
     };
 
     const handleNewGameClick = () => {
+        setCurrentSeason("Spring"); // Reset the season to Spring when starting a new game
         navigate('/new-game'); // Navigate to the NewGame page
+    };
+
+    const handleContinueGameClick = () => {
+        if (unfinishedGame) {
+            navigate(`/game/${unfinishedGame._id}/week/${unfinishedGame.currentWeek}`);
+        }
     };
 
     return (
@@ -111,6 +118,12 @@ const LandingPage = () => {
                             New Game
                         </button>
                     )}
+                       <button
+                            onClick={() => navigate('/active')}
+                            className="unfinished-games-button bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Active Games
+                        </button>
                 </section>
 
             </main>

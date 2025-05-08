@@ -16,6 +16,9 @@ export const getAllGames = () => gameAPI.get('/game');
 // Fetch a game by its ID
 export const getGameById = (id) => gameAPI.get(`/game/${id}`);
 
+// Fetch all active games
+export const getActiveGames =  () => gameAPI.get(`$/game/active/${isActive}`);
+
 // Fetch a game by its title
 export const getGameByTitle = (title) => gameAPI.get(`/game/title/${title}`);
 
@@ -74,6 +77,8 @@ export const getCompletedProjects = (title) =>
 
 export const resolveProject = (title, projectTitle, type, resolution) =>
   gameAPI.put(`/game/title/${title}/projects/${projectTitle}/${type}/resolve`, { resolution });
+
+
 
 // Default export for direct use of Axios instance
 export default gameAPI;

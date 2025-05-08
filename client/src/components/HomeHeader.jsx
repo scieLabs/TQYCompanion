@@ -20,6 +20,10 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
         navigate('/new-game'); // Navigate to the NewGame page
     };
 
+    const handleActiveGamesClick = () => {
+        navigate('/active'); // Navigate to the ActiveGames page
+    }
+
     return (
         <header
             className="home-header ${theme.headerBg} ${theme.headerText} width-full py-4 px-6 flex justify-between items-center "
@@ -68,6 +72,12 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                             }}
                         >
                             Log Out
+                        </button>
+                        <button
+                            onClick={handleActiveGamesClick}
+                            className="active-games-button bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Active Games
                         </button>
                         <button
                             onClick={handleNewGameClick}
