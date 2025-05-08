@@ -21,7 +21,7 @@ export const SeasonProvider = ({ children }) => {
       headerTextHover: 'hover:text-[#ffdbaa]', //for links hover
       headerBtnBg: 'bg-[#ffb7b7]',
       headerBtnBgHover: 'hover:bg-[#ffa27f]', //for button hover
-      headerBtnText: 'text-green-900', //TODO: change to a visible colour against the yellow later. to the same colour as body text
+      headerBtnText: 'text-[#4a4a4a]', //TODO: change to a visible colour against the yellow later. to the same colour as body text
   
       // LandingPage, NewGame, and GameProgress pages (including ActionModal), and modals
       bodyBg: 'bg-[#f4eeee]', // main body; also use for modals

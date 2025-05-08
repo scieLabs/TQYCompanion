@@ -6,6 +6,7 @@ import { useAuthContext } from "../contexts/authContext.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useSeason } from "../contexts/seasonContext.jsx";
 import rulesPdf from "../assets/rules.pdf";
+import titleImage from "../assets/titlepngedit.png"; // Import the image
 
 const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
     const { user } = useAuthContext();
@@ -27,9 +28,10 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                 width-full py-4 px-6 flex justify-between items-center`}
             role="banner"
         >
+
             <nav className="flex space-x-4">
                 <a href="/"
-                    className={`about-button 
+                    className={`btn about-button border-none shadow-md
                         ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
                 py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
@@ -39,36 +41,43 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                     href={rulesPdf}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`rules-button 
+                    className={`btn rules-button border-none shadow-md
                         ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                     py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
                     View Rules
                 </a>
             </nav>
-            <h1
+            {/* <h1
                 className={`game-title text-5xl font-bold 
                     ${theme.headerText} ${theme.headerBg}`}
                 style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }} // Optional: Add a shadow effect to the text
             >
                 THE QUIET YEAR
-            </h1>
+            </h1> */}
+
+                          {/* Header Image */}
+            <img
+                src={titleImage}
+                alt="The Quiet Year"
+                className="w-64 h-auto mb-4" // Adjust width and height as needed
+            />
             <div className="header-content flex space-x-4">
                 {!user && (
                     <>
                         <button
                             onClick={onLoginClick}
-                            className={`login-button 
+                            className={`btn login-button border-none shadow-md
                                 ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                                py-2 px-4 rounded hover:cursor-pointer`}
+                                py-2 px-4 rounded`}
                         >
-                            Login
+                            Log In
                         </button>
                         <button
                             onClick={onRegisterClick}
-                            className={`register-button 
+                            className={`btn register-button border-none shadow-md
                                 ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                                py-2 px-4 rounded hover:cursor-pointer`}
+                                py-2 px-4 rounded`}
                         >
                             Register
                         </button>
@@ -77,7 +86,7 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                 {user && (
                     <>
                         <button
-                            className="hover:underline"
+                            className={`btn border-none shadow-md ${theme.bodyBg} ${theme.bodyText} hover:bg-gray-200`}
                             onClick={() => {
                                 console.log('Log Out button clicked');
                                 setShowLogOutModal(!showLogOutModal); // Show the logout modal
@@ -88,7 +97,7 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                         </button>
                         <button
                             onClick={handleNewGameClick}
-                            className={`new-game-button 
+                            className={`btn new-game-button border-none shadow-md
                                 ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                                 py-2 px-4 rounded focus:outline-none focus:shadow-outline`}>
                             New Game

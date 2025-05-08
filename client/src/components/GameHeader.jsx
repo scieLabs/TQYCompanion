@@ -59,25 +59,13 @@ const GameHeader = () => {
       {/* App Title */}
       {/* <h1 className="text-2xl font-bold">The Quiet Year</h1> */}
 
-      <img
-        src={titleImage}
-        alt="The Quiet Year"
-        className="w-48 h-auto mb-4" // Adjust width and height as needed
-      />
 
-      {/* Game Title (only on game progress page) */}
-      {isGameProgressPage && gameTitle && (
-        <h2
-          className="text-lg font-semibold mt-2 cursor-pointer underline"
-          onClick={() => setShowGameModal(true)} // Open the modal when the title is clicked
-        >
-          {gameTitle}
-        </h2>
-      )}
+
+
 
       {/* Navigation and User Info */}
-      <div className="flex justify-between w-full mt-4">
-        <nav className="flex space-x-4">
+      <div className="flex justify-between items-center w-full mt-2">
+        {/* <nav className="flex space-x-4">
           <a
             href="/"
             className="hover:underline"
@@ -97,14 +85,55 @@ const GameHeader = () => {
           >
             Rules
           </a>
+        </nav> */}
 
+        <nav className="flex space-x-4">
+          <a
+            href="/"
+            className={`btn border-none shadow-md ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} py-2 px-4 rounded`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavigation('/');
+            }}
+          >
+            Home
+          </a>
+          <a
+            href={rulesPdf}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`btn border-none shadow-md ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} py-2 px-4 rounded`}
+          >
+            Rules
+          </a>
         </nav>
-        <div className="flex space-x-4">
-          <div className="user-info flex space-x-4">
+
+        <div className="flex flex-col items-center">
+            {/* Game Title (only on game progress page) */}
+          <img
+            src={titleImage}
+            alt="The Quiet Year"
+            className="w-64 h-auto mb-2" // Adjust width and height as needed
+          />
+
+          {isGameProgressPage && gameTitle && (
+          <h2
+            className={`text-lg font-semibold mt-2 cursor-pointer underline ${theme.headerTextHover}`}
+            onClick={() => setShowGameModal(true)} // Open the modal when the title is clicked
+          >
+            {gameTitle}
+          </h2>
+          )}
+
+        </div>
+
+
+        <div className="flex space-x-4 items-center">
+          {/* <div className="user-info flex space-x-4">
             <span className="username">{user.username}</span>
-          </div>
+          </div> */}
           <button
-            className="hover:underline"
+            className={`btn border-none shadow-md ${theme.bodyBg} ${theme.bodyText} hover:bg-gray-200`}
             onClick={() => {
               console.log('Log Out button clicked');
               setShowLogOutModal(!showLogOutModal); // Show the logout modal
@@ -112,7 +141,7 @@ const GameHeader = () => {
             }}
           >
             {/* {showLogOutModal&&`Log Out`} */}
-            Log Out
+            Log Out {user.username}
           </button>
           {/* <Link
             to="/logout"
