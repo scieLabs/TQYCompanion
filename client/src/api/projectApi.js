@@ -7,7 +7,17 @@ const projectAPI = axios.create({
 
   export const getProjectsByGame = (game_id) => projectAPI.get(`/projects/${game_id}`);
 
-  export const createProject = async (data) => projectAPI.post('/projects', data);
+  export const createProject = async (projectData) => {
+    try {
+      console.log('Sending project data to backend:', projectData); // Log the data being sent
+      const response = await projectAPI.post('/projects', projectData);
+      console.log('Project creation response:', response.data); // Log the response
+      return response;
+    } catch (error) {
+      console.error('Error creating project:', error.response?.data || error.message);
+      throw error;
+    }
+  };
 
   export const getOngoingProjects = (game_id) =>
     projectAPI.get(`/projects/${game_id}/ongoing`);

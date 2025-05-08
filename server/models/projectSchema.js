@@ -10,7 +10,7 @@ const projectSchema = new mongoose.Schema(
     project_resolve: { type: String },
     pp_title: { type: String },
     pp_desc: { type: String },
-    pp_weeks: { type: Number, min: 0, max: 6 },
+    pp_weeks: { type: Number, min: 0, max: 6},
     pp_resolve: { type: String },
   },
   { timestamps: true }
