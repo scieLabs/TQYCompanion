@@ -23,14 +23,15 @@ export const getProjectsByGame = async (req, res) => {
 
 //TODO: should include pp_* ??? and resolution?? as an update
 export const createProject = async (req, res) => {
-  const { game_id, title, description, weeks, stats_week } = req.body;
+  const { game_id, pp_title, project_title, pp_desc, project_desc, pp_weeks, project_weeks, stats_week } = req.body;
 
   try {
     const newProject = new Project({
       game_id,
-      title,
-      description,
-      project_weeks: weeks,
+      title: project_title || pp_title, // Use project_title if available, otherwise pp_title
+      description: project_desc || pp_desc, // Use project_desc if available, otherwise pp_desc
+      weeks: project_weeks || pp_weeks || 1,
+      // pp_weeks: weeks,
       stats_week,
     });
 

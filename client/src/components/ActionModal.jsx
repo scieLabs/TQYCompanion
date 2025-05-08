@@ -24,20 +24,23 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
         p_discovery: formData.p_discovery,
         pp_title: formData.pp_title,
         pp_desc: formData.pp_desc,
-        pp_weeks: formData.pp_weeks,
+        pp_weeks: formData.pp_weeks || 1,
       };
   
       await statAPI.saveActionData(game_id, currentWeek, data);
-      // console.log('Conditional action data saved:', data);
+      console.log('Conditional action data saved:', data);
 
       // Save project to the backend if it's a "Start a Project" action
-      if (formData.pp_title && formData.pp_desc && formData.pp_weeks) {
+      if (formData.pp_title && formData.pp_desc) { //removed && formData.pp_weeks
         const projectData = {
           game_id,
           stats_week: currentWeek,
-          project_title: formData.pp_title,
-          project_desc: formData.pp_desc,
-          project_weeks: formData.pp_weeks,
+          pp_title: formData.pp_title,
+          pp_desc: formData.pp_desc,
+          pp_weeks: formData.pp_weeks || 1,
+          project_title: formData.project_title,
+          project_desc: formData.project_desc,
+          project_weeks: formData.project_weeks,
         };
 
         console.log('Creating project with data:', projectData);

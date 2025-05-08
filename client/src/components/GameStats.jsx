@@ -83,9 +83,20 @@ export default function GameStats({ game_id, currentWeek, fetchProjects, ongoing
       await projectAPI.updateProjectWeeks(project_id, weeks);
 
       // Update the ongoing projects list
+      // setOngoingProjects((prev) =>
+      //   prev.map((proj) =>
+      //     proj._id === project_id ? { ...proj, project_weeks: weeks } : proj
+      //   )
+      // );
       setOngoingProjects((prev) =>
         prev.map((proj) =>
-          proj._id === project_id ? { ...proj, project_weeks: weeks } : proj
+          proj._id === project_id
+            ? {
+                ...proj,
+                project_weeks: proj.project_weeks !== undefined ? weeks : proj.project_weeks,
+                pp_weeks: proj.pp_weeks !== undefined ? weeks : proj.pp_weeks,
+              }
+            : proj
         )
       );
 

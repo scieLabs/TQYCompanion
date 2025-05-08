@@ -82,7 +82,7 @@ export default function GameProgress() {
       // console.log('Response from backend:', response);
       const allProjects = response.data;
 
-      // console.log('All projects:', allProjects);
+      console.log('All projects:', allProjects);
       // Sort projects into ongoing and completed
       const ongoing = allProjects.filter(
         (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
