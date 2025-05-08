@@ -6,6 +6,7 @@ export const getProjectsByGame = async (req, res) => {
   try {
     console.log(`Fetching all projects for game_id: ${game_id}`);
     const projects = await Project.find({ game_id });
+    console.log('Projects fetched from database:', projects);
 
     if (!projects || projects.length === 0) {
       console.warn('No projects found for this game.');
@@ -22,14 +23,16 @@ export const getProjectsByGame = async (req, res) => {
 
 //TODO: should include pp_* ??? and resolution?? as an update
 export const createProject = async (req, res) => {
-  const { game_id, title, description, weeks } = req.body;
+  const { game_id, pp_title, project_title, pp_desc, project_desc, pp_weeks, project_weeks, stats_week } = req.body;
 
   try {
     const newProject = new Project({
       game_id,
-      title,
-      description,
-      project_weeks: weeks,
+      title: project_title || pp_title, // Use project_title if available, otherwise pp_title
+      description: project_desc || pp_desc, // Use project_desc if available, otherwise pp_desc
+      weeks: project_weeks || pp_weeks || 1,
+      // pp_weeks: weeks,
+      stats_week,
     });
 
     await newProject.save();
@@ -110,18 +113,20 @@ export const updateProjectWeeks = async (req, res) => {
 
 export const resolveProject = async (req, res) => {
   const { project_id } = req.params;
-  const { resolution } = req.body;
+  const { project_resolve, pp_resolve } = req.body;
 
   try {
     const updatedProject = await Project.findByIdAndUpdate(
       project_id,
-      { resolution, project_weeks: 0, pp_weeks: 0 },
+      { project_resolve, pp_resolve, project_weeks: 0, pp_weeks: 0 },
       { new: true, runValidators: true } // Return the updated document
     );
 
     if (!updatedProject) {
       return res.status(404).json({ message: 'Project not found.' });
     }
+
+    console.log('Resolved project:', updatedProject);
 
     res.status(200).json(updatedProject);
   } catch (error) {
@@ -133,6 +138,7 @@ export const resolveProject = async (req, res) => {
 export const updateProjectResolution = async (req, res) => {
   const { id } = req.params;
   const { project_resolve, pp_resolve } = req.body;
+  console.log('Request body:', req.body);
 
   try {
     const project = await Project.findById(id);

@@ -10,6 +10,8 @@ import rulesPdf from "../assets/rules.pdf";
 const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
     const { user } = useAuthContext();
     const navigate = useNavigate();
+    const [showLogOutModal, setShowLogOutModal] = useState(false);
+
     const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
     const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
 
@@ -74,7 +76,16 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                 )}
                 {user && (
                     <>
-                        <Logout />
+                        <button
+                            className="hover:underline"
+                            onClick={() => {
+                                console.log('Log Out button clicked');
+                                setShowLogOutModal(!showLogOutModal); // Show the logout modal
+                                console.log('showLogOutModal:', showLogOutModal);
+                            }}
+                        >
+                            Log Out
+                        </button>
                         <button
                             onClick={handleNewGameClick}
                             className={`new-game-button 
@@ -85,6 +96,11 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                     </>
                 )}
             </div>
+            {showLogOutModal && (
+                // <Logout  />
+                <Logout onClose={() => setShowLogOutModal(false)} />
+                // 
+            )}
         </header>
     );
 };

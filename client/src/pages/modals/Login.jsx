@@ -63,14 +63,14 @@ export default function Login({ onClose, handleRegisterClick }) {
             <form
                 className={`
                     login-form 
-                    ${theme.bodyText} ${theme.bodyBg} ${theme.bodyInputText}
-                    p-6 rounded shadow-lg shadow-[#97be5a]
+                    ${theme.bodyBg} ${theme.bodyText}
+                    p-6 rounded
                     `}
                 onSubmit={handleSubmit}
             >
                 <button
                     className={`close-button float-right
-                        ${theme.headerBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
+                        ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
                         px-1 rounded hover:cursor-pointer`}
                     onClick={onClose}
                     aria-label="Close"
@@ -93,7 +93,7 @@ export default function Login({ onClose, handleRegisterClick }) {
                 <div className={`mb-4`}>
                     <label
                         className={`
-                            block text-gray-700 text-sm font-bold mb-2
+                            block gray-700 text-sm font-bold mb-2
                             `}
                         htmlFor="email"
                     >
@@ -139,8 +139,7 @@ export default function Login({ onClose, handleRegisterClick }) {
                     <button
                         className={`
                             login-button flex justify-center items-center mt-4
-                            ${theme.headerBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                            ${theme.bodyText}
+                            ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                             py-2 px-4 rounded hover:cursor-pointer  ${loading ? 'opacity-50 cursor-not-allowed' : ''}
                             `}
                         type="submit"

@@ -80,8 +80,8 @@ export default function Register({ onClose }) {
             >
                 <button
                     className={`close-button float-right
-                        ${theme.headerBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
-                        ${theme.bodyText} px-1 rounded hover:cursor-pointer`}
+                        ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
+                        px-1 rounded hover:cursor-pointer`}
                     onClick={onClose}
                     aria-label="Close"
                 >
@@ -165,7 +165,7 @@ export default function Register({ onClose }) {
                 <div className={`login-button-container`}>
                     <button
                         className={`login-button flex justify-center items-center mt-4
-                                ${theme.headerBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                                 py-2 px-4 rounded hover:cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         type="submit"
                         disabled={loading}

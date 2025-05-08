@@ -10,13 +10,18 @@ import { createProject } from '../api/projectApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
-import GameSummary from './GameSummary.jsx'; // Import the GameSummary component
+import GameHeader from '../components/GameHeader.jsx'; // Import the GameHeader component
+import GameSummary from '../components/GameSummary.jsx'; // Import the GameSummary component
+
+
 
 export default function GameProgress() {
   const { game_id, week } = useParams(); // Get the game title from the URL parameters
   const { user } = useAuthContext(); // get the logged-in user
   const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
+
+  const [showGameSummary, setShowGameSummary] = useState(false);
 
   const [game, setGame] = useState(null);
   const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
@@ -36,42 +41,6 @@ export default function GameProgress() {
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
 
-  const fetchProjects = async () => {
-    try {
-      // console.log(`Fetching all projects for game_id: ${game_id}`);
-      const response = await projectAPI.getProjectsByGame(game_id);
-      // console.log('Response from backend:', response);
-      const allProjects = response.data;
-
-      // console.log('All projects:', allProjects);
-
-      // Sort projects into ongoing and completed
-      const ongoing = allProjects.filter(
-        (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
-      );
-      const completed = allProjects.filter(
-        (proj) =>
-          proj.project_weeks === 0 &&
-          proj.pp_weeks === 0 &&
-          (proj.project_resolve || proj.pp_resolve)
-      );
-
-      setProjects(allProjects);
-      setOngoingProjects(ongoing);
-      setCompletedProjects(completed);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      if (error.response?.status === 404) {
-        console.warn('No projects found for this game.');
-        setProjects([]);
-        setOngoingProjects([]);
-        setCompletedProjects([]);
-      } else {
-        console.error('Error fetching projects:', error);
-      }
-    }
-  };
-
   const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
   const [prompt, setPrompt] = useState(null);
   const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
@@ -86,11 +55,64 @@ export default function GameProgress() {
     console.log('Current season updated:', currentSeason);
   }, [currentSeason]);
 
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever game_id or currentWeek changes
+
+  useEffect(() => {
+    console.log('Updated ongoingProjects:', ongoingProjects);
+  }, [ongoingProjects]);
+
+  useEffect(() => {
+    console.log('Updated completedProjects:', completedProjects);
+  }, [completedProjects]);
+
   // useEffect(() => {
   //   // console.log('Game ID:', game_id);
   //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
   //   fetchGameData();
   // }, [game_id, currentSeason, currentWeek]);
+
+  const fetchProjects = async () => {
+    try {
+      console.log(`Fetching all projects for game_id: ${game_id}`);
+      const response = await projectAPI.getProjectsByGame(game_id);
+      // console.log('Response from backend:', response);
+      const allProjects = response.data;
+
+      console.log('All projects:', allProjects);
+      // Sort projects into ongoing and completed
+      const ongoing = allProjects.filter(
+        (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
+      );
+
+      const completed = allProjects.filter(
+        (proj) =>
+          (proj.project_weeks === 0 || proj.pp_weeks === 0) &&
+          (proj.project_resolve || proj.pp_resolve)
+      );
+
+      // console.log('Ongoing projects:', ongoing);
+      // console.log('Completed projects:', completed);
+
+      setProjects(allProjects);
+      setOngoingProjects(ongoing);
+      setCompletedProjects(completed);
+      console.log('Fetched projects:', { ongoing, completed });
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      if (error.response?.status === 404) {
+        console.warn('No projects found for this game.');
+        setProjects([]);
+        setOngoingProjects([]);
+        setCompletedProjects([]);
+      } else {
+        console.error('Error fetching projects:', error);
+      }
+    }
+  };
 
   const hasFetchedPrompt = useRef(false);
 
@@ -132,6 +154,12 @@ export default function GameProgress() {
 
     fetchInitialData();
   }, [game_id, currentSeason, currentWeek]);
+
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever currentWeek changes
 
   const fetchGameData = async () => {
     try {
@@ -208,8 +236,8 @@ export default function GameProgress() {
         await updateGame(game_id, data);
         console.log('Game Over data saved:', data);
 
-        // Navigate to the Game Summary page
-        navigate(`/${game_id}/summary`);
+        // Show the game summary modal
+        setShowGameSummary(true);
         return; // Exit early since the game is over
       }
 
@@ -261,7 +289,7 @@ export default function GameProgress() {
       setCurrentWeek(nextWeek);
       // fetchPrompt(currentSeason);
 
-      fetchGameData(); //refresh game state
+      await fetchGameData(); //refresh game state
 
       // Fetch the next prompt explicitly
       await fetchPrompt();
@@ -288,8 +316,10 @@ export default function GameProgress() {
             completedProjects={completedProjects}
             setOngoingProjects={setOngoingProjects}
             setCompletedProjects={setCompletedProjects}
+            fetchProjects={fetchProjects}
           />
         </div>
+
         <div className={`w-3/4`}>
           <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
           {prompt && prompt._id && (
@@ -297,12 +327,12 @@ export default function GameProgress() {
               <div className="text-center mb-8">
                 <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
                 <p
-                className="mb-8 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: prompt.prompt }}
+                  className="mb-8 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: prompt.prompt }}
                 ></p>
-            </div>
+              </div>
 
-              <ActionModal 
+              <ActionModal
                 prompt={prompt}
                 game_id={game_id}
                 stats={stats}
@@ -314,24 +344,31 @@ export default function GameProgress() {
                 isDiscussion={prompt?.isDiscussion || false}
                 isDiscovery={prompt?.isDiscovery || false}
                 isProject={prompt?.isProject || false}
-                />
-
-
-            <div className="text-center">
-              <button
-                className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
-                onClick={handleNextWeek}
-              >
-                {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
-              </button>
-              <GameSummary
-                game={game}
-                stats={stats}
-                projects={projects}
-                currentWeek={currentWeek}
-                loading={loading}
+                fetchProjects={fetchProjects}
+                setOngoingProjects={setOngoingProjects}
               />
-            </div>
+
+
+              <div className="text-center">
+                <button
+                  className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
+                  onClick={handleNextWeek}
+                >
+                  {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
+                </button>
+                {showGameSummary && (
+                  <GameSummary
+                    className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
+                    onClose={() => setShowGameSummary(false)}
+                    game={game}
+                    stats={stats}
+                    projects={projects}
+                    currentWeek={currentWeek}
+                    loading={loading}
+                    errorMessage={errorMessage}
+                  />
+                )}
+              </div>
             </div>
           )}
         </div>

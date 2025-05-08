@@ -48,7 +48,7 @@ const LandingPage = () => {
                 landing-page grid 
                 grid-rows-[150px_minmax(900px,1fr)_100px] 
                 grid-cols-3 grid-cols-[1fr_3fr]
-                ${theme.bodyBg} ${theme.bodyText} 
+                ${theme.bodyBg} ${theme.bodyText}
                 p-6`}>
                 {/*<img
                     src={quietYearImage}

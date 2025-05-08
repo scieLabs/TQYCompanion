@@ -1,28 +1,32 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx';
 import { useSeason } from "../../contexts/seasonContext";
+import { useNavigate } from 'react-router-dom';
 
-
-export default function Logout() {
+export default function Logout({onClose}) {
+    const { logout } = useAuthContext();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const { logout } = useAuthContext();
+
 
     const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
     const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
 
     const handleLogout = async () => {
+        // const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
         setErrorMessage('');
         setSuccessMessage('');
-    
+        // if (confirmLeave) {
         try {
             setLoading(true);
             await logout(); // Use the logout function from authContext
-            setSuccessMessage('Logout successful!');
+            console.log('Logout successful:');
+            setSuccessMessage('You are logged out! Redirecting to home page...');
             setTimeout(() => {
                 setLoading(false);
+                navigate('/');
             }, 2000);
         } catch (error) {
             console.error('Logout failed:', error);
@@ -30,6 +34,7 @@ export default function Logout() {
             setLoading(false);
         }
     };
+
 
     return (
         <div>
@@ -46,19 +51,30 @@ export default function Logout() {
                                 {successMessage}
                                 </div>
                 )}
+                <div className="flex justify-center space-x-4">
             <button
                 className={`
                     login-button flex justify-center items-center mt-4
-                    ${theme.headerBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                    ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                     py-2 px-4 rounded hover:cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}
                     `}
                 type="button"
                 onClick={handleLogout}
                 disabled={loading}
-                aria-label="Logout"
             >
                 {loading ? 'Logging out...' : 'Logout'}
             </button>
+            <button
+                        onClick={onClose}
+                        className={`
+                            login-button flex justify-center items-center mt-4
+                            ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                            py-2 px-4 rounded hover:cursor-pointer
+                            `}
+                    >
+                        Cancel
+                    </button>
+                    </div>
         </div>
     );
-}
+};
