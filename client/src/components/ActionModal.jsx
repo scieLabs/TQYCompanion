@@ -87,15 +87,48 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
     );
   }
 
+  const [isOpen, setIsOpen] = useState(true); // State to toggle the box
+
   const renderActionForm = () => {
     //displays individual actions
     return (
       <div>
-      <h2 className="text-center my-8 uppercase font-lg font-bold underline">Choose One</h2>
+        {/* <div className={`flex flex-col items-center justify-center text-center my-8 ${theme.bodyText} `}>
+          <h2 className="uppercase font-lg font-bold">Game Order</h2>
+          <div className="p-4 bg-white border border-gray-300 rounded-b-lg shadow-md">
+            <ol className={`list-decimal list-inside text-sm ${theme.bodyText}`}>
+              <li className={``}>Resolve the weekly prompt. Follow all bold text.</li>
+              <li className={``}>Reduce project dice by one. Resolve any completed projects.</li>
+              <li className={``}>Take an action. Choose one.</li>
+            </ol>
+          </div>
+        </div> */}
+
+        <div className={`flex flex-col items-center justify-center text-center my-8`}>
+          {/* Header with toggle functionality */}
+          <div
+            className={`cursor-pointer p-4 uppercase font-lg font-bold ${theme.bodyText} ${theme.bodyTextHover}`}
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            ❯❯ Game Order ❮❮
+          </div>
+
+            {/* Collapsible content */}
+            {isOpen && (
+              <div className={`p-4 ${theme.statsBg} border border-gray-300 rounded-b-lg shadow-md`}>
+                <ol className={`list-decimal list-inside text-sm ${theme.statsText}`}>
+                  <li>Resolve the weekly prompt. Follow all bold text.</li>
+                  <li>Reduce project dice by one. Resolve any completed projects.</li>
+                  <li>Take an action. Choose one.</li>
+                </ol>
+              </div>
+            )}
+        </div>
+
       <div className="flex flex-row justify-between space-x-6 mx-8">
 
         <div className="w-1/3 flex flex-col items-center">
-          <label className="block font-bold mb-2 text-center">Discover something new</label>
+          <label className={`block font-bold mb-2 text-center ${theme.bodyText}`}>Discover something new</label>
           <textarea
             className={`textarea textarea-bordered w-full h-64 ${theme.bodyInputBg} ${theme.bodyInputText}`}
             placeholder="Introduce a new situation. It might be a problem, opportunity, or a bit of both."
@@ -105,7 +138,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
         </div>
 
         <div className="w-1/3 flex flex-col items-center">
-          <label className="block font-bold mb-2 text-center">Hold a discussion</label>
+          <label className={`block font-bold mb-2 text-center ${theme.bodyText}`}>Hold a discussion</label>
           <textarea
             className={`textarea textarea-bordered w-full h-64 ${theme.bodyInputBg} ${theme.bodyInputText}`}
             placeholder="A discussion never results in a decision or summation process. Everyone weighs in, and then it’s over."
@@ -115,7 +148,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
         </div>
 
         <div className="w-1/3 flex flex-col items-center">
-          <label className="block font-bold text-center mb-2">Start a project</label>
+          <label className={`block font-bold mb-2 text-center ${theme.bodyText}`}>Start a project</label>
           <div className="w-full flex flex-col justify-between h-64">
             <input
               type="text"
@@ -133,7 +166,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
             />
           </div>
           <div className="flex items-center justify-end space-x-2 mt-2 w-full">
-            <span className="font-bold">Weeks:</span>
+            <span className={`font-bold ${theme.bodyText}`}>Weeks:</span>
             <button 
               className={`btn btn-sm text-lg ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
               onClick={() => updateField('project_weeks', Math.max(1, (formData.project_weeks || 1) - 1))}>-</button>

@@ -25,10 +25,12 @@ export const SeasonProvider = ({ children }) => {
   
       // LandingPage, NewGame, and GameProgress pages (including ActionModal), and modals
       bodyBg: 'bg-[#f4eeee]', // main body; also use for modals
-      bodyText: 'text-green-900', // TODO: find later
+      bodyText: 'text-[#4a4a4a]', // TODO: find later, originally text-green-900
+      // suggestions: #2f4f2f  #4a4a4a #36454f 
+      bodyTextHover: 'hover:text-[#97be5a]',
   
       bodyInputBg: 'bg-[#ffdbaa] focus:outline-[#ffdbaa] focus:ring-0 focus:border-[#ffdbaa]', //Text field input for actions. Use for modals input as well
-      bodyInputText: 'text-green-900', // TODO: change along with the other body text
+      bodyInputText: 'text-[#4a4a4a]', // TODO: change along with the other body text
   
       nextWeekBtnBg: 'bg-[#97be5a]', //Next week button. also use for saving modals
       nextWeekBtnBgHover: 'hover:bg-[#ffb7b7]', //Next week button hover
@@ -42,7 +44,7 @@ export const SeasonProvider = ({ children }) => {
       statsBg: 'bg-[#ffb7b7]',
       statsText: 'text-[#f4eeee]',
       statsBtnBg: 'bg-[#97be5a]',
-      statsBtnBgHover: 'hover:bg-[#ffdbaa]',
+      statsBtnBgHover: 'hover:bg-[#ffa27f]',
       statsBtnText: 'text-[#f4eeee]', // TODO: change to body text colour later
   
       //footer
@@ -67,10 +69,11 @@ export const SeasonProvider = ({ children }) => {
   
       // LandingPage, NewGame, and GameProgress pages (including ActionModal), and modals
       bodyBg: 'bg-[#fbf0e8]', // main body; also use for modals
-      bodyText: 'text-green-900', // TODO: find later
+      bodyText: 'text-[#4a4a4a]', // TODO: find later
   
       bodyInputBg: 'bg-[#ffa27f] focus:outline-[#ffa27f] focus:ring-0 focus:border-[#ffa27f]', //Text field input for actions. Use for modals input as well
       bodyInputText: 'text-[#fbf0e8]',
+      bodyTextHover: 'hover:text-[#d44747]',
   
       nextWeekBtnBg: 'bg-[#97be5a]', //Next week button. also use for saving modals
       nextWeekBtnBgHover: 'hover:bg-[#d44747]', //Next week button hover
@@ -109,7 +112,8 @@ export const SeasonProvider = ({ children }) => {
   
       // LandingPage, NewGame, and GameProgress pages (including ActionModal), and modals
       bodyBg: 'bg-[#f9ebd9]', // main body; also use for modals
-      bodyText: 'text-green-900', // TODO: find later
+      bodyText: 'text-[#4a4a4a]', // TODO: find later
+      bodyTextHover: 'hover:text-[#d44747]', 
   
       bodyInputBg: 'bg-[#f39e60] focus:outline-[#f39e60] focus:ring-0 focus:border-[#f39e60]', //Text field input for actions. Use for modals input as well
       bodyInputText: 'text-[#f9ebd9]',
@@ -151,7 +155,8 @@ export const SeasonProvider = ({ children }) => {
   
       // LandingPage, NewGame, and GameProgress pages (including ActionModal), and modals
       bodyBg: 'bg-[#eef5ff]', // main body; also use for modals
-      bodyText: 'text-green-900', // TODO: find later
+      bodyText: 'text-[#4a4a4a]', // TODO: find later
+      bodyTextHover: 'hover:text-[#7c444f]',
   
       bodyInputBg: 'bg-[#b4d4ff] focus:outline-[#b4d4ff] focus:ring-0 focus:border-[#b4d4ff]', //Text field input for actions. Use for modals input as well
       bodyInputText: 'text-[#eef5ff]', //TODO: may be too light
