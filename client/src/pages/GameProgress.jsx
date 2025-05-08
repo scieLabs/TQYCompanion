@@ -12,12 +12,17 @@ import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 import GameHeader from '../components/GameHeader.jsx'; // Import the GameHeader component
 import GameSummary from './GameSummary.jsx'; // Import the GameSummary component
+import GameSummary from '../components/GameSummary.jsx'; // Import the GameSummary component
+
+
 
 export default function GameProgress() {
   const { game_id, week } = useParams(); // Get the game title from the URL parameters
   const { user } = useAuthContext(); // get the logged-in user
   const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
+
+  const [showGameSummary, setShowGameSummary] = useState(false);
 
   const [game, setGame] = useState(null);
   const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
@@ -73,21 +78,26 @@ export default function GameProgress() {
   //   fetchGameData();
   // }, [game_id, currentSeason, currentWeek]);
 
+
   const fetchProjects = async () => {
     try {
+      console.log(`Fetching all projects for game_id: ${game_id}`);
       console.log(`Fetching all projects for game_id: ${game_id}`);
       const response = await projectAPI.getProjectsByGame(game_id);
       // console.log('Response from backend:', response);
       const allProjects = response.data;
 
+      console.log('All projects:', allProjects);
       // console.log('All projects:', allProjects);
       // Sort projects into ongoing and completed
       const ongoing = allProjects.filter(
         (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
       );
 
+
       const completed = allProjects.filter(
         (proj) =>
+          (proj.project_weeks === 0 || proj.pp_weeks === 0) &&
           (proj.project_weeks === 0 || proj.pp_weeks === 0) &&
           (proj.project_resolve || proj.pp_resolve)
       );
@@ -95,9 +105,13 @@ export default function GameProgress() {
       // console.log('Ongoing projects:', ongoing);
       // console.log('Completed projects:', completed);
 
+      // console.log('Ongoing projects:', ongoing);
+      // console.log('Completed projects:', completed);
+
       setProjects(allProjects);
       setOngoingProjects(ongoing);
       setCompletedProjects(completed);
+      console.log('Fetched projects:', { ongoing, completed });
       console.log('Fetched projects:', { ongoing, completed });
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -152,6 +166,12 @@ export default function GameProgress() {
 
     fetchInitialData();
   }, [game_id, currentSeason, currentWeek]);
+
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever currentWeek changes
 
   useEffect(() => {
     if (game_id) {
@@ -234,8 +254,8 @@ export default function GameProgress() {
         await updateGame(game_id, data);
         console.log('Game Over data saved:', data);
 
-        // Navigate to the Game Summary page
-        navigate(`/${game_id}/summary`);
+        // Show the game summary modal
+        setShowGameSummary(true);
         return; // Exit early since the game is over
       }
 
@@ -290,6 +310,7 @@ export default function GameProgress() {
       // fetchPrompt(currentSeason);
 
       await fetchGameData(); //refresh game state
+      await fetchGameData(); //refresh game state
 
       // Fetch the next prompt explicitly
       await fetchPrompt();
@@ -334,43 +355,48 @@ export default function GameProgress() {
                   ></p>
                 </div>
 
-                <ActionModal
-                  prompt={prompt}
-                  game_id={game_id}
-                  stats={stats}
-                  setStats={setStats}
-                  formData={formData}
-                  setFormData={setFormData}
-                  currentSeason={currentSeason}
-                  currentWeek={currentWeek}
-                  isDiscussion={prompt?.isDiscussion || false}
-                  isDiscovery={prompt?.isDiscovery || false}
-                  isProject={prompt?.isProject || false}
-                  fetchProjects={fetchProjects}
-                  setOngoingProjects={setOngoingProjects}
-                />
+              <ActionModal
+                prompt={prompt}
+                game_id={game_id}
+                stats={stats}
+                setStats={setStats}
+                formData={formData}
+                setFormData={setFormData}
+                currentSeason={currentSeason}
+                currentWeek={currentWeek}
+                isDiscussion={prompt?.isDiscussion || false}
+                isDiscovery={prompt?.isDiscovery || false}
+                isProject={prompt?.isProject || false}
+                fetchProjects={fetchProjects}
+                setOngoingProjects={setOngoingProjects}
+              />
 
 
-                <div className="text-center">
-                  <button
-                    className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
-                    onClick={handleNextWeek}
-                  >
-                    {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
-                  </button>
+              <div className="text-center">
+                <button
+                  className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
+                  onClick={handleNextWeek}
+                >
+                  {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
+                </button>
+                {showGameSummary && (
                   <GameSummary
+                    className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
+                    onClose={() => setShowGameSummary(false)}
                     game={game}
                     stats={stats}
                     projects={projects}
                     currentWeek={currentWeek}
                     loading={loading}
+                    errorMessage={errorMessage}
                   />
-                </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
+    </div>
     </div>
   );
 }
