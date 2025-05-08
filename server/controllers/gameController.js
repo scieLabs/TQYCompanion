@@ -284,12 +284,12 @@ export const updateGameEntry = async (req, res) => {
 export const updateGameProgress = async (req, res) => {
   try {
     const { game_id } = req.params;
-    const { week, isFinished } = req.body;
+    const { currentWeek, isFinished } = req.body;
 
     const game = await Game.findByIdAndUpdate(
       game_id,
       {
-        week,
+        currentWeek,
         isFinished,
         isActive: !isFinished, // Set isActive to false if the game is finished
         updatedAt: Date.now(),

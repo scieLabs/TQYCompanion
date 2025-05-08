@@ -17,7 +17,7 @@ export const getAllGames = () => gameAPI.get('/game');
 export const getGameById = (id) => gameAPI.get(`/game/${id}`);
 
 // // Fetch all active games
-// export const getActiveGames =  (isActive) => gameAPI.get(`$/game//${isActive}`);
+export const getActiveGames =  () => gameAPI.get(`/game/active`);
 
 // Fetch a game by its title
 export const getGameByTitle = (title) => gameAPI.get(`/game/title/${title}`);
