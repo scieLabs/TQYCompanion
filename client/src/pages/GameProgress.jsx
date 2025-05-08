@@ -235,7 +235,7 @@ export default function GameProgress() {
         const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
         await updateGame(game_id, data);
         console.log('Game Over data saved:', data);
-        
+
         // Show the game summary modal
         setShowGameSummary(true);
         return; // Exit early since the game is over
@@ -365,6 +365,7 @@ export default function GameProgress() {
                     projects={projects}
                     currentWeek={currentWeek}
                     loading={loading}
+                    errorMessage={errorMessage}
                   />
                 )}
               </div>
