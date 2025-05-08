@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx'
+import { useSeason } from "../../contexts/seasonContext";
+
 
 // Import the base URL from the .env file
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -16,6 +18,9 @@ export default function Register({ onClose }) {
     const [loading, setLoading] = useState(false);
     const { login } = useAuthContext();
 
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -29,7 +34,6 @@ export default function Register({ onClose }) {
         setErrorMessage(''); // Clear previous error messages
         setSuccessMessage(''); // Clear previous success messages
 
-        // Basic validation
         if (!formData.email || !formData.password) {
             setErrorMessage('Email and password are required.');
             return;
@@ -41,11 +45,11 @@ export default function Register({ onClose }) {
         if (formData.password.length < 8) {
             setErrorMessage('Password must be at least 8 characters long.');
             return;
-        } //should we be doing this in the front end? Belongs into the backend, ain't it, chief?
+        } 
         if (!/\S+@\S+\.\S+/.test(formData.email)) {
             setErrorMessage('Email is invalid.');
             return;
-        } //same here, should be in the backend, I wager
+        } 
 
         try {
             setLoading(true); // Show loading state
