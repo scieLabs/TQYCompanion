@@ -63,9 +63,8 @@ export default function Login({ onClose, handleRegisterClick }) {
             <form
                 className={`
                     login-form 
-                    TODO: bg-[#ffdbaa] 
-                    ${theme.bodyText} 
-                    p-6 rounded shadow-md
+                    ${theme.bodyText} ${theme.bodyBg} ${theme.bodyInputText}
+                    p-6 rounded shadow-lg shadow-[#97be5a]
                     `}
                 onSubmit={handleSubmit}
             >
