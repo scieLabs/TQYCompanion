@@ -122,17 +122,16 @@ const LandingPage = () => {
                             onClick={handleLoginClick}
                             className={`login-button flex justify-center items-center mt-4
                             ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                            py-2 px-4 rounded`}
+                            py-2 px-4 rounded hover:cursor-pointer`}
                         >
                             Get Started!
                         </button>
                     ) : (
                         <button
                             onClick={handleNewGameClick}
-                            // onClick={() => navigate('/login')} TODO: suggested code
                             className={`new-game-button flex justify-center mt-4
                             ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                            py-2 px-4 rounded`}
+                            py-2 px-4 rounded hover:cursor-pointer`}
                         >
                             New Game
                         </button>
@@ -142,13 +141,13 @@ const LandingPage = () => {
             </main>
             {showLogin || showRegister ? (
                 <div
-                    //TODO: remember to change pitch black background to something prettier
-                    className={`modal-wrapper fixed inset-0 flex justify-center bg-red bg-opacity-10 z-50`}
+                    className={`
+                        modal-wrapper fixed inset-0 flex justify-center items-center
+                        `}
                     onClick={handleCloseModal}
                 >
                     {showLogin && (
                         <div
-                            //className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <Login onClose={handleCloseModal} handleRegisterClick={handleRegisterClick} />
@@ -156,7 +155,6 @@ const LandingPage = () => {
                     )}
                     {showRegister && (
                         <div
-                            //className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <Register onClose={handleCloseModal} />

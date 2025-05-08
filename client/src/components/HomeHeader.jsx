@@ -58,7 +58,7 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                             onClick={onLoginClick}
                             className={`login-button 
                                 ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                                py-2 px-4 rounded hover:cursor-pointer`}
                         >
                             Login
                         </button>
@@ -66,7 +66,7 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                             onClick={onRegisterClick}
                             className={`register-button 
                                 ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
-                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                                py-2 px-4 rounded hover:cursor-pointer`}
                         >
                             Register
                         </button>

@@ -32,18 +32,26 @@ export default function Logout() {
     };
 
     return (
-        <div className="bg-white p-6 rounded shadow-md w-full max-w-sm mx-auto">
+        <div>
             <h2 className="text-2xl font-bold mb-4">Logout</h2>
             {errorMessage && (
-                <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
-            )}
-            {successMessage && (
-                <div className="text-green-500 text-sm mb-4">{successMessage}</div>
-            )}
+                    <div className={`
+                            text-red-500 text-sm mb-4`}>
+                                {errorMessage}
+                                </div>
+                )}
+                {successMessage && (
+                    <div className={`
+                            text-green-500 text-sm mb-4`}>
+                                {successMessage}
+                                </div>
+                )}
             <button
-                className={`bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`
+                    login-button flex justify-center items-center mt-4
+                    ${theme.headerBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                    py-2 px-4 rounded hover:cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+                    `}
                 type="button"
                 onClick={handleLogout}
                 disabled={loading}

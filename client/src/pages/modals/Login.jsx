@@ -58,16 +58,21 @@ export default function Login({ onClose, handleRegisterClick }) {
 
     return (
         <div
-        className='bg-red'
+            className={`flex justify-center items-center`}
         >
             <form
-            className={`login-form ${theme.bodyBg} ${theme.bodyText} p-6 rounded shadow-md`}
+                className={`
+                    login-form 
+                    TODO: bg-[#ffdbaa] 
+                    ${theme.bodyText} 
+                    p-6 rounded shadow-md
+                    `}
                 onSubmit={handleSubmit}
             >
                 <button
                     className={`close-button float-right
                         ${theme.headerBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
-                        ${theme.bodyText} px-1 rounded `}
+                        px-1 rounded hover:cursor-pointer`}
                     onClick={onClose}
                     aria-label="Close"
                 >
@@ -76,17 +81,21 @@ export default function Login({ onClose, handleRegisterClick }) {
                 <h2 className={`text-2xl font-bold mb-4 ${theme.bodyText}`}>Login</h2>
                 {errorMessage && (
                     <div className={`
-                            text-red-500 text-sm mb-4`}>{errorMessage}
-                    </div>
+                            text-red-500 text-sm mb-4`}>
+                                {errorMessage}
+                                </div>
                 )}
                 {successMessage && (
                     <div className={`
-                            text-green-500 text-sm mb-4`}>{successMessage}</div>
+                            text-green-500 text-sm mb-4`}>
+                                {successMessage}
+                                </div>
                 )}
                 <div className={`mb-4`}>
                     <label
                         className={`
-                            block text-gray-700 text-sm font-bold mb-2`}
+                            block text-gray-700 text-sm font-bold mb-2
+                            `}
                         htmlFor="email"
                     >
                         Email
@@ -107,7 +116,8 @@ export default function Login({ onClose, handleRegisterClick }) {
                 <div className={`mb-6`}>
                     <label
                         className={`
-                                block text-gray-700 text-sm font-bold mb-2`}
+                                block text-gray-700 text-sm font-bold mb-2
+                                `}
                         htmlFor="password"
                     >
                         Password
@@ -116,7 +126,8 @@ export default function Login({ onClose, handleRegisterClick }) {
                         className={`
                                 shadow appearance-none border rounded 
                                 w-full py-2 px-3 text-gray-700 mb-3 
-                                leading-tight `}
+                                leading-tight
+                                `}
                         id="password"
                         name="password"
                         type="password"
@@ -127,10 +138,12 @@ export default function Login({ onClose, handleRegisterClick }) {
                 </div>
                 <div className={`login-button-container`}>
                     <button
-                        className={`login-button flex justify-center items-center mt-4
+                        className={`
+                            login-button flex justify-center items-center mt-4
                             ${theme.headerBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                             ${theme.bodyText}
-                            py-2 px-4 rounded  ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            py-2 px-4 rounded hover:cursor-pointer  ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+                            `}
                         type="submit"
                         disabled={loading}
                     >
@@ -146,9 +159,11 @@ export default function Login({ onClose, handleRegisterClick }) {
                             onClose();
                             handleRegisterClick();
                         }}
-                        className={`register-button flex justify-center items-center mt-4
+                        className={`
+                            register-button flex justify-center items-center mt-4
                             font-bold py-2 px-4 rounded text-blue-500 text-sm
-                            hover:text-purple-500 hover:underline hover:cursor-pointer`}
+                            hover:text-purple-500 hover:underline hover:cursor-pointer
+                            `}
                     >
                         Create one!
                     </a>
