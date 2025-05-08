@@ -5,25 +5,43 @@ import HomeHeader from '../components/HomeHeader';
 
 const ActiveGames = () => {
     const [activeGames, setActiveGames] = useState([]);
-    const [selectedGame, setSelectedGame] = useState(null); // Game selected for the modal
+    const [selectedGame, setSelectedGame] = useState(null); 
+    const [finishedGames, setFinishedGames] = useState([]); 
+    const [game, setGame] = useState(null); 
+    const [stats, setStats] = useState(null);
+    const [projects, setProjects] = useState([]); // Game selected for the modal
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchActiveGames = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/game/active`, {
-                    withCredentials: true,
-                });
-                setActiveGames(response.data);
-            } catch (error) {
-                console.error('Error fetching active games:', error);
+    const fetchAllGames = async () => {
+        try {
+            const gameResponse = await getGameById(game_id);
+            const statsResponse = await getStatsByGameAndWeek(game_id, currentWeek);
+            const response = await projectAPI.getProjectsByGame(game_id);
+            // console.log('Response from backend:', response);
+            const allProjects = response.data;
+            setProjects(allProjects);
+
+            const allActiveGames = response.data.filter((game) => game.isActive === true);
+            const allFinishedGames = response.data.filter((game) => game.isActive === false);
+            setActiveGames(allActiveGames);
+            setFinishedGames(allFinishedGames);
+            setGame(gameResponse.data);
+            setStats(statsResponse.data);
+
+            fetchAllGames();
+
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+            if (error.response?.status === 404) {
+                console.warn('No data found.');
+                setProjects([]);
+            } else {
+                console.error('Error fetching game data:', error);
             }
-        };
+        }
+    };
 
-        fetchActiveGames();
-    }, []);
 
-    
     const handleDeleteGame = async (gameId) => {
         try {
             await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/game/${gameId}`, {
@@ -42,22 +60,22 @@ const ActiveGames = () => {
 
     return (
         <>
-        <HomeHeader />
-        <div className="active-games-page p-6">
-            <h1 className="text-2xl font-bold mb-4">My Active Games</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {activeGames.map((game) => (
-                    <div
-                        key={game._id}
-                        className="game-card bg-white shadow-md rounded p-4 cursor-pointer hover:shadow-lg"
-                        onClick={() => handleContinueGame(game._id, game.currentWeek)}
-                    >
-                        <h2 className="text-lg font-semibold">{game.title}</h2>
-                        <p> Week: {game.currentWeek}</p>
-                    </div>
-                ))}
+            <HomeHeader />
+            <div className="active-games-page p-6">
+                <h1 className="text-2xl font-bold mb-4">My Active Games</h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {activeGames.map((game) => (
+                        <div
+                            key={game._id}
+                            className="game-card bg-white shadow-md rounded p-4 cursor-pointer hover:shadow-lg"
+                            onClick={() => handleContinueGame(game._id, game.currentWeek)}
+                        >
+                            <h2 className="text-lg font-semibold">{game.title}</h2>
+                            <p> Week: {game.currentWeek}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
-        </div>
 
             {selectedGame && (
                 <div className="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
