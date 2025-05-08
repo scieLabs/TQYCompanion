@@ -6,6 +6,8 @@ import { useSeason } from '../contexts/seasonContext.jsx';
 import Logout from '../pages/modals/LogOut';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import rulesPdf from "../assets/rules.pdf";
+import titleImage from "../assets/titlepngedit.png";
 
 const GameHeader = () => {
   const { user } = useAuthContext();
@@ -14,6 +16,8 @@ const GameHeader = () => {
   const [showLogOutModal, setShowLogOutModal] = useState(false);
   // const [popupType, setPopupType] = useState('');
   const [gameTitle, setGameTitle] = useState('');
+  const [gameDescription, setGameDescription] = useState('');
+  const [showGameModal, setShowGameModal] = useState(false); // State to control the game modal
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -30,6 +34,7 @@ const GameHeader = () => {
             { withCredentials: true }
           );
           setGameTitle(response.data.title); // Set the game title from the response
+          setGameDescription(response.data.description);
         } catch (err) {
           console.error('Error fetching game title:', err);
         }
@@ -48,15 +53,26 @@ const GameHeader = () => {
 
   return (
     <header
-      className={`game-header w-full ${theme.headerBg} ${theme.textColor} py-4 px-6 flex flex-col items-center`}
+      className={`game-header w-full ${theme.headerBg} ${theme.headerText} py-4 px-6 flex flex-col items-center`}
       role="banner"
     >
       {/* App Title */}
-      <h1 className="text-2xl font-bold">The Quiet Year</h1>
+      {/* <h1 className="text-2xl font-bold">The Quiet Year</h1> */}
+
+      <img
+        src={titleImage}
+        alt="The Quiet Year"
+        className="w-48 h-auto mb-4" // Adjust width and height as needed
+      />
 
       {/* Game Title (only on game progress page) */}
       {isGameProgressPage && gameTitle && (
-        <h2 className="text-lg font-semibold mt-2">{gameTitle}</h2>
+        <h2
+          className="text-lg font-semibold mt-2 cursor-pointer underline"
+          onClick={() => setShowGameModal(true)} // Open the modal when the title is clicked
+        >
+          {gameTitle}
+        </h2>
       )}
 
       {/* Navigation and User Info */}
@@ -73,7 +89,7 @@ const GameHeader = () => {
             Home
           </a>
           <a
-            href="rules.pdf"
+            href={rulesPdf}
             target="_blank"
             rel="noopener noreferrer"
             download
@@ -81,6 +97,7 @@ const GameHeader = () => {
           >
             Rules
           </a>
+
         </nav>
         <div className="flex space-x-4">
           <div className="user-info flex space-x-4">
@@ -111,6 +128,34 @@ const GameHeader = () => {
           </Link> */}
         </div>
       </div>
+
+      {/* Game Modal */}
+      {showGameModal && (
+        <dialog id="gameModal" className="modal modal-open">
+          <div className="modal-box p-0">
+            <header className={`p-4 text-center max-h-120 break-words overflow-y-auto ${theme.headerBg} ${theme.headerText}`}>
+              <h3 className="font-bold text-lg mb-4 uppercase">{gameTitle}</h3>
+            </header>
+
+            <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+              <div className="max-h-120 break-words overflow-y-auto pr-4">
+                <p>{gameDescription || 'No description available.'}</p>
+              </div>
+            <div className="modal-action">
+              <button
+                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                onClick={() => setShowGameModal(false)} // Close the modal
+              >
+                Close
+              </button>
+            </div>
+            </div>
+          </div>
+        </dialog>
+      )}
+
+
+
       {showLogOutModal && (
         // <Logout  />
         <Logout onClose={() => setShowLogOutModal(false)} />
