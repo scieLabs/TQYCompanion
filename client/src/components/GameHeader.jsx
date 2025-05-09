@@ -34,6 +34,7 @@ const GameHeader = () => {
             { withCredentials: true }
           );
           setGameTitle(response.data.title); // Set the game title from the response
+          setGameDescription(response.data.description);
         } catch (err) {
           console.error('Error fetching game title:', err);
         }
@@ -52,14 +53,18 @@ const GameHeader = () => {
 
   return (
     <header
-      className={`game-header w-full ${theme.headerBg} ${theme.textColor} py-4 px-6 flex flex-col items-center`}
+      className={`game-header w-full ${theme.headerBg} ${theme.headerText} py-4 px-6 flex flex-col items-center`}
       role="banner"
     >
       {/* App Title */}
       {/* <h1 className="text-2xl font-bold">The Quiet Year</h1> */}
 
+
+
+
+
       {/* Navigation and User Info */}
-      <div className="flex justify-between w-full mt-4">
+      <div className="flex justify-between items-center w-full mt-2">
         {/* <nav className="flex space-x-4">
           <a
             href="/"
@@ -72,7 +77,7 @@ const GameHeader = () => {
             Home
           </a>
           <a
-            href="rules.pdf"
+            href={rulesPdf}
             target="_blank"
             rel="noopener noreferrer"
             download
@@ -81,6 +86,7 @@ const GameHeader = () => {
             Rules
           </a>
         </nav> */}
+
         <nav className="flex space-x-4">
           <a
             href="/"
@@ -124,7 +130,7 @@ const GameHeader = () => {
           <span className="username">{user.username}</span>
         </div> */}
           <button
-            className="hover:underline"
+            className={`btn border-none shadow-md ${theme.bodyBg} ${theme.bodyText} hover:bg-gray-200`}
             onClick={() => {
               console.log('Log Out button clicked');
               setShowLogOutModal(!showLogOutModal); // Show the logout modal
@@ -161,26 +167,27 @@ const GameHeader = () => {
               <div className="max-h-120 break-words overflow-y-auto pr-4">
                 <p>{gameDescription || 'No description available.'}</p>
               </div>
-              <div className="modal-action">
-                <button
-                  className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
-                  onClick={() => setShowGameModal(false)} // Close the modal
-                >
-                  Close
-                </button>
-              </div>
+            <div className="modal-action">
+              <button
+                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                onClick={() => setShowGameModal(false)} // Close the modal
+              >
+                Close
+              </button>
+            </div>
             </div>
           </div>
         </dialog>
       )}
-      {
-        showLogOutModal && (
-          // <Logout  />
-          <Logout onClose={() => setShowLogOutModal(false)} />
-          // 
-        )
-      }
-    </header >
+
+
+
+      {showLogOutModal && (
+        // <Logout  />
+        <Logout onClose={() => setShowLogOutModal(false)} />
+        // 
+      )}
+    </header>
   );
 };
 

@@ -28,10 +28,11 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
     return (
         <header
             className={`home-header 
-            ${theme.headerBg} ${theme.headerText} ${theme.headerTextHover} ${theme.headerBg}
-            width-full py-4 px-6 flex justify-between items-center`}
+                ${theme.headerBg} ${theme.headerText} ${theme.headerTextHover} ${theme.headerBg}
+                width-full py-4 px-6 flex justify-between items-center`}
             role="banner"
         >
+
             <nav className="flex space-x-4">
                 <a href="/"
                     className={`btn about-button border-none shadow-md
@@ -59,7 +60,7 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                 THE QUIET YEAR
             </h1> */}
 
-            {/* Header Image */}
+                          {/* Header Image */}
             <img
                 src={titleImage}
                 alt="The Quiet Year"

@@ -323,24 +323,24 @@ export default function GameProgress() {
 
 
   return (
-    <div>
-      <GameHeader />
-      <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
-        <div className={`flex`}>
-          <div className={`w-1/4 pr-4`}>
-            <GameStats
-              game_id={game_id}
-              currentWeek={currentWeek}
-              currentSeason={currentSeason}
-              stats={stats}
-              setStats={setStats}
-              ongoingProjects={ongoingProjects}
-              completedProjects={completedProjects}
-              setOngoingProjects={setOngoingProjects}
-              setCompletedProjects={setCompletedProjects}
-              fetchProjects={fetchProjects}
-            />
-          </div>
+    <>
+    <GameHeader />
+    <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
+      <div className={`flex`}>
+        <div className={`w-1/4 pr-4`}>
+          <GameStats
+            game_id={game_id}
+            currentWeek={currentWeek}
+            currentSeason={currentSeason}
+            stats={stats}
+            setStats={setStats}
+            ongoingProjects={ongoingProjects}
+            completedProjects={completedProjects}
+            setOngoingProjects={setOngoingProjects}
+            setCompletedProjects={setCompletedProjects}
+            fetchProjects={fetchProjects}
+          />
+        </div>
 
           <div className={`w-3/4`}>
             <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
@@ -396,6 +396,7 @@ export default function GameProgress() {
         </div>
       </div>
     </div>
-    </div>
+    
+    </>
   );
 }
