@@ -8,6 +8,7 @@ import {
   loginUser,
   logoutUser,
   checkSession,
+  getActiveGames,
 } from '../controllers/userController.js';
 
 
@@ -18,7 +19,7 @@ const router = express.Router();
 
 router.get('/', getAllUsers);
 router.get('/check-session', checkSession);
-// TODO: will be: router.get("/",auth, getAllUsers);
+router.get('/active-games', getActiveGames); // Endpoint to fetch active games
 
 // session routers:
 router.post('/register', createUser);

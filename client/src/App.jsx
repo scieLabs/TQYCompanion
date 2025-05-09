@@ -6,7 +6,7 @@ import Footer from './components/Footer.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import GameProgress from './pages/GameProgress.jsx';
 import CreateNewGame from './pages/NewGame.jsx';
-import ActiveGames from './pages/activeGames.jsx';
+import ActiveGames from './pages/ActiveGames.jsx';
 
 import { SeasonProvider } from './contexts/seasonContext.jsx';
 import { AuthProvider } from './contexts/authContext.jsx';

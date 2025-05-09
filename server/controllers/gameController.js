@@ -68,6 +68,22 @@ export const getGameById = async (req, res) => {
   }
 };
 
+// export const getGamesByUserId = asyncHandler(async (req, res) => {
+//   const { user_id } = req.query; // Retrieve user_id from query parameters
+
+//   if (!user_id) {
+//     return res.status(400).json({ message: 'User ID is required.' });
+//   }
+
+//   try {
+//     const games = await Game.find({ user_id }); // Fetch all games for the user
+//     res.status(200).json(games);
+//   } catch (error) {
+//     console.error('Error fetching games by user ID:', error);
+//     res.status(500).json({ message: 'Error fetching games by user ID.', error: error.message });
+//   }
+// });
+
 // Get all games for a user by user ID
 export const getGamesByUserId = async (req, res) => {
   try {
@@ -78,7 +94,8 @@ export const getGamesByUserId = async (req, res) => {
       return res.status(400).json({ message: 'User ID is required.' });
     }
 
-    const games = await Game.find({ user_id: userId, isActive: true }); // Fetch active games for the user
+    const games = await Game.find({ user_id: userId }); // Fetch active games for the user
+
     console.log('Fetched games:', games); // Debugging log
     res.json(games);
   } catch (error) {
@@ -117,6 +134,10 @@ export const createGameEntry = async (req, res) => {
 
       const newGame = new Game({ user_id, title, description });
       const savedGame = await newGame.save();
+
+      // Add the game ID to the user's activeGames array
+      user.activeGames.push(savedGame._id);
+      await user.save();
 
       const initialStats = new Stats({
         game_id: savedGame._id,

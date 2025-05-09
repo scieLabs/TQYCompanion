@@ -15,7 +15,7 @@ const gameAPI = axios.create({
 
 export default function CreateNewGame() {
     // Authentication and user context
-    const { user, loading } = useAuthContext();
+    const { user, setUser, loading } = useAuthContext();
     // console.log('CreateNewGame user:', user);
     // const token = user?.token; // Assuming the token is stored in the user object
     
@@ -91,6 +91,11 @@ export default function CreateNewGame() {
 
           // console.log('Game created:', response.data.game);
           // console.log('Initial stats created:', response.data.stats);
+
+            // Update the user object in authContext with the new active game
+            const updatedUser = { ...user, activeGames: [...(user.activeGames || []), response.data._id] };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser)); // Persist the updated user
 
           return response.data; // Return the data object directly
         } catch (err) {

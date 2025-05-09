@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { getGameById, updateGame } from '../api/gameApi.js';
@@ -50,6 +50,25 @@ export default function GameProgress() {
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
   const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+  
+  //function for fetching game data when entering via Continue
+  const initializeGameProgress = async () => {
+  try {
+    console.log('Initializing GameProgress...');
+    await fetchGameData(); // Fetch game data (game and stats)
+    await fetchPrompt(); // Fetch the current or next prompt
+  } catch (error) {
+    console.error('Error initializing GameProgress:', error);
+  }
+};
+
+const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.fromActiveGames) {
+    initializeGameProgress(); // Run the combined function only if coming from ActiveGames
+  }
+}, [location.state, game_id, currentWeek, currentSeason]);
 
   useEffect(() => {
     console.log('Current season updated:', currentSeason);

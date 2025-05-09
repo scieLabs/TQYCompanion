@@ -18,6 +18,7 @@ import {
   getCompletedProjects,
   resolveProject
 } from '../controllers/gameController.js';
+// import { protect } from '../middleware/authMiddleware.js'; 
 
 const router = express.Router();
 //import { authenticateUser } from '../middleware/authMiddleware.js';

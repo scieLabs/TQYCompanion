@@ -1,4 +1,5 @@
 import User from '../models/userSchema.js';
+import Game from '../models/gameSchema.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../utils/errorHandler.js';
@@ -193,3 +194,23 @@ export const checkSession = async (req, res) => {
 //     res.json({ authenticated: false });
 //   }
 // };
+
+export const getActiveGames = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const user = await User.findById(user_id).populate('activeGames');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    res.status(200).json(user.activeGames);
+  } catch (err) {
+    console.error('Error fetching active games:', err);
+    res.status(500).json({ message: 'Error fetching active games.', error: err.message });
+  }
+};
