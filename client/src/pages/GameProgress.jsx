@@ -4,7 +4,7 @@ import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { getGameById, updateGame } from '../api/gameApi.js';
 import * as projectAPI from '../api/projectApi.js';
-import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
+import { getStatsByGameAndWeek, createStatsEntry, saveActionData, getStatsByGame } from '../api/statApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 import { createProject } from '../api/projectApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
@@ -301,6 +301,17 @@ export default function GameProgress() {
     }
   };
 
+  // Function to fetch all stats for the game for when the game summary is shown
+  const fetchAllStats = async () => {
+    const statsResponse = await getStatsByGame(game_id);
+    setStats(statsResponse.data);
+  };
+
+  useEffect(() => {
+    if (showGameSummary) {
+      fetchAllStats();
+    }
+  }, [showGameSummary]);
 
   return (
     <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
@@ -365,7 +376,6 @@ export default function GameProgress() {
                     projects={projects}
                     currentWeek={currentWeek}
                     loading={loading}
-                    errorMessage={errorMessage}
                   />
                 )}
               </div>

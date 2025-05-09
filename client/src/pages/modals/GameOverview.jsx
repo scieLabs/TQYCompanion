@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
+import { useSeason } from '../../contexts/seasonContext.jsx'; // Import the season context
 
 export default function GameOverview({ onClose, weeks, gameTitle, season }) {
     const [selectedWeek, setSelectedWeek] = useState(null);
+
+        const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+        const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
 
     const handleWeekClick = (week) => {
         setSelectedWeek(week);
     };
 
+    //I forgot how I thought this would work, I only know it doesn't work
+    //Was supposed to colour the buttons in the same way as the seasons in the game
+    //why that week.weeknumber key? Game Over, Man, Game Over
     const getButtonForSeason = (week) => {
         switch (season) {
             case 'Spring':
@@ -63,7 +70,7 @@ export default function GameOverview({ onClose, weeks, gameTitle, season }) {
     };
 
     return (
-        <div className="game-overview-modal bg-white p-6 rounded shadow-md max-w-lg mx-auto">
+        <div className="game-overview-modal bg-white p-6 rounded shadow-md max-w-lg mx-auto max-h-120 break-words overflow-y-auto pr-4">
             <h2 className="text-2xl font-bold mb-4">Game Overview: {gameTitle}</h2>
             <div className="weeks-buttons grid grid-cols-3 gap-4 mb-6">
                 {weeks.map((week) => getButtonForSeason(week))}

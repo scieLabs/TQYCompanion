@@ -25,4 +25,8 @@ const statAPI = axios.create({
   export const updateStatsByGameAndWeek = (game_id, week, data) =>
     statAPI.put(`/stats/${game_id}/week/${week}`, data);
 
+  export const getStatsByGame = async (game_id) => {
+    return statAPI.get(`/stats/${game_id}`);
+  };
+
   export default statAPI;
