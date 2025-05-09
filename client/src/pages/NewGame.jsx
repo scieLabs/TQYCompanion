@@ -313,7 +313,7 @@ export default function CreateNewGame() {
               {success.description && <span className="text-[#97be5a]">✔</span>}
             </div>
 
-            <div className="my-8 flex gap-6">
+            <div className="my-8 flex flex-row gap-6">
               <div className="w-1/2">
                 <label className="block font-bold mb-1" htmlFor="abundance">
                   Abundance:
@@ -330,25 +330,34 @@ export default function CreateNewGame() {
                 ></textarea>
                 {success.abundance && <span className="text-[#97be5a]">✔</span>}
               </div>
+              
+              <div className="w-1/2">
+                <label className="block font-bold mb-1" htmlFor="scarcity">
+                  Scarcity:
+                </label>
+                <textarea
+                  id="scarcity"
+                  className={`textarea textarea-bordered w-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
+                  placeholder="Enter a scarcity for this game"
+                  value={scarcity}
+                  onChange={(e) => {
+                    setScarcity(e.target.value);
+                    updateSuccess('scarcity', e.target.value);
+                  }}
+                ></textarea>
+                {success.scarcity && <span className="text-[#97be5a]">✔</span>}
               </div>
 
-            <h2 className="text-2xl font-bold mb-2">Scarcity:</h2>
-            <textarea
-              className="textarea textarea-bordered w-full mb-4"
-              placeholder="Enter a scarcity for this game"
-              value={scarcity}
-              onChange={(e) => {
-                setScarcity(e.target.value);
-                updateSuccess('scarcity', e.target.value);
-              }}
-            ></textarea>
-            {success.scarcity && <span className="text-green-500">✔</span>}
+                <div className="flex justify-center mt-8">
+                  <button
+                    className={`btn shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
+                    onClick={handleStartSpring}
+                  >
+                    Start Spring
+                  </button>
+                  {error && <p className="text-[#d44747]">{error}</p>}
+                </div>
 
-            <div className="flex items-center justify-between">
-              <button className="btn btn-primary mt-6" onClick={handleStartSpring}>
-                Start Spring
-              </button>
-              {error && <p className="text-[#d44747]">{error}</p>}
             </div>
           </form>
         </div>
