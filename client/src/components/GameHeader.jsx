@@ -132,7 +132,7 @@ const GameHeader = () => {
             }}
           >
             {/* {showLogOutModal&&`Log Out`} */}
-            Log Out
+            Log Out {user.username}
           </button>
           {/* <Link
             to="/logout"

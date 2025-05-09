@@ -6,6 +6,7 @@ import { useAuthContext } from "../contexts/authContext.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useSeason } from "../contexts/seasonContext.jsx";
 import rulesPdf from "../assets/rules.pdf";
+import titleImage from "../assets/titlepngedit.png"; // Import the image
 
 const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
     const { user } = useAuthContext();
@@ -26,12 +27,16 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
 
     return (
         <header
-            className="home-header ${theme.headerBg} ${theme.headerText} width-full py-4 px-6 flex justify-between items-center "
+            className={`home-header 
+            ${theme.headerBg} ${theme.headerText} ${theme.headerTextHover} ${theme.headerBg}
+            width-full py-4 px-6 flex justify-between items-center`}
             role="banner"
         >
             <nav className="flex space-x-4">
                 <a href="/"
-                    className="about-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    className={`btn about-button border-none shadow-md
+                        ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
+                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
                     About
                 </a>
@@ -39,23 +44,43 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                     href={rulesPdf}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rules-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    className={`btn rules-button border-none shadow-md
+                        ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                    py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
                     View Rules
                 </a>
             </nav>
+            {/* <h1
+                className={`game-title text-5xl font-bold 
+                    ${theme.headerText} ${theme.headerBg}`}
+                style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }} // Optional: Add a shadow effect to the text
+            >
+                THE QUIET YEAR
+            </h1> */}
+
+            {/* Header Image */}
+            <img
+                src={titleImage}
+                alt="The Quiet Year"
+                className="w-64 h-auto mb-4" // Adjust width and height as needed
+            />
             <div className="header-content flex space-x-4">
                 {!user && (
                     <>
                         <button
                             onClick={onLoginClick}
-                            className="login-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            className={`btn login-button border-none shadow-md
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                py-2 px-4 rounded`}
                         >
-                            Login
+                            Log In
                         </button>
                         <button
                             onClick={onRegisterClick}
-                            className="register-button bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            className={`btn register-button border-none shadow-md
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                py-2 px-4 rounded`}
                         >
                             Register
                         </button>
@@ -64,7 +89,7 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                 {user && (
                     <>
                         <button
-                            className="hover:underline"
+                            className={`btn border-none shadow-md ${theme.bodyBg} ${theme.bodyText} hover:bg-gray-200`}
                             onClick={() => {
                                 console.log('Log Out button clicked');
                                 setShowLogOutModal(!showLogOutModal); // Show the logout modal
@@ -75,24 +100,27 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                         </button>
                         <button
                             onClick={handleActiveGamesClick}
-                            className="active-games-button bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+                            className={`btn active-games-button border-none shadow-md
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                         >
                             Active Games
                         </button>
                         <button
                             onClick={handleNewGameClick}
-                            className="new-game-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
+                            className={`btn new-game-button border-none shadow-md
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}>
                             New Game
                         </button>
                     </>
                 )}
             </div>
             {showLogOutModal && (
-                    // <Logout  />
-                    <Logout onClose={() => setShowLogOutModal(false)} />
-                    // 
-                  )}
+                // <Logout  />
+                <Logout onClose={() => setShowLogOutModal(false)} />
+                // 
+            )}
         </header>
     );
 };
