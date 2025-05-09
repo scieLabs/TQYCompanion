@@ -49,7 +49,7 @@ const ActiveGames = () => {
                             >
                                 <h2 className={`text-lg font-semibold ${theme.headerText}`}>{game.title}</h2>
                                 <p>Week: {game.currentWeek}</p>
-                                <p>Season: {game.currentSeason}</p>
+                                {/* <p>Season: {game.currentSeason}</p> */}
                             </div>
                         ))}
                 </div>
