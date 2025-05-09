@@ -5,12 +5,16 @@ import GameInfo from './modals/GameInfo';
 import { getAllGames } from '../api/gameApi';
 import HomeHeader from '../components/HomeHeader';
 import { useAuthContext } from '../contexts/authContext';
+import { useSeason } from '../contexts/seasonContext.jsx'; 
+
 
 const ActiveGames = () => {
     const [activeGames, setActiveGames] = useState([]);// List of active games
     const [selectedGame, setSelectedGame] = useState(null); // Game selected for the modal
     const [gameTitle, setGameTitle] = useState('');
     const [gameDescription, setGameDescription] = useState('');
+    const { currentSeason, seasonThemes } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || {};
     const { user } = useAuthContext();
 
     // Fetch all active games for the logged-in user
@@ -32,18 +36,18 @@ const ActiveGames = () => {
     return (
         <>
             <HomeHeader />
-            <div className="active-games-page p-6">
-                <h1 className="text-2xl font-bold mb-4">My Active Games</h1>
+            <div className={`p-6 ${theme.bodyBg} active-games-page`}>
+                <h1 className={`text-2xl font-bold mb-4 ${theme.bodyBg} ${theme.bodyText}`}>My Active Games</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {activeGames
                         .filter((game) => game.isActive === true) // Filter active games
                         .map((game) => (
                             <div
                                 key={game._id}
-                                className="game-card bg-white shadow-md rounded p-4 cursor-pointer hover:shadow-lg"
+                                className={`p-4 ${theme.statsBg} game-card shadow-md rounded p-4 cursor-pointer hover:shadow-lg`}
                                 onClick={() => setSelectedGame(game)} // Open modal with game details
                             >
-                                <h2 className="text-lg font-semibold">{game.title}</h2>
+                                <h2 className={`text-lg font-semibold ${theme.headerText}`}>{game.title}</h2>
                                 <p>Week: {game.currentWeek}</p>
                                 <p>Season: {game.currentSeason}</p>
                             </div>

@@ -5,6 +5,7 @@ import { useAuthContext } from '../contexts/authContext';
 import GameHeader from '../components/GameHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 
 
 const gameAPI = axios.create({
@@ -20,6 +21,8 @@ export default function CreateNewGame() {
     
     // Redirecting to login if not authenticated
     const navigate = useNavigate();
+    const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
+    const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
 
     useEffect(() => {
       if (loading) {
@@ -151,14 +154,20 @@ export default function CreateNewGame() {
   return (
     <div>
       <GameHeader />
+      <main className={`
+                landing-page grid 
+                grid-rows-[150px_minmax(900px,1fr)_100px] 
+                grid-cols-3 grid-cols-[1fr_3fr]
+                ${theme.bodyBg} ${theme.bodyText}
+                p-6`}>
       <div className="min-h-screen p-4">
         <div className="flex">
           <div className="w-1/4 pr-4">
-            <h2 className="text-2xl font-bold mb-2">Name your game:</h2>
+            <h2 className={`text-2xl font-bold mb-2${theme.bodyText}`}>Name your game:</h2>
             <input
               type="text"
               placeholder="Enter a title for this game"
-              className="input input-bordered w-full mb-4"
+              className={`title-input-area p-6 input input-bordered w-full mb-4 ${theme.bodyBg} ${theme.bodyText}`}
               value={gameTitle}
               onChange={(e) => {
                 setGameTitle(e.target.value);
@@ -203,7 +212,7 @@ export default function CreateNewGame() {
             {success.scarcity && <span className="text-green-500">✔</span>}
 
             <div className="flex items-center justify-between">
-              <button className="btn btn-primary mt-6" onClick={handleStartSpring}>
+              <button className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`} onClick={handleStartSpring}>
                 Start Spring
               </button>
               {error && <p className="text-red-500">{error}</p>}
@@ -211,6 +220,7 @@ export default function CreateNewGame() {
           </div>
         </div>
       </div>
+    </main>
     </div>
   );
 }
