@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx'
-import { useSeason } from "../../contexts/seasonContext";
+import { useSeason } from "../../contexts/seasonContext.jsx";
 
 
 // Import the base URL from the .env file

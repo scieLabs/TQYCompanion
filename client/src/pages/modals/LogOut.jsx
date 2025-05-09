@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuthContext } from '../../contexts/authContext.jsx';
-import { useSeason } from "../../contexts/seasonContext";
+import { useSeason } from "../../contexts/seasonContext.jsx";
 import { useNavigate } from 'react-router-dom';
 
 export default function Logout({onClose}) {

@@ -1,12 +1,12 @@
-import HomeHeader from "../components/HomeHeader";
-import Login from "../pages/modals/Login";
-import Register from "../pages/modals/NewUser";
-import { useAuthContext } from "../contexts/authContext";
+import HomeHeader from "../components/HomeHeader.jsx";
+import Login from "../pages/modals/Login.jsx";
+import Register from "../pages/modals/NewUser.jsx";
+import { useAuthContext } from "../contexts/authContext.jsx";
 import { useState } from "react";
 import titleImage from "../assets/title.png";
 import quietYearImage from "../assets/The-Quiet-Year.webp";
 import { useNavigate } from 'react-router-dom';
-import { useSeason } from "../contexts/seasonContext";
+import { useSeason } from "../contexts/seasonContext.jsx";
 
 const LandingPage = () => {
     const [showLogin, setShowLogin] = useState(false);
@@ -47,7 +47,7 @@ const LandingPage = () => {
             <main className={`
                 landing-page grid 
                 grid-rows-[150px_minmax(900px,1fr)_100px] 
-                grid-cols-3 grid-cols-[1fr_3fr]
+                grid-cols-[1fr_3fr]
                 ${theme.bodyBg} ${theme.bodyText}
                 p-6`}>
                 {/*<img
@@ -57,22 +57,27 @@ const LandingPage = () => {
                 />*/}
 
                 <section 
-                className={`p-4 col-start-1 row-start-2 row-span-3 ${theme.statsBg} rounded text-justify`}>
-                    <p>
-                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Necessitatibus nam sed architecto est temporibus unde rem exercitationem asperiores tempora ea, aliquam quaerat praesentium eos fugit sint officia mollitia at optio?
-                    </p>
+                className={`p-4 col-start-1 row-start-1 row-span-3 ${theme.statsBg} ${theme.statsText} rounded-lg text-justify`}>
+                    <h2 className="text-2xl font-bold mb-4 text-center">
+                        About the Game
+                    </h2>
                     <img
                         src={quietYearImage}
                         alt="The Quiet Year gameplay example"
-                        className={`mx-auto object-contain p-4 col-start-2 row-start-2 row-span-3`}
+                        className={`mx-auto rounded-sm object-contain p-4 col-start-2 row-start-2 row-span-3`}
                     />
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis enim unde repellendus mollitia suscipit, impedit ad fuga accusantium commodi facere similique, amet iste iure esse consequatur placeat eum maxime! Earum!
-                    </p>
+                    <ul className={`text-sm list-disc list-inside mt-4`}>
+                        <li>Designed and written by Avery Alder.</li>
+                        <li>Design insights from Jackson Tegu.</li>
+                        <li>Illustrations by Ariel Norris.</li>
+                        <li>First released 2013. This iteration 2019.</li>
+                        <li>Explore <a href="https://buriedwithoutceremony.com/the-quiet-year" className={`underline ${theme.statsTextHover}`}>Buried Without Ceremony</a></li>
+                    </ul>
+                    
                 </section>
                 
 
-                <section className={`text-center col-start-1 col-end-3 row-start-1 row-span-2`}>
+                <section className={`text-center col-start-2 col-end-3 row-start-1 row-span-2`}>
                     {/*<img
                         src={titleImage}
                         alt="The Quiet Year Game Title"
@@ -80,7 +85,7 @@ const LandingPage = () => {
                     />
                     <h1 className="text-4xl font-bold mb-4">Welcome to The Quiet Year!</h1>
                     */}
-                    <h1 className={`text-5xl mb-4`}>
+                    <h1 className={`text-xl m-4`}>
                         The Quiet Year is a map-drawing game about community, difficult choices, and the struggle to rebuild after the collapse of civilization.
                     </h1>
                 </section>
@@ -88,7 +93,7 @@ const LandingPage = () => {
                 <section className={`features grid grid-flow-col grid-rows-3 col-start-2 row-start-2 row-span-2 gap-4`}>
                     <div className={`feature-item flex items-center mt-5 mr-20 ml-20`}>
                         <p>
-                            Explore the challenges of rebuilding a community in the aftermath of a disaster. Make decisions that shape the future of your people. Lorem ipsum dolor sit amet consectetur adipisicing elit. Est eos odio, maiores doloremque enim dolore eius sit iure blanditiis deleniti doloribus voluptatum similique! A sint corporis, rerum officia sed cum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic, itaque. Debitis tempora minus corrupti esse eveniet accusantium soluta sunt magnam porro eum dolorem laudantium, beatae similique amet illo labore suscipit? Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem accusantium quibusdam asperiores consectetur. Eius inventore veniam culpa, magni deleniti aliquid autem qui rerum architecto accusantium tenetur est fugiat quae dolorum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis necessitatibus, itaque cupiditate tempora commodi deleniti illum quia repellat
+                            Explore the challenges of rebuilding a community in the aftermath of a disaster. Make decisions that shape the future of your people.
                         </p>
                         <img
                             src={quietYearImage}
@@ -103,12 +108,12 @@ const LandingPage = () => {
                             className={`h-72 w-101 object-contain p-4`}
                         />
                         <p>
-                            Draw maps, tell stories, and create a unique narrative with your friends. Every game is a new adventure. Lorem ipsum dolor sit amet consectetur adipisicing elit. Est eos odio, maiores doloremque enim dolore eius sit iure blanditiis deleniti doloribus voluptatum similique! A sint corporis, rerum officia sed cum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic, itaque. Debitis tempora minus corrupti esse eveniet accusantium soluta sunt magnam porro eum dolorem laudantium, beatae similique amet illo labore suscipit? Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem accusantium quibusdam asperiores consectetur. Eius inventore veniam culpa, magni deleniti aliquid autem qui rerum architecto accusantium tenetur est fugiat quae dolorum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis necessitatibus, itaque cupiditate tempora commodi deleniti illum quia repellat nulla perferendis reprehenderit molestiae rerum architecto culpa, saepe, laboriosam harum labore maiores.
+                            Draw maps, tell stories, and create a unique narrative with your friends. Every game is a new adventure.
                         </p>
                     </div>
                     <div className={`feature-item flex items-center mt-5 mr-20 ml-20`}>
                         <p>
-                            Make tough decisions as the seasons change. Will your community thrive, or will it fall apart under the weight of its challenges? Lorem ipsum dolor sit amet consectetur adipisicing elit. Est eos odio, maiores doloremque enim dolore eius sit iure blanditiis deleniti doloribus voluptatum similique! A sint corporis, rerum officia sed cum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic, itaque. Debitis tempora minus corrupti esse eveniet accusantium soluta sunt magnam porro eum dolorem laudantium, beatae similique amet illo labore suscipit? Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem accusantium quibusdam asperiores consectetur. Eius inventore veniam culpa, magni deleniti aliquid autem qui rerum architecto accusantium tenetur est fugiat quae dolorum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis necessitatibus, itaque cupiditate tempora commodi deleniti illum quia repellat nulla perferendis reprehenderit molestiae rerum architecto culpa, saepe, laboriosam harum labore maiores.
+                            Make tough decisions as the seasons change. Will your community thrive, or will it fall apart under the weight of its challenges?
                         </p>
                         <img
                             src={quietYearImage}

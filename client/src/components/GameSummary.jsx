@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import GameHeader from './GameHeader.jsx';
 import GameOverview from '../pages/modals/GameOverview.jsx';
 import Login from '../pages/modals/Login.jsx';
-import { useAuthContext } from '../contexts/authContext';
+import { useAuthContext } from '../contexts/authContext.jsx';
 
 const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage, onClose }) => {
     const [showOverview, setShowOverview] = useState(false);

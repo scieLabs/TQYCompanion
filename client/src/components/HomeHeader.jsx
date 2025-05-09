@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Login from "../pages/modals/Login";
-import Logout from "../pages/modals/LogOut";
-import Register from "../pages/modals/NewUser";
+import Login from "../pages/modals/Login.jsx";
+import Logout from "../pages/modals/LogOut.jsx";
+import Register from "../pages/modals/NewUser.jsx";
 import { useAuthContext } from "../contexts/authContext.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useSeason } from "../contexts/seasonContext.jsx";
