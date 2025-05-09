@@ -113,10 +113,12 @@ const ActiveGames = () => {
                     </header>
 
                     <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
-                    <p className="mb-4">{selectedGame.description || 'No description available.'}</p>
-                    <p className="mb-4">
-                        <strong>Current week</strong>: {gameStats?.week || 'Loading...'}
-                    </p>
+                    <div className={`max-h-120 break-words overflow-y-auto rounded-lg pr-4 ${theme.bodyInputBg} ${theme.bodyInputText}`}>
+                        <p className="mb-4 p-4">{selectedGame.description || 'No description available.'}</p>
+                    </div>
+                    <div className="flex justify-center space-x-4 mt-4">
+                        <p className="mb-4 text-centre"><strong>Current week</strong>: {gameStats?.week || 'Loading...'}</p>
+                    </div>
                     <div className="modal-action">
                         <button
                             className={`btn ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
