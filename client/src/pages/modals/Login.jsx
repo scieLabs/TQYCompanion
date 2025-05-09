@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx';
-import { useSeason } from "../../contexts/seasonContext";
+import { useSeason } from "../../contexts/seasonContext.jsx";
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;

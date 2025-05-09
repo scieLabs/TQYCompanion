@@ -1,7 +1,7 @@
 //the page where a user sets up basic info about their game. leads to GameProgress//the page where a user sets up basic info about their game. leads to GameProgress
 
 import React, { useState, useEffect } from 'react';
-import { useAuthContext } from '../contexts/authContext';
+import { useAuthContext } from '../contexts/authContext.jsx';
 import GameHeader from '../components/GameHeader.jsx';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
