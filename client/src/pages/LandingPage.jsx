@@ -57,7 +57,7 @@ const LandingPage = () => {
                 />*/}
 
                 <section 
-                className={`p-4 col-start-1 row-start-2 row-span-3`}>
+                className={`p-4 col-start-1 row-start-2 row-span-3 ${theme.statsBg} rounded text-justify`}>
                     <p>
                         Lorem ipsum, dolor sit amet consectetur adipisicing elit. Necessitatibus nam sed architecto est temporibus unde rem exercitationem asperiores tempora ea, aliquam quaerat praesentium eos fugit sint officia mollitia at optio?
                     </p>
@@ -70,6 +70,8 @@ const LandingPage = () => {
                         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis enim unde repellendus mollitia suscipit, impedit ad fuga accusantium commodi facere similique, amet iste iure esse consequatur placeat eum maxime! Earum!
                     </p>
                 </section>
+                
+
                 <section className={`text-center col-start-1 col-end-3 row-start-1 row-span-2`}>
                     {/*<img
                         src={titleImage}
@@ -139,6 +141,7 @@ const LandingPage = () => {
                 </section>
 
             </main>
+            
             {showLogin || showRegister ? (
                 <div
                     className={`
