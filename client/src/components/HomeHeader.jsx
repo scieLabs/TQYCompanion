@@ -20,7 +20,11 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
     const handleNewGameClick = () => {
         navigate('/new-game'); // Navigate to the NewGame page
     };
-    //{``}
+
+    const handleActiveGamesClick = () => {
+        navigate('/active'); // Navigate to the ActiveGames page
+    }
+
     return (
         <header
             className={`home-header 
@@ -94,6 +98,14 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                             }}
                         >
                             Log Out
+                        </button>
+                        <button
+                            onClick={handleActiveGamesClick}
+                            className={`btn active-games-button border-none shadow-md
+                                ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+                                py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                        >
+                            Active Games
                         </button>
                         <button
                             onClick={handleNewGameClick}

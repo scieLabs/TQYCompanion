@@ -15,7 +15,7 @@ const gameAPI = axios.create({
 
 export default function CreateNewGame() {
     // Authentication and user context
-    const { user, loading } = useAuthContext();
+    const { user, setUser, loading } = useAuthContext();
     // console.log('CreateNewGame user:', user);
     // const token = user?.token; // Assuming the token is stored in the user object
     
@@ -32,7 +32,7 @@ export default function CreateNewGame() {
       }
       if (!loading && !user) {
         console.error('User is not logged in.');
-        navigate('/login');
+        navigate('/');
       } else {
         console.log('User object in NewGame:', user); // Debugging: Log the full user object
         console.log('User ID:', user._id); // Debugging: Log the user ID
@@ -91,6 +91,11 @@ export default function CreateNewGame() {
 
           // console.log('Game created:', response.data.game);
           // console.log('Initial stats created:', response.data.stats);
+
+            // Update the user object in authContext with the new active game
+            const updatedUser = { ...user, activeGames: [...(user.activeGames || []), response.data._id] };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser)); // Persist the updated user
 
           return response.data; // Return the data object directly
         } catch (err) {
@@ -325,30 +330,22 @@ export default function CreateNewGame() {
                 ></textarea>
                 {success.abundance && <span className="text-[#97be5a]">✔</span>}
               </div>
-
-              <div className="w-1/2">
-                <label className="block font-bold mb-1" htmlFor="scarcity">
-                  Scarcities:
-                </label>
-                <textarea
-                  id="scarcity"
-                  placeholder="The rest of your resources are scarce. Enter them here."
-                  className={`textarea textarea-bordered w-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
-                  value={scarcity}
-                  onChange={(e) => {
-                    setScarcity(e.target.value);
-                    updateSuccess('scarcity', e.target.value);
-                  }}
-                ></textarea>
-                {success.scarcity && <span className="text-[#97be5a]">✔</span>}
               </div>
-            </div>
 
-            <div className="flex flex-col items-center justify-between mt-10">
-              <button
-                type="submit"
-                className={`btn btn-primary border-none shadow-md ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
-              >
+            <h2 className="text-2xl font-bold mb-2">Scarcity:</h2>
+            <textarea
+              className="textarea textarea-bordered w-full mb-4"
+              placeholder="Enter a scarcity for this game"
+              value={scarcity}
+              onChange={(e) => {
+                setScarcity(e.target.value);
+                updateSuccess('scarcity', e.target.value);
+              }}
+            ></textarea>
+            {success.scarcity && <span className="text-green-500">✔</span>}
+
+            <div className="flex items-center justify-between">
+              <button className="btn btn-primary mt-6" onClick={handleStartSpring}>
                 Start Spring
               </button>
               {error && <p className="text-[#d44747]">{error}</p>}
@@ -356,71 +353,7 @@ export default function CreateNewGame() {
           </form>
         </div>
       </div>
+
     </div>
   );
 }
-//     <div>
-//       <GameHeader />
-//       <div className="min-h-screen p-4">
-//         <div className="flex">
-//           <div className="w-1/4 pr-4">
-//             <h2 className="text-2xl font-bold mb-2">Name your game:</h2>
-//             <input
-//               type="text"
-//               placeholder="Enter a title for this game"
-//               className="input input-bordered w-full mb-4"
-//               value={gameTitle}
-//               onChange={(e) => {
-//                 setGameTitle(e.target.value);
-//                 updateSuccess('title', e.target.value);
-//               }}
-//             />
-//             {success.gameTitle && <span className="text-green-500">✔</span>}
-
-//             <h2 className="text-2xl font-bold mb-2">Description:</h2>
-//             <textarea
-//               className="textarea textarea-bordered w-full mb-4"
-//               placeholder="Enter a description for this game"
-//               value={description}
-//               onChange={(e) => {
-//                 setDescription(e.target.value);
-//                 updateSuccess('description', e.target.value);
-//               }}
-//             ></textarea>
-//             {success.description && <span className="text-green-500">✔</span>}
-//             <h2 className="text-2xl font-bold mb-2">Abundance:</h2>
-//             <textarea
-//               className="textarea textarea-bordered w-full mb-4"
-//               placeholder="Enter an abundance for this game"
-//               value={abundance}
-//               onChange={(e) => {
-//                 setAbundance(e.target.value);
-//                 updateSuccess('abundance', e.target.value);
-//               }}
-//             ></textarea>
-//             {success.abundance && <span className="text-green-500">✔</span>}
-
-//             <h2 className="text-2xl font-bold mb-2">Scarcity:</h2>
-//             <textarea
-//               className="textarea textarea-bordered w-full mb-4"
-//               placeholder="Enter a scarcity for this game"
-//               value={scarcity}
-//               onChange={(e) => {
-//                 setScarcity(e.target.value);
-//                 updateSuccess('scarcity', e.target.value);
-//               }}
-//             ></textarea>
-//             {success.scarcity && <span className="text-green-500">✔</span>}
-
-//             <div className="flex items-center justify-between">
-//               <button className="btn btn-primary mt-6" onClick={handleStartSpring}>
-//                 Start Spring
-//               </button>
-//               {error && <p className="text-red-500">{error}</p>}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
