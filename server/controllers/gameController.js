@@ -56,6 +56,7 @@ export const getGameByTitleAndWeek = async (req, res) => {
 //   }
 // };
 
+// Get a game by its ID
 export const getGameById = async (req, res) => {
   try {
     const game = await Game.findById(req.params.id);
@@ -64,6 +65,25 @@ export const getGameById = async (req, res) => {
   } catch (err) {
     console.error('Error fetching game by ID:', err);
     res.status(500).json({ message: 'Error fetching game by ID.', error: err.message });
+  }
+};
+
+// Get all games for a user by user ID
+export const getGamesByUserId = async (req, res) => {
+  try {
+    const userId = req.user?._id; // Ensure the user ID is available in the request
+    console.log('Fetching games for user ID:', userId); // Debugging log
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const games = await Game.find({ user_id: userId, isActive: true }); // Fetch active games for the user
+    console.log('Fetched games:', games); // Debugging log
+    res.json(games);
+  } catch (error) {
+    console.error('Error fetching games by user ID:', error);
+    res.status(500).json({ message: 'Failed to fetch games by user ID.', error: error.message });
   }
 };
 

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import GameInfo from './modals/GameInfo';
-import { getAllGames } from '../api/gameApi';
-import HomeHeader from '../components/HomeHeader';
-import { useAuthContext } from '../contexts/authContext';
+import GameInfo from './modals/GameInfo.jsx';
+import { getAllGames, getGamesByUserId } from '../api/gameApi.js';
+import HomeHeader from '../components/HomeHeader.jsx';
+import { useAuthContext } from '../contexts/authContext.jsx';
 import { useSeason } from '../contexts/seasonContext.jsx'; 
 
 
@@ -21,7 +21,8 @@ const ActiveGames = () => {
     useEffect(() => {
         const fetchActiveGames = async () => {
             try {
-                const response = await getAllGames();
+                const response = await getGamesByUserId(); // Fetch all games for the user
+                console.log('Response from backend:', response);
                 setActiveGames(response.data);
             } catch (error) {
                 console.error('Error fetching active games:', error);
@@ -40,7 +41,7 @@ const ActiveGames = () => {
                 <h1 className={`text-2xl font-bold mb-4 ${theme.bodyBg} ${theme.bodyText}`}>My Active Games</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {activeGames
-                        .filter((game) => game.isActive === true) // Filter active games
+                        // .filter((game) => game.isActive === true) // Filter active games
                         .map((game) => (
                             <div
                                 key={game._id}
