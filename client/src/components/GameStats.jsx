@@ -234,7 +234,7 @@ export default function GameStats({ game_id, currentWeek, fetchProjects, ongoing
                   Save
                 </button>
                 <button
-                  className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                  className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                   onClick={() => setEditModalOpen(false)}>
                   Cancel
                 </button>
@@ -329,7 +329,7 @@ export default function GameStats({ game_id, currentWeek, fetchProjects, ongoing
                 >
                   Save
                 </button>
-                <button className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                <button className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                   onClick={() => setResolveModal(null)}>
                   Cancel
                 </button>
@@ -389,7 +389,7 @@ export default function GameStats({ game_id, currentWeek, fetchProjects, ongoing
                 </div>
               <div className="modal-action">
                 <button
-                  className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                  className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                   onClick={() => setShowCompleted(false)}
                 >
                   Close

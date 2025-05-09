@@ -338,7 +338,7 @@ export default function CreateNewGame() {
                 <textarea
                   id="scarcity"
                   className={`textarea textarea-bordered w-full ${theme.bodyInputBg} ${theme.bodyInputText}`}
-                  placeholder="Enter a scarcity for this game"
+                  placeholder="All other resources are scarce. Enter them here."
                   value={scarcity}
                   onChange={(e) => {
                     setScarcity(e.target.value);

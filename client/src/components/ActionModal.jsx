@@ -242,7 +242,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
                 Save
               </button>
               <button
-                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                 onClick={() => setFormData((prev) => ({ ...prev, showDiscussionModal: false }))}
               >
                 Cancel
@@ -275,7 +275,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
                 Save
               </button>
               <button
-                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                 onClick={() => setFormData((prev) => ({ ...prev, showDiscoveryModal: false }))}
               >
                 Cancel
@@ -332,7 +332,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
                 Save
               </button>
               <button
-                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                 onClick={() => setFormData((prev) => ({ ...prev, showProjectModal: false }))}
               >
                 Cancel
