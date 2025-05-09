@@ -39,7 +39,7 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
                         ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText}
                 py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
-                    About
+                    Home
                 </a>
                 <a
                     href={rulesPdf}
@@ -64,7 +64,7 @@ const HomeHeader = ({ onLoginClick, onRegisterClick }) => {
             <img
                 src={titleImage}
                 alt="The Quiet Year"
-                className="w-64 h-auto mb-4" // Adjust width and height as needed
+                className="w-74 h-auto mb-4" // Adjust width and height as needed
             />
             <div className="header-content flex space-x-4">
                 {!user && (
