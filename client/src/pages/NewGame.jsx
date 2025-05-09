@@ -347,8 +347,8 @@ export default function CreateNewGame() {
                 ></textarea>
                 {success.scarcity && <span className="text-[#97be5a]">✔</span>}
               </div>
-
-                <div className="flex justify-center mt-8">
+            </div>
+              <div className="flex justify-center mt-8">
                   <button
                     className={`btn shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
                     onClick={handleStartSpring}
@@ -357,8 +357,6 @@ export default function CreateNewGame() {
                   </button>
                   {error && <p className="text-[#d44747]">{error}</p>}
                 </div>
-
-            </div>
           </form>
         </div>
       </div>
