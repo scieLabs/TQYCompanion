@@ -284,14 +284,12 @@ export const updateGameEntry = async (req, res) => {
 export const updateGameProgress = async (req, res) => {
   try {
     const { game_id } = req.params;
-    const { currentWeek, isFinished } = req.body;
+    const { currentWeek, isActive } = req.body;
 
     const game = await Game.findByIdAndUpdate(
       game_id,
       {
-        currentWeek,
-        isFinished,
-        isActive: !isFinished, // Set isActive to false if the game is finished
+        isActive,
         updatedAt: Date.now(),
       },
       { new: true }
@@ -299,6 +297,17 @@ export const updateGameProgress = async (req, res) => {
 
     if (!game) {
       return res.status(404).json({ message: 'Game not found.' });
+    }
+
+    // Update the currentWeek in the Stats model
+    const stats = await Stats.findOneAndUpdate(
+      { game_id, week: currentWeek }, // Match the game_id and current week
+      { week: currentWeek }, // Update the week (if needed)
+      { new: true }
+    );
+
+    if (!stats) {
+      return res.status(404).json({ message: 'Stats for the current week not found.' });
     }
 
     res.json(game);
@@ -312,6 +321,7 @@ export const updateGameProgress = async (req, res) => {
 export const getActiveGames = async (req, res) => {
     try {
         const userId = req.user._id; 
+        console.log('Fetching active games for user:', userId); // Debugging log
         const activeGames = await Game.find({ user_id: userId, isActive: true }).sort({ updatedAt: -1 });
         res.json(activeGames);
     } catch (error) {

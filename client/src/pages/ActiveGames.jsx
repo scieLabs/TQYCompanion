@@ -2,18 +2,20 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import GameInfo from './modals/GameInfo';
-import { getActiveGames } from '../api/gameApi';
+import { getAllGames } from '../api/gameApi';
 import HomeHeader from '../components/HomeHeader';
+import { useAuthContext } from '../contexts/authContext';
 
 const ActiveGames = () => {
     const [activeGames, setActiveGames] = useState([]);// List of active games
     const [selectedGame, setSelectedGame] = useState(null); // Game selected for the modal
+    const { user } = useAuthContext();
 
     // Fetch all active games for the logged-in user
     useEffect(() => {
         const fetchActiveGames = async () => {
             try {
-                const response = await getActiveGames(`/active`);            
+                const response = await getAllGames();            
                 setActiveGames(response.data);
             } catch (error) {
                 console.error('Error fetching active games:', error);
@@ -31,7 +33,9 @@ const ActiveGames = () => {
             <div className="active-games-page p-6">
                 <h1 className="text-2xl font-bold mb-4">My Active Games</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {activeGames.map((game) => (
+                    {activeGames
+                    .filter((game) => game.isActive === true) // Filter active games
+                    .map((game) => (
                         <div
                             key={game._id}
                             className="game-card bg-white shadow-md rounded p-4 cursor-pointer hover:shadow-lg"

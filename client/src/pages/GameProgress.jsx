@@ -11,9 +11,7 @@ import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 import GameHeader from '../components/GameHeader.jsx'; // Import the GameHeader component
-import GameSummary from './GameSummary.jsx'; // Import the GameSummary component
 import GameSummary from '../components/GameSummary.jsx'; // Import the GameSummary component
-
 
 
 export default function GameProgress() {
@@ -37,7 +35,6 @@ export default function GameProgress() {
     isDiscovery: false,
     isProject: false,
     isActive: true,
-    isFinished: false,
   });
 
   const [projects, setProjects] = useState([]);
@@ -251,13 +248,16 @@ export default function GameProgress() {
       if (prompt._id === GAME_OVER_PROMPT_ID) {
         // Save the "fate of the community" to the database
         const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
-        await updateGame(game_id, { currentWeek, isFinished: true }, data);
+        await updateGame(game_id, { currentWeek, isActive: false }, data);
         console.log('Game Over data saved:', data);
 
         // Show the game summary modal
         setShowGameSummary(true);
         return; // Exit early since the game is over
+      } else {
+        await updateGame(game_id, { currentWeek, isActive: true });
       }
+      
 
       // Save the updated projects to the database
       await Promise.all(
@@ -303,7 +303,6 @@ export default function GameProgress() {
         isDiscovery: false,
         isProject: false,
         isActive: true,
-        isFinished: false,
       });
       // Update the current week state
       setCurrentWeek(nextWeek);
