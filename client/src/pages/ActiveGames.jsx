@@ -9,13 +9,15 @@ import { useAuthContext } from '../contexts/authContext';
 const ActiveGames = () => {
     const [activeGames, setActiveGames] = useState([]);// List of active games
     const [selectedGame, setSelectedGame] = useState(null); // Game selected for the modal
+    const [gameTitle, setGameTitle] = useState('');
+    const [gameDescription, setGameDescription] = useState('');
     const { user } = useAuthContext();
 
     // Fetch all active games for the logged-in user
     useEffect(() => {
         const fetchActiveGames = async () => {
             try {
-                const response = await getAllGames();            
+                const response = await getAllGames();
                 setActiveGames(response.data);
             } catch (error) {
                 console.error('Error fetching active games:', error);
@@ -34,23 +36,55 @@ const ActiveGames = () => {
                 <h1 className="text-2xl font-bold mb-4">My Active Games</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {activeGames
-                    .filter((game) => game.isActive === true) // Filter active games
-                    .map((game) => (
-                        <div
-                            key={game._id}
-                            className="game-card bg-white shadow-md rounded p-4 cursor-pointer hover:shadow-lg"
-                            onClick={() => setSelectedGame(game)} // Open modal with game details
-                        >
-                            <h2 className="text-lg font-semibold">{game.title}</h2>
-                            <p>Week: {game.currentWeek}</p>
-                            <p>Season: {game.currentSeason}</p>
-                        </div>
-                    ))}
+                        .filter((game) => game.isActive === true) // Filter active games
+                        .map((game) => (
+                            <div
+                                key={game._id}
+                                className="game-card bg-white shadow-md rounded p-4 cursor-pointer hover:shadow-lg"
+                                onClick={() => setSelectedGame(game)} // Open modal with game details
+                            >
+                                <h2 className="text-lg font-semibold">{game.title}</h2>
+                                <p>Week: {game.currentWeek}</p>
+                                <p>Season: {game.currentSeason}</p>
+                            </div>
+                        ))}
                 </div>
             </div>
 
             {/* Modal for selected game */}
             {selectedGame && (
+                <dialog id="gameModal" className="modal modal-open">
+                    <div className="modal-box p-0">
+                        <header className={`p-4 text-center max-h-120 break-words overflow-y-auto ${theme.headerBg} ${theme.headerText}`}>
+                            <h3 className="font-bold text-lg mb-4 uppercase">{gameTitle}</h3>
+                        </header>
+
+                        <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+                            <div className="max-h-120 break-words overflow-y-auto pr-4">
+                                <p>{gameDescription || 'No description available.'}</p>
+                            </div>
+                            <div className="modal-action">
+                                <button
+                                    className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                                    onClick={() => setSelectedGame(false)} // Close the modal
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+
+                        <GameInfo
+                            game={selectedGame}
+                            onClose={() => setSelectedGame(null)} // Close the modal
+                            onGameDeleted={(deletedGameId) =>
+                                setActiveGames((prevGames) => prevGames.filter((game) => game._id !== deletedGameId))
+                            }
+                        />
+                    </div>
+                </dialog>
+            )}
+
+            {/* {selectedGame && (
                 <GameInfo
                     game={selectedGame}
                     onClose={() => setSelectedGame(null)} // Close the modal
@@ -58,7 +92,7 @@ const ActiveGames = () => {
                         setActiveGames((prevGames) => prevGames.filter((game) => game._id !== deletedGameId))
                     }
                 />
-            )}
+            )} */}
         </>
     );
 };
@@ -69,8 +103,8 @@ export default ActiveGames;
 
 
 
-//     const [finishedGames, setFinishedGames] = useState([]); 
-//     const [game, setGame] = useState(null); 
+//     const [finishedGames, setFinishedGames] = useState([]);
+//     const [game, setGame] = useState(null);
 //     const [stats, setStats] = useState(null);
 //     const [projects, setProjects] = useState([]); // Game selected for the modal
 //     const navigate = useNavigate();
