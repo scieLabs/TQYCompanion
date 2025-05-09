@@ -38,7 +38,7 @@ export const SeasonProvider = ({ children }) => {
       nextWeekBtnBgHover: 'hover:bg-[#E4ADAD]', //Next week button hover
       nextWeekBtnText: 'text-[#f4eeee]',
   
-      pWeeksBtnBg: 'bg-[#ffb7b7]', //the + and - buttons for setting project duration
+      pWeeksBtnBg: 'bg-[#E4ADAD]', //the + and - buttons for setting project duration
       pWeeksBtnBgHover: 'hover:bg-[#97be5a]', //hover for above
       pWeeksBtnText: 'text-[#f4eeee]',
   

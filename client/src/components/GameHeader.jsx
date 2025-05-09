@@ -1,9 +1,9 @@
 // for gameplay, not the landing page
 import { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { useAuthContext } from '../contexts/authContext';
+import { NavLink,Link } from 'react-router-dom';
+import { useAuthContext } from '../contexts/authContext.jsx';
 import { useSeason } from '../contexts/seasonContext.jsx';
-import Logout from '../pages/modals/LogOut';
+import Logout from '../pages/modals/LogOut.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import rulesPdf from "../assets/rules.pdf";
