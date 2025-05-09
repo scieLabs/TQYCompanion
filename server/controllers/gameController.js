@@ -56,6 +56,7 @@ export const getGameByTitleAndWeek = async (req, res) => {
 //   }
 // };
 
+// Get a game by its ID
 export const getGameById = async (req, res) => {
   try {
     const game = await Game.findById(req.params.id);
@@ -64,6 +65,42 @@ export const getGameById = async (req, res) => {
   } catch (err) {
     console.error('Error fetching game by ID:', err);
     res.status(500).json({ message: 'Error fetching game by ID.', error: err.message });
+  }
+};
+
+// export const getGamesByUserId = asyncHandler(async (req, res) => {
+//   const { user_id } = req.query; // Retrieve user_id from query parameters
+
+//   if (!user_id) {
+//     return res.status(400).json({ message: 'User ID is required.' });
+//   }
+
+//   try {
+//     const games = await Game.find({ user_id }); // Fetch all games for the user
+//     res.status(200).json(games);
+//   } catch (error) {
+//     console.error('Error fetching games by user ID:', error);
+//     res.status(500).json({ message: 'Error fetching games by user ID.', error: error.message });
+//   }
+// });
+
+// Get all games for a user by user ID
+export const getGamesByUserId = async (req, res) => {
+  try {
+    const userId = req.user?._id; // Ensure the user ID is available in the request
+    console.log('Fetching games for user ID:', userId); // Debugging log
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const games = await Game.find({ user_id: userId }); // Fetch active games for the user
+
+    console.log('Fetched games:', games); // Debugging log
+    res.json(games);
+  } catch (error) {
+    console.error('Error fetching games by user ID:', error);
+    res.status(500).json({ message: 'Failed to fetch games by user ID.', error: error.message });
   }
 };
 
@@ -97,6 +134,10 @@ export const createGameEntry = async (req, res) => {
 
       const newGame = new Game({ user_id, title, description });
       const savedGame = await newGame.save();
+
+      // Add the game ID to the user's activeGames array
+      user.activeGames.push(savedGame._id);
+      await user.save();
 
       const initialStats = new Stats({
         game_id: savedGame._id,
@@ -266,7 +307,7 @@ export const updateGameByTitle = async (req, res) => {
     const game = await Game.findOneAndUpdate({ title }, updates, { new: true });
     if (!game) return res.status(404).json({message: 'Game not found'});
     res.json(game);
-  } catch (err) {
+  } catch (err) { v
     res.status(500).json({message: 'Error updating game by title'});
   }
 };
@@ -281,6 +322,55 @@ export const updateGameEntry = async (req, res) => {
   }
 };
 
+export const updateGameProgress = async (req, res) => {
+  try {
+    const { game_id } = req.params;
+    const { currentWeek, isActive } = req.body;
+
+    const game = await Game.findByIdAndUpdate(
+      game_id,
+      {
+        isActive,
+        updatedAt: Date.now(),
+      },
+      { new: true }
+    );
+
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found.' });
+    }
+
+    // Update the currentWeek in the Stats model
+    const stats = await Stats.findOneAndUpdate(
+      { game_id, week: currentWeek }, // Match the game_id and current week
+      { week: currentWeek }, // Update the week (if needed)
+      { new: true }
+    );
+
+    if (!stats) {
+      return res.status(404).json({ message: 'Stats for the current week not found.' });
+    }
+
+    res.json(game);
+  } catch (error) {
+    console.error('Error updating game progress:', error);
+    res.status(500).json({ message: 'Failed to update game progress.' });
+  }
+};
+
+// Fetch all active games
+export const getActiveGames = async (req, res) => {
+    try {
+        const userId = req.user._id; 
+        console.log('Fetching active games for user:', userId); // Debugging log
+        const activeGames = await Game.find({ user_id: userId, isActive: true }).sort({ updatedAt: -1 });
+        res.json(activeGames);
+    } catch (error) {
+        console.error('Error fetching active games:', error);
+        res.status(500).json({ message: 'Failed to fetch active games.' });
+    }
+};
+
 // Delete a game by title
 export const deleteGameByTitle = async (req, res) => {
   const { title } = req.params;
@@ -293,9 +383,15 @@ export const deleteGameByTitle = async (req, res) => {
   }
 };
 
+// Delete a specific game by ID
 export const deleteGameEntry = async (req, res) => {
   try {
+    // const gameId = req.params.id;
+    // const userId = req.user._id;
+
     const deleted = await Game.findByIdAndDelete(req.params.id);
+    // const deleted = await Game.findOneAndDelete({ _id: gameId, user_id: userId });
+
     if (!deleted) return res.status(404).json({ message: 'Game not found' });
     res.json({ message: 'Game deleted' });
   } catch (err) {
@@ -303,6 +399,22 @@ export const deleteGameEntry = async (req, res) => {
   }
 };
 
+export const deleteGameById = async (req, res) => {
+  try {
+    const gameId = req.params.id;
+    const userId = req.user._id;
+
+    const game = await Game.findOneAndDelete({ _id: gameId, user_id: userId });
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found or not authorized to delete.' });
+    }
+
+    res.json({ message: 'Game deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting game:', error);
+    res.status(500).json({ message: 'Failed to delete game.' });
+  }
+};
 
 // Projects
 

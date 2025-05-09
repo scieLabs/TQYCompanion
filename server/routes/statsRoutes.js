@@ -1,15 +1,17 @@
 import express from 'express';
-import { getStatsByGameAndWeek,
+import {
+    getStatsByGameAndWeek,
     createStatsEntry,
     saveActionData,
     updateStatsByGameAndWeek,
-    getStatsByGame, }
-from '../controllers/statsController.js';
+    getStatsByGameId
+}
+    from '../controllers/statsController.js';
 
 const router = express.Router();
 
 router.get('/:game_id/week/:week', getStatsByGameAndWeek);
-router.get('/:game_id', getStatsByGame); //used to fetch all weeks of a game for the GameSummary component
+router.get('/latest/:game_id', getStatsByGameId);
 router.post('/', createStatsEntry);
 // router.put('/:game_id/week/:week', saveActionData);
 router.post('/save-action', saveActionData);

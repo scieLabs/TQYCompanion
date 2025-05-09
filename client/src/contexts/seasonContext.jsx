@@ -11,17 +11,19 @@ export const SeasonProvider = ({ children }) => {
   
       // green: #97be5a
       // pink: #ffb7b7
+      // alternatives: #ff9999 #E2A3A3 #E4ADAD
       // white: #f4eeee
       // yellow: #ffdbaa
+      // bodyText: #4a4a4a
   
   
       // Home Header, Game Header, also modal header
       headerBg: 'bg-[#97be5a]', //also use for modal header
       headerText: 'text-[#f4eeee]',
       headerTextHover: 'hover:text-[#ffdbaa]', //for links hover
-      headerBtnBg: 'bg-[#ffb7b7]',
+      headerBtnBg: 'bg-[#E4ADAD]',
       headerBtnBgHover: 'hover:bg-[#ffa27f]', //for button hover
-      headerBtnText: 'text-green-900', //TODO: change to a visible colour against the yellow later. to the same colour as body text
+      headerBtnText: 'text-[#4a4a4a]', //TODO: change to a visible colour against the yellow later. to the same colour as body text
   
       // LandingPage, NewGame, and GameProgress pages (including ActionModal), and modals
       bodyBg: 'bg-[#f4eeee]', // main body; also use for modals
@@ -33,16 +35,17 @@ export const SeasonProvider = ({ children }) => {
       bodyInputText: 'text-[#4a4a4a]', // TODO: change along with the other body text
   
       nextWeekBtnBg: 'bg-[#97be5a]', //Next week button. also use for saving modals
-      nextWeekBtnBgHover: 'hover:bg-[#ffb7b7]', //Next week button hover
+      nextWeekBtnBgHover: 'hover:bg-[#E4ADAD]', //Next week button hover
       nextWeekBtnText: 'text-[#f4eeee]',
   
-      pWeeksBtnBg: 'bg-[#ffb7b7]', //the + and - buttons for setting project duration
+      pWeeksBtnBg: 'bg-[#E4ADAD]', //the + and - buttons for setting project duration
       pWeeksBtnBgHover: 'hover:bg-[#97be5a]', //hover for above
       pWeeksBtnText: 'text-[#f4eeee]',
   
       // GameStats sidebar
-      statsBg: 'bg-[#ffb7b7]',
+      statsBg: 'bg-[#E4ADAD]',
       statsText: 'text-[#f4eeee]',
+      statsTextHover: 'hover:text-[#4a4a4a]',
       statsBtnBg: 'bg-[#97be5a]',
       statsBtnBgHover: 'hover:bg-[#ffa27f]',
       statsBtnText: 'text-[#f4eeee]', // TODO: change to body text colour later

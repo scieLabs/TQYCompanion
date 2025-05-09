@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import GameHeader from './GameHeader.jsx';
 import GameOverview from '../pages/modals/GameOverview.jsx';
 import Login from '../pages/modals/Login.jsx';
-import { useAuthContext } from '../contexts/authContext';
+import { useAuthContext } from '../contexts/authContext.jsx';
 import { useSeason } from '../contexts/seasonContext.jsx';
 import HomeHeader from './HomeHeader.jsx';
 
