@@ -303,6 +303,8 @@ export default function GameProgress() {
 
 
   return (
+    <>
+    <GameHeader />
     <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
       <div className={`flex`}>
         <div className={`w-1/4 pr-4`}>
@@ -374,5 +376,6 @@ export default function GameProgress() {
         </div>
       </div>
     </div>
+    </>
   );
 }
