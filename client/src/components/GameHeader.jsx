@@ -1,6 +1,6 @@
 // for gameplay, not the landing page
 import { useState, useEffect } from 'react';
-import { NavLink,Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuthContext } from '../contexts/authContext.jsx';
 import { useSeason } from '../contexts/seasonContext.jsx';
 import Logout from '../pages/modals/LogOut.jsx';
@@ -15,6 +15,8 @@ const GameHeader = () => {
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' };
   const [showLogOutModal, setShowLogOutModal] = useState(false);
   // const [popupType, setPopupType] = useState('');
+  const [showNavigationModal, setShowNavigationModal] = useState(false); // State for navigation modal
+  const [pendingNavigationPath, setPendingNavigationPath] = useState(null); // Track the path to navigate to
   const [gameDescription, setGameDescription] = useState('');
   const [showGameModal, setShowGameModal] = useState(false); // State to control the game modal
   const [gameTitle, setGameTitle] = useState('');
@@ -45,10 +47,21 @@ const GameHeader = () => {
   }, [isGameProgressPage, location.pathname]);
 
   const handleNavigation = (path) => {
-    const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
-    if (confirmLeave) {
-      navigate(path);
+    setPendingNavigationPath(path); // Store the path to navigate to
+    setShowNavigationModal(true); // Show the navigation confirmation modal
+  };
+
+  const confirmNavigation = () => {
+    if (pendingNavigationPath) {
+      navigate(pendingNavigationPath); // Navigate to the stored path
+      setPendingNavigationPath(null); // Clear the pending path
     }
+    setShowNavigationModal(false); // Close the modal
+  };
+
+  const cancelNavigation = () => {
+    setPendingNavigationPath(null); // Clear the pending path
+    setShowNavigationModal(false); // Close the modal
   };
 
   return (
@@ -155,6 +168,38 @@ const GameHeader = () => {
         </div>
       </div>
 
+      {/* Navigation Confirmation Modal */}
+      {showNavigationModal && (
+        <dialog id="navigationModal" className="modal modal-open">
+          <div className="modal-box p-0">
+            <header
+              className={`p-4 text-center ${theme.headerBg} ${theme.headerText}`}
+            >
+              <h3 className="font-bold text-lg uppercase">Leaving so soon?</h3>
+            </header>
+            <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+              <p className="py-4">
+                Are you sure you want to leave your ongoing game? Any unsaved progress for this week will be lost.
+              </p>
+              <div className="modal-action">
+                <button
+                  className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                  onClick={confirmNavigation} // Confirm navigation
+                >
+                  Yes
+                </button>
+                <button
+                  className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
+                  onClick={cancelNavigation} // Cancel navigation
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        </dialog>
+      )}
+
       {/* Game Modal */}
       {showGameModal && (
         <dialog id="gameModal" className="modal modal-open">
@@ -167,14 +212,14 @@ const GameHeader = () => {
               <div className="max-h-120 break-words overflow-y-auto pr-4">
                 <p>{gameDescription || 'No description available.'}</p>
               </div>
-            <div className="modal-action">
-              <button
-                className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
-                onClick={() => setShowGameModal(false)} // Close the modal
-              >
-                Close
-              </button>
-            </div>
+              <div className="modal-action">
+                <button
+                  className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
+                  onClick={() => setShowGameModal(false)} // Close the modal
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </dialog>
