@@ -55,6 +55,7 @@ const LandingPage = () => {
                 landing-page grid 
                 grid-rows-[150px_minmax(1000px,1fr)_50px] 
                 grid-cols-[1fr_3fr]
+                md:grid-cols-auto md:grid-rows-auto
                 ${theme.bodyBg} ${theme.bodyText}
                 p-6`}>
                 {/*<img
@@ -110,28 +111,29 @@ const LandingPage = () => {
                     </div>
 
                 </section>
-                
 
-                <section className={`text-center col-start-2 col-end-3 row-start-1 row-span-1`}>
-                    <h1 className={`text-4xl font-bold italic m-4`}>
-                        Build community after the collapse.
-                    </h1>
-                    {/* <img
-                        src={quietYearImage}
-                        alt="The Quiet Year Game Title"
-                        className="title-image mx-auto mb-6 w-42 h-42 rounded-full"
-                    /> */}
-                    <div className={`max-w-[60%] mx-auto text-justify`}>
-                        <p className="mb-2"><em>The Quiet Year</em> is a map game. You define the struggles of a community living after the collapse of civilization, and attempt to build something good within their quiet year. Every decision and every action is set against a backdrop of dwindling time and rising concern.</p>
-                        <p className="mb-2">The game is played using a set of 52 prompts – each corresponds to a week during the quiet year. Each prompt triggers certain events – bringing bad news, good omens, project delays and sudden changes in luck. At the end of the quiet year, the Frost Shepherds will come, ending the game.</p>
-                        <p className="mb-2">The Quiet Year occupies an interesting space – part roleplaying game, part cartographic poetry.</p>
+                <section className={`features grid grid-cols-1 grid-rows-auto col-start-2 row-start-1 row-span-3 gap-10`}>
+                    <div className={`hero flex items-center justify-center mt-5 mx-10`}>
+                        <div>
+                            <h1 className={`text-4xl text-center font-bold italic m-4`}>
+                                Build community after the collapse.
+                            </h1>
+                            {/* <img
+                                src={quietYearImage}
+                                alt="The Quiet Year Game Title"
+                                className="title-image mx-auto mb-6 w-42 h-42 rounded-full"
+                            /> */}
+                            <div className={`max-w-[60%] mx-auto text-justify`}>
+                                <p className="mb-2"><em>The Quiet Year</em> is a map game. You define the struggles of a community living after the collapse of civilization, and attempt to build something good within their quiet year. Every decision and every action is set against a backdrop of dwindling time and rising concern.</p>
+                                <p className="mb-2">The game is played using a set of 52 prompts – each corresponds to a week during the quiet year. Each prompt triggers certain events – bringing bad news, good omens, project delays and sudden changes in luck. At the end of the quiet year, the Frost Shepherds will come, ending the game.</p>
+                                <p className="mb-2">The Quiet Year occupies an interesting space – part roleplaying game, part cartographic poetry.</p>
+                            </div>
+                        </div>
                     </div>
-                </section>
-
-                <section className={`features grid grid-cols-1 grid-rows-auto col-start-2 row-start-2 row-span-3 gap-10 mt-35`}>
-                    <div className={`feature-item flex items-center mt-5 mx-10`}>
-                        <div className="w-1/3">
-                            <h2 className="text-center font-bold">What This Is</h2>
+                    
+                    <div className={`feature-item flex items-center justify-center mt-5 mx-10`}>
+                        <div className="w-1/2">
+                            <h2 className="text-center font-bold mb-2">What This Is</h2>
                             <p className={`text-justify`}>
                                 This is a map-drawing game. You collectively explore the struggles of a community, trying to rebuild after the collapse of civilization. It’s a game about community, difficult choices, and landscapes. When you play, you make decisions about the community, decisions that get recorded on a map that is constantly evolving. Parts of the map are literal cartography, while other parts are symbolic. Players work together to create and steer this community, but they also play devil’s advocate and introduce problems and tensions into the game.
                             </p>
@@ -144,15 +146,15 @@ const LandingPage = () => {
                         />
                     </div>
                     
-                    <div className={`feature-item flex items-center justify-end mt-5 mx-10`}>
+                    <div className={`feature-item flex items-center justify-center mt-5 mx-10`}>
                         <img
-                            src={ship}
+                            src={survey}
                             alt="The Quiet Year map example"
-                            className={`h-72 w-101 object-contain p-4 mr-10 rounded-full`}
+                            className={`h-72 w-101 object-contain p-4 rounded-full`}
                         />
                     
-                        <div className="w-1/3">
-                            <h2 className="text-center font-bold">Supplies</h2>
+                        <div className="w-1/2">
+                            <h2 className="text-center font-bold mb-2">Supplies</h2>
                             <p>
                                 The Quiet Year requires 2-4 players and 2-4 hours. In addition, it requires:
                             </p>
@@ -163,16 +165,16 @@ const LandingPage = () => {
                             </ul>
                         </div>
 
-                        <img
+                        {/* <img
                             src={survey}
                             alt="The Quiet Year map example"
                             className={`h-72 w-101 object-contain p-4 rounded-full`}
-                        />
+                        /> */}
                     </div>
 
-                    <div className={`feature-item flex items-center mt-5 mx-10`}>
-                        <div className="w-1/3 text-justify">
-                            <h2 className="text-center font-bold">The Week</h2>
+                    <div className={`feature-item flex items-center justify-center mt-5 mx-10`}>
+                        <div className="w-1/2 text-justify">
+                            <h2 className="text-center font-bold mb-2">The Week</h2>
                             <p>
                                 The basic unit of play in <em>The Quiet Year</em> is the week. Each week is a turn taken by one player, with play proceeding clockwise around the table. Weeks should take an average of 2-3 minutes to complete. During each week, the following things happen:
                             </p>
@@ -189,28 +191,29 @@ const LandingPage = () => {
                         />
                         
                     </div>
-                    <div className={`feature-item flex items-center justify-end mt-5 mx-10`}>
-                        <div className="w-1/3 text-justify">
-                            <h2 className="text-center font-bold">The Prompts</h2>
+                    <div className={`feature-item flex items-center justify-center mt-5 mx-10`}>
+
+                        <img
+                            src={more}
+                            alt="The Quiet Year decision-making example"
+                            className={`h-72 w-101 object-contain p-4 rounded-full`}
+                        />
+                        <div className="w-1/2 text-justify">
+                            <h2 className="text-center font-bold mb-2">The Prompts</h2>
                             <p className="mb-2">
                                 As there are 52 prompts, there are 52 weeks. We won’t necessarily get to play all of them - the <em>Frost Shepherds</em> could arrive any time during Winter.
                             </p>
                             <p className="mb-2">Most prompts have two options to choose from, separated by an ‘or…’ divider. Pick the option that you find the most interesting and fitting, and read the text aloud. The card might ask you a question, bring bad news, or create new opportunities. Many cards have specific rules attached to them, which are written in bold text. If you drew the card, it’s up to you to make the decisions that the card requires.</p>
                             <p>If a prompt asks you a question, think about whether your answer could be represented on the map somehow. If it fits, update the map to reflect this new information. For example, if the card asks you about the sleeping quarters for the community, you might end up drawing a row of tents near the edge of the forest.</p>
                         </div>
-                        <img
-                            src={more}
-                            alt="The Quiet Year decision-making example"
-                            className={`h-72 w-101 object-contain p-4 rounded-full`}
-                        />
-                    </div>
-                </section>
 
-                <section className={`cta text-center mt-8 col-start-1 col-end-3 row-start-5 row-span-1 justify-self-center`}>
+                    </div>
+
+                    <div className={`cta flex items-center justify-center mt-5 mx-10`}>
                     {!user ? (
                         <button
                             onClick={handleLoginClick}
-                            className={`login-button flex justify-center items-center mt-4
+                            className={`login-button btn btn-lg flex justify-center mt-4
                             ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                             py-2 px-4 rounded hover:cursor-pointer`}
                         >
@@ -219,14 +222,16 @@ const LandingPage = () => {
                     ) : (
                         <button
                             onClick={handleNewGameClick}
-                            className={`new-game-button flex justify-center mt-4
+                            className={`new-game-button btn btn-lg flex justify-center mt-4
                             ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
                             py-2 px-4 rounded hover:cursor-pointer`}
                         >
                             New Game
                         </button>
                     )}
+                    </div>
                 </section>
+
 
             </main>
             
