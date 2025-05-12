@@ -428,6 +428,7 @@ const fetchAllStats = async () => {
                     projects={projects}
                     currentWeek={currentWeek}
                     loading={loading}
+                    onClose={() => setShowGameSummary(false)}
                   />
                 )}
               </div>
