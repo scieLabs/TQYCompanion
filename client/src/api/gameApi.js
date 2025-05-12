@@ -16,6 +16,49 @@ export const getAllGames = () => gameAPI.get('/game');
 // Fetch a game by its ID
 export const getGameById = (id) => gameAPI.get(`/game/${id}`);
 
+// Fetch all games for the active user
+// export const getGamesByUserId = async () => {
+//   try {
+//     const token = localStorage.getItem('token'); // Retrieve the JWT token
+//     const response = await axios.get(`${API_BASE_URL}/game/user`, {
+//       headers: { Authorization: `Bearer ${token}` }, // Include the token in the request
+//       withCredentials: true,
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error fetching games by user ID:', error.response?.data || error.message);
+//     throw error;
+//   }
+// };
+
+// export const getGamesByUserId = async (user_id) => {
+//   try {
+//     // const token = localStorage.getItem('token'); // Retrieve the JWT token
+//     const response = await gameAPI.get(`/game/user`, {
+//       params: { user_id }, // Send user_id as a query parameter
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error fetching games by user ID:', error.response?.data || error.message);
+//     throw error;
+//   }
+// };
+
+export const getGamesByUserId = async (user_id) => {
+  try {
+    const response = await gameAPI.get('/users/active-games', {
+      params: { user_id }, // Send user_id as a query parameter
+    });
+    return response.data; // Return the list of active games
+  } catch (error) {
+    console.error('Error fetching games by user ID:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// // Fetch all active games
+// export const getActiveGames =  () => gameAPI.get(`/active`);
+
 // Fetch a game by its title
 export const getGameByTitle = (title) => gameAPI.get(`/game/title/${title}`);
 
@@ -74,6 +117,8 @@ export const getCompletedProjects = (title) =>
 
 export const resolveProject = (title, projectTitle, type, resolution) =>
   gameAPI.put(`/game/title/${title}/projects/${projectTitle}/${type}/resolve`, { resolution });
+
+
 
 // Default export for direct use of Axios instance
 export default gameAPI;

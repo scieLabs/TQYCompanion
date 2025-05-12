@@ -142,3 +142,23 @@ export const updateStatsByGameAndWeek = async (req, res) => {
     res.status(500).json({ message: 'Error updating stats.', error: error.message });
   }
 };
+
+export const getStatsByGameId = async (req, res) => {
+  try {
+    const { game_id } = req.params;
+
+    if (!game_id) {
+      return res.status(400).json({ message: 'Game ID is required.' });
+    }
+
+    const stats = await Stats.findOne({ game_id }).sort({ week: -1 }); // Get the latest stats entry
+    if (!stats) {
+      return res.status(404).json({ message: 'Stats not found for this game.' });
+    }
+
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error('Error fetching stats by game ID:', error);
+    res.status(500).json({ message: 'Error fetching stats.', error: error.message });
+  }
+};

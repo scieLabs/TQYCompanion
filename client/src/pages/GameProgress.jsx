@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { getGameById, updateGame } from '../api/gameApi.js';
@@ -12,7 +12,6 @@ import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
 import GameHeader from '../components/GameHeader.jsx'; // Import the GameHeader component
 import GameSummary from '../components/GameSummary.jsx'; // Import the GameSummary component
-
 
 
 export default function GameProgress() {
@@ -35,6 +34,7 @@ export default function GameProgress() {
     isDiscussion: false,
     isDiscovery: false,
     isProject: false,
+    isActive: true,
   });
 
   const [projects, setProjects] = useState([]);
@@ -50,6 +50,25 @@ export default function GameProgress() {
   const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
 
   const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+  
+  //function for fetching game data when entering via Continue
+  const initializeGameProgress = async () => {
+  try {
+    console.log('Initializing GameProgress...');
+    await fetchGameData(); // Fetch game data (game and stats)
+    await fetchPrompt(); // Fetch the current or next prompt
+  } catch (error) {
+    console.error('Error initializing GameProgress:', error);
+  }
+};
+
+const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.fromActiveGames) {
+    initializeGameProgress(); // Run the combined function only if coming from ActiveGames
+  }
+}, [location.state, game_id, currentWeek, currentSeason]);
 
   useEffect(() => {
     console.log('Current season updated:', currentSeason);
@@ -75,21 +94,26 @@ export default function GameProgress() {
   //   fetchGameData();
   // }, [game_id, currentSeason, currentWeek]);
 
+
   const fetchProjects = async () => {
     try {
+      console.log(`Fetching all projects for game_id: ${game_id}`);
       console.log(`Fetching all projects for game_id: ${game_id}`);
       const response = await projectAPI.getProjectsByGame(game_id);
       // console.log('Response from backend:', response);
       const allProjects = response.data;
 
       console.log('All projects:', allProjects);
+      // console.log('All projects:', allProjects);
       // Sort projects into ongoing and completed
       const ongoing = allProjects.filter(
         (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
       );
 
+
       const completed = allProjects.filter(
         (proj) =>
+          (proj.project_weeks === 0 || proj.pp_weeks === 0) &&
           (proj.project_weeks === 0 || proj.pp_weeks === 0) &&
           (proj.project_resolve || proj.pp_resolve)
       );
@@ -97,9 +121,13 @@ export default function GameProgress() {
       // console.log('Ongoing projects:', ongoing);
       // console.log('Completed projects:', completed);
 
+      // console.log('Ongoing projects:', ongoing);
+      // console.log('Completed projects:', completed);
+
       setProjects(allProjects);
       setOngoingProjects(ongoing);
       setCompletedProjects(completed);
+      console.log('Fetched projects:', { ongoing, completed });
       console.log('Fetched projects:', { ongoing, completed });
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -154,6 +182,12 @@ export default function GameProgress() {
 
     fetchInitialData();
   }, [game_id, currentSeason, currentWeek]);
+
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever currentWeek changes
 
   useEffect(() => {
     if (game_id) {
@@ -233,13 +267,16 @@ export default function GameProgress() {
       if (prompt._id === GAME_OVER_PROMPT_ID) {
         // Save the "fate of the community" to the database
         const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
-        await updateGame(game_id, data);
+        await updateGame(game_id, { currentWeek, isActive: false }, data);
         console.log('Game Over data saved:', data);
 
         // Show the game summary modal
         setShowGameSummary(true);
         return; // Exit early since the game is over
+      } else {
+        await updateGame(game_id, { currentWeek, isActive: true });
       }
+      
 
       // Save the updated projects to the database
       await Promise.all(
@@ -284,11 +321,13 @@ export default function GameProgress() {
         isDiscussion: false,
         isDiscovery: false,
         isProject: false,
+        isActive: true,
       });
       // Update the current week state
       setCurrentWeek(nextWeek);
       // fetchPrompt(currentSeason);
 
+      await fetchGameData(); //refresh game state
       await fetchGameData(); //refresh game state
 
       // Fetch the next prompt explicitly
@@ -314,6 +353,8 @@ export default function GameProgress() {
   }, [showGameSummary]);
 
   return (
+    <>
+    <GameHeader />
     <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
       <div className={`flex`}>
         <div className={`w-1/4 pr-4`}>
@@ -331,17 +372,17 @@ export default function GameProgress() {
           />
         </div>
 
-        <div className={`w-3/4`}>
-          <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
-          {prompt && prompt._id && (
-            <div>
-              <div className="text-center mb-8">
-                <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
-                <p
-                  className="mb-8 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: prompt.prompt }}
-                ></p>
-              </div>
+          <div className={`w-3/4`}>
+            <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
+            {prompt && prompt._id && (
+              <div>
+                <div className="text-center mb-8">
+                  <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
+                  <p
+                    className="mb-8 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: prompt.prompt }}
+                  ></p>
+                </div>
 
               <ActionModal
                 prompt={prompt}
@@ -384,5 +425,7 @@ export default function GameProgress() {
         </div>
       </div>
     </div>
+    
+    </>
   );
 }
