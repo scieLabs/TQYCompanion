@@ -4,7 +4,7 @@ import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { getGameById, updateGame } from '../api/gameApi.js';
 import * as projectAPI from '../api/projectApi.js';
-import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
+import { getStatsByGameAndWeek, createStatsEntry, saveActionData, getStatsByGame } from '../api/statApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 import { createProject } from '../api/projectApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
@@ -196,6 +196,7 @@ useEffect(() => {
 
   const fetchGameData = async () => {
     try {
+      console.log('Game ID:', game_id);
       const gameResponse = await getGameById(game_id);
       const statsResponse = await getStatsByGameAndWeek(game_id, currentWeek);
 
@@ -339,6 +340,28 @@ useEffect(() => {
     }
   };
 
+  // Function to fetch all stats for the game for when the game summary is shown
+const fetchAllStats = async () => {
+    try {
+        console.log('Fetching all stats for game_id:', game_id); // Debug game_id
+        const statsResponse = await getStatsByGame(game_id); // Fetch all stats
+        console.log('Stats response:', statsResponse); // Debug response
+
+        if (Array.isArray(statsResponse) && statsResponse.length > 0) {
+            setStats(statsResponse);
+        } else {
+            console.warn('No stats data available for this game.');
+        }
+    } catch (err) {
+        console.error('Error fetching all stats:', err);
+    }
+};
+
+  useEffect(() => {
+    if (showGameSummary) {
+      fetchAllStats();
+    }
+  }, [showGameSummary]);
 
   return (
     <>
@@ -399,13 +422,12 @@ useEffect(() => {
                 {showGameSummary && (
                   <GameSummary
                     className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
-                    onClose={() => setShowGameSummary(false)}
                     game={game}
                     stats={stats}
                     projects={projects}
                     currentWeek={currentWeek}
                     loading={loading}
-                    errorMessage={errorMessage}
+                    onClose={() => setShowGameSummary(false)}
                   />
                 )}
               </div>

@@ -35,4 +35,14 @@ const statAPI = axios.create({
   }
 };
 
+  export const getStatsByGame = async (game_id) => {
+    try {
+    const response = await statAPI.get(`/stats/gameover/${game_id}`);
+    return response.data; // Return the final stats for the game
+  } catch (error) {
+    console.error('Error fetching stats for this game:', error.response?.data || error.message);
+    throw error;
+  }
+  };
+
   export default statAPI;
