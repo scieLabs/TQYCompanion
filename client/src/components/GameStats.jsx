@@ -261,7 +261,7 @@ export default function GameStats({ game_id, currentWeek, fetchProjects, ongoing
                 {proj.project_weeks > 0 || proj.pp_weeks > 0 ? (
                   <>
                     <button
-                      className="btn btn-xs border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                      className={`btn btn-xs border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                       onClick={() =>
                         updateProjectWeeks(proj._id, Math.max((proj.project_weeks || proj.pp_weeks) - 1, 0))
                       }
@@ -270,7 +270,7 @@ export default function GameStats({ game_id, currentWeek, fetchProjects, ongoing
                     </button>
                     <span>{proj.project_weeks || proj.pp_weeks}</span>
                     <button
-                      className="btn btn-xs border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                      className={`btn btn-xs border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                       onClick={() =>
                         updateProjectWeeks(proj._id, (proj.project_weeks || proj.pp_weeks) + 1)
                       }
