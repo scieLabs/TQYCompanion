@@ -34,7 +34,6 @@ export default function GameProgress() {
     isDiscussion: false,
     isDiscovery: false,
     isProject: false,
-    isActive: true,
   });
 
   const [projects, setProjects] = useState([]);

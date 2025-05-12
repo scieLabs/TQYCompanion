@@ -79,6 +79,7 @@ export default function CreateNewGame() {
               description,
               abundance,
               scarcity,
+              isActive: true, // Set the game as active
             },
             {
               headers: {
