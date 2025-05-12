@@ -327,7 +327,7 @@ export const updateGameProgress = async (req, res) => {
     const { game_id } = req.params;
     const { currentWeek, isActive } = req.body;
 
-    const game = await Game.findByIdAndUpdate(
+    const game = await Game.findByIdAndUpdate( 
       game_id,
       {
         isActive,

@@ -266,15 +266,17 @@ useEffect(() => {
 
       if (prompt._id === GAME_OVER_PROMPT_ID) {
         // Save the "fate of the community" to the database
+        isActive = false; // Set isActive to false for game over
         const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
-        await updateGame(game_id, { currentWeek, isActive: false }, data);
-        console.log('Game Over data saved:', data);
+        await updateGame(game_id, {  currentWeek, isActive: false, ...data });
+        console.log('Game Over data saved:',{ currentWeek, isActive:false}, data);
 
         // Show the game summary modal
         setShowGameSummary(true);
         return; // Exit early since the game is over
       } else {
         await updateGame(game_id, { currentWeek, isActive: true });
+        console.log('Game updated for next week:', { currentWeek, isActive: true });
       }
       
 
@@ -327,7 +329,6 @@ useEffect(() => {
       setCurrentWeek(nextWeek);
       // fetchPrompt(currentSeason);
 
-      await fetchGameData(); //refresh game state
       await fetchGameData(); //refresh game state
 
       // Fetch the next prompt explicitly
