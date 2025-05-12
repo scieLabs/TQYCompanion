@@ -110,7 +110,7 @@ export default function Login({ onClose, handleRegisterClick }) {
                             {loading ? 'Logging in...' : 'Login'}
                         </button>
                         <button
-                            className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                            className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                             onClick={onClose}
                             type="button"
                         >
