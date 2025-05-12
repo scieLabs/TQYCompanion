@@ -6,7 +6,7 @@ import { useAuthContext } from '../contexts/authContext.jsx';
 import { useSeason } from '../contexts/seasonContext.jsx';
 import HomeHeader from './HomeHeader.jsx';
 
-const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage, onClose }) => {
+const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage }) => {
     const [showOverview, setShowOverview] = useState(false);
     const { user } = useAuthContext();
 
@@ -28,6 +28,10 @@ const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage
 
     if (!game || !stats || !projects) {
         return <p>No game data available.</p>;
+    }
+
+    if (!stats || stats.length === 0) {
+        return <p>No stats data available.</p>;
     }
 
     // Combine and count the stats
@@ -57,7 +61,6 @@ const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage
     return (
         <div
             className={`modal-wrapper fixed inset-0 flex justify-center items-center`}
-            onClick={onClose} // Close modal when clicking outside
         >
             <div
                 className={`modal-content`}
@@ -104,7 +107,6 @@ const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage
                                 {showOverview && (
                                     <GameOverview
                                         className="bg-white p-6 rounded-lg shadow-lg w-full"
-                                        onClose={() => setShowOverview(false)}
                                         weeks={weeks}
                                         gameTitle={game.title || 'Unknown Game'}
                                     />
@@ -127,6 +129,7 @@ const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage
                                 >
                                     Homepage
                                 </a>
+                                {/*
                                 <button
                                     onClick={onClose}
                                     className={`close-button gap-1 mt-4
@@ -135,6 +138,7 @@ const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage
                                 >
                                     Close
                                 </button>
+                                 */}
                             </div>
                         </div>
                     </div>
