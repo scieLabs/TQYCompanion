@@ -77,9 +77,21 @@ export const getGameByTitleAndWeek = async (gameTitle, week) => {
 export const createGameEntry = (data, config) => gameAPI.post('/game', data, config);
 
 // Update a game by its ID
-export const updateGame = (id, data) => gameAPI.put(`/game/${id}`, data);
+// export const updateGame = (id, data) => gameAPI.put(`/game/${id}`, data);
 
-
+// Update a game by its id:
+export const updateGame = async (gameId, updates) => {
+  try {
+    const response = await axios.put(
+      `/game/${gameId}`,
+      updates,
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating game:', error.response?.data || error.message);
+    throw error;
+  }
+};
 
 // Update a game by its title and week
 export const updateGameByWeek = (gameTitle, week, data) =>
