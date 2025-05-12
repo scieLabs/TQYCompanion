@@ -104,7 +104,7 @@ export default function GameOverview({ onClose, weeks, gameTitle, season }) {
             <div className="mt-6 text-right">
                 <button
                     onClick={onClose}
-                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    className={`${theme.bodyText}bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                 >
                     Close
                 </button>

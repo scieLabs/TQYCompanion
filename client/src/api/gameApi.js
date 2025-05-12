@@ -79,6 +79,8 @@ export const createGameEntry = (data, config) => gameAPI.post('/game', data, con
 // Update a game by its ID
 export const updateGame = (id, data) => gameAPI.put(`/game/${id}`, data);
 
+
+
 // Update a game by its title and week
 export const updateGameByWeek = (gameTitle, week, data) =>
   gameAPI.put(`/game/title/${gameTitle}/week/${week}`, data);

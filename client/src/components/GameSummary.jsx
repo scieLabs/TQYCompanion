@@ -106,7 +106,7 @@ const GameSummary = ({ game, stats, projects, currentWeek, loading, errorMessage
                             <p>You need to be logged in to view the summary.</p>
                             <a
                                 href="/"
-                                className="about-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                className={`about-button bg-blue-500 hover:bg-blue-700 ${theme.bodyText} font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
                             >
                                 Return to Homepage
                             </a>

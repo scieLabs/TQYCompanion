@@ -169,7 +169,7 @@ const GameHeader = () => {
               </div>
             <div className="modal-action">
               <button
-                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                className={`btn border-none shadow-md bg-white hover:bg-gray-200 ${theme.bodyText} py-2 px-4 rounded`}
                 onClick={() => setShowGameModal(false)} // Close the modal
               >
                 Close

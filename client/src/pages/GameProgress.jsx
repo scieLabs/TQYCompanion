@@ -265,8 +265,9 @@ useEffect(() => {
     try {
 
       if (prompt._id === GAME_OVER_PROMPT_ID) {
+        console.log('GAME_OVER_PROMPT_ID encountered');
+
         // Save the "fate of the community" to the database
-        isActive = false; // Set isActive to false for game over
         const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
         await updateGame(game_id, {  currentWeek, isActive: false, ...data });
         console.log('Game Over data saved:',{ currentWeek, isActive:false}, data);
