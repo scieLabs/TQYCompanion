@@ -242,7 +242,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
                 Save
               </button>
               <button
-                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                 onClick={() => setFormData((prev) => ({ ...prev, showDiscussionModal: false }))}
               >
                 Cancel
@@ -275,7 +275,7 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
                 Save
               </button>
               <button
-                className="btn border-none shadow-md bg-white text-grey-600 hover:bg-gray-200"
+                className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
                 onClick={() => setFormData((prev) => ({ ...prev, showDiscoveryModal: false }))}
               >
                 Cancel
@@ -308,6 +308,10 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
               value={formData.pp_desc || ''}
               onChange={(e) => updateField('pp_desc', e.target.value)}
             />
+              {/* Display the error message */}
+                {formData.error && (
+                  <p className="text-[#d44747] mt-2">{formData.error}</p>
+                )}
             <div className="flex items-center space-x-2 mt-4">
               <span className="font-bold">Weeks:</span>
               <button
@@ -327,13 +331,19 @@ export default function ActionModal({ action, game_id, currentWeek, fetchProject
             <div className="modal-action">
               <button
                 className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
-                onClick={() => saveActionData()}
+                onClick={() => {
+                  if (!formData.pp_desc) {
+                    updateField('error', 'Project description is required.');
+                    return;
+                  }
+                  saveActionData();
+                }}
               >
                 Save
               </button>
               <button
                 className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
-                onClick={() => setFormData((prev) => ({ ...prev, showProjectModal: false }))}
+                onClick={() => setFormData((prev) => ({ ...prev, showProjectModal: false, error: '' }))}
               >
                 Cancel
               </button>

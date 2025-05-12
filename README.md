@@ -1,12 +1,9 @@
-# React + Vite
+# The Quiet Year Companion
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[The Quiet Year](https://buriedwithoutceremony.com/the-quiet-year) is a map game. You define the struggles of a community living after the collapse of civilization, and attempt to build something good within their quiet year. Every decision and every action is set against a backdrop of dwindling time and rising concern.
 
-Currently, two official plugins are available:
+The game is played using a set of 52 prompts – each corresponds to a week during the quiet year. Each prompt triggers certain events – bringing bad news, good omens, project delays and sudden changes in luck. At the end of the quiet year, the Frost Shepherds will come, ending the game.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The Quiet Year occupies an interesting space – part roleplaying game, part cartographic poetry.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+There is currently no way to play the game in a digital form without keeping track of a variety of different software: prompt randomizers, text documents, counters. This application aims to mitigate this issue by bringing most of the game's features (sans map!) to one place.

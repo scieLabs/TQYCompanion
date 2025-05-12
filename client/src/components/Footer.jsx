@@ -1,6 +1,6 @@
 //copyrights and all
 import { useSeason } from '../contexts/seasonContext.jsx';
-
+import BWCLogo from '../assets/BWCLogo.webp';
 
 const Footer = () => {
 
@@ -9,8 +9,14 @@ const Footer = () => {
 
     return <footer className={`width-full ${theme.footerBg} ${theme.footerText} py-4 px-6 flex justify-between items-center mt-auto`}>
       <div className="text-sm">The Quiet Year Companion, 2025</div>
-      <div className="flex space-x-4">
+      <div className="flex flex-col items-center space-x-4">
+
         <a href="https://buriedwithoutceremony.com/the-quiet-year" className={`${theme.footerTextHover}`}>❯❯ © Buried Without Ceremony ❮❮</a>
+          {/* <img
+            src={BWCLogo}
+            alt="Buried Without Ceremony Logo"
+            className={`rounded-sm object-contain w-8`}
+          /> */}
       </div>
       <div className="flex space-x-4 text-sm">
         <p>A project by:</p>
