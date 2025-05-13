@@ -1,6 +1,6 @@
  import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { deleteGame } from '../../api/gameApi'; // Import the deleteGame function
+import { deleteGame } from '../../api/gameApi.js'; // Import the deleteGame function
 const GameInfo = ({ game, onClose, onGameDeleted }) => {
     const navigate = useNavigate();
 

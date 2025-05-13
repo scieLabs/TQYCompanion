@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 8080;
 
 // Middleware to handle CORS and JSON parsing
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173', // frontend's URL
+    origin: process.env.CLIENT_URL, // frontend's URL
     credentials: true, // Allow cookies and credentials
 }));
 app.use(express.json()); // parse JSON request bodies
