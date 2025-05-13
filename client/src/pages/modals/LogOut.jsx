@@ -1,28 +1,33 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useAuthContext } from '../../contexts/authContext.jsx';
-import { useSeason } from "../../contexts/seasonContext";
+import { useSeason } from "../../contexts/seasonContext.jsx";
+import { useNavigate } from 'react-router-dom';
 
-
-export default function Logout() {
+export default function Logout({onClose}) {
+    const { logout } = useAuthContext();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const { logout } = useAuthContext();
+
 
     const { currentSeason = 'Spring', setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context
     const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black'}; // Get the theme based on the current season
 
     const handleLogout = async () => {
+        // const confirmLeave = window.confirm('Are you sure you want to leave your ongoing game without saving?');
         setErrorMessage('');
         setSuccessMessage('');
-    
+        // if (confirmLeave) {
         try {
             setLoading(true);
             await logout(); // Use the logout function from authContext
-            setSuccessMessage('Logout successful!');
+            console.log('Logout successful:');
+            setSuccessMessage('You are logged out! Redirecting to home page...');
             setTimeout(() => {
                 setLoading(false);
+                onClose(); // Close the modal
+                navigate('/');
             }, 2000);
         } catch (error) {
             console.error('Logout failed:', error);
@@ -31,26 +36,86 @@ export default function Logout() {
         }
     };
 
+
     return (
-        <div className="bg-white p-6 rounded shadow-md w-full max-w-sm mx-auto">
-            <h2 className="text-2xl font-bold mb-4">Logout</h2>
-            {errorMessage && (
-                <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
-            )}
-            {successMessage && (
-                <div className="text-green-500 text-sm mb-4">{successMessage}</div>
-            )}
-            <button
-                className={`bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                type="button"
-                onClick={handleLogout}
-                disabled={loading}
-                aria-label="Logout"
-            >
-                {loading ? 'Logging out...' : 'Logout'}
-            </button>
-        </div>
+        <dialog id="logoutModal" className="modal modal-open">
+            <div className="modal-box p-0">
+                {/* Header */}
+                <header className={`p-4 text-center ${theme.headerBg} ${theme.headerText}`}>
+                    <h3 className="font-bold text-lg mb-4">Log Out</h3>
+                </header>
+
+                {/* Body */}
+                <div className={`p-6 ${theme.bodyBg} ${theme.bodyText}`}>
+                    {errorMessage && (
+                        <div className="text-[#d44747] text-sm mb-4">{errorMessage}</div>
+                    )}
+                    {successMessage && (
+                        <div className="text-[#97be5a] text-sm mb-4">{successMessage}</div>
+                    )}
+                    <p className="text-center mb-6">
+                        Are you sure you want to log out?
+                    </p>
+                    <div className="modal-action">
+                        <button
+                            className={`btn btn-primary border-none shadow-md ${theme.pWeeksBtnBg} ${theme.pWeeksBtnText} ${theme.pWeeksBtnBgHover}`}
+                            type="button"
+                            onClick={handleLogout}
+                            disabled={loading}
+                        >
+                            {loading ? 'Logging out...' : 'Logout'}
+                        </button>
+                        <button
+                            className={`btn border-none shadow-md bg-white ${theme.bodyText} hover:bg-gray-200`}
+                            onClick={onClose}
+                            type="button"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </dialog>
     );
 }
+//         <div>
+//             <h2 className="text-2xl font-bold mb-4">Logout</h2>
+//             {errorMessage && (
+//                     <div className={`
+//                             text-[#d44747] text-sm mb-4`}>
+//                                 {errorMessage}
+//                                 </div>
+//                 )}
+//                 {successMessage && (
+//                     <div className={`
+//                             text-[#97be5a] text-sm mb-4`}>
+//                                 {successMessage}
+//                                 </div>
+//                 )}
+//                 <div className="flex justify-center space-x-4">
+//             <button
+//                 className={`
+//                     login-button flex justify-center items-center mt-4
+//                     ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+//                     py-2 px-4 rounded hover:cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+//                     `}
+//                 type="button"
+//                 onClick={handleLogout}
+//                 disabled={loading}
+//             >
+//                 {loading ? 'Logging out...' : 'Logout'}
+//             </button>
+//             <button
+//                         onClick={onClose}
+//                         className={`
+//                             login-button flex justify-center items-center mt-4
+//                             ${theme.headerBtnBg} ${theme.headerBtnBgHover} ${theme.headerBtnText} 
+//                             py-2 px-4 rounded hover:cursor-pointer
+//                             `}
+//                     >
+//                         Cancel
+//                     </button>
+//                     </div>
+//         </div>
+//     );
+// };

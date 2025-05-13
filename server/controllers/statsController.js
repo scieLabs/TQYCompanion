@@ -14,6 +14,23 @@ export const getStatsByGameAndWeek = async (req, res) => {
   }
 };
 
+//Should fetch data for all weeks of a game for the GameSummary component
+//It should only be used once per game, when the summary is opened and thus created
+export const getStatsByGame = async (req, res) => {
+  const { game_id } = req.params;
+
+  try {
+    const stats = await Stats.find({ game_id }).sort({ week: 1 }); 
+    if (!stats || stats.length === 0) {
+      return res.status(404).json({ message: 'No stats found for this game.' });
+    }
+    res.json(stats);
+  } catch (err) {
+    console.error('Error fetching stats by game:', err);
+    res.status(500).json({ message: 'Error fetching stats by game.', error: err.message });
+  }
+};
+
 export const createStatsEntry = async (req, res) => {
   const { game_id, week, abundance, scarcity, contempt } = req.body;
 
@@ -30,14 +47,14 @@ export const createStatsEntry = async (req, res) => {
 // export const saveActionData = async (req, res) => {
 //     const { game_id, week } = req.params;
 //     const updates = req.body;
-  
+
 //     try {
 //       const stats = await Stats.findOneAndUpdate(
 //         { game_id, week },
 //         { $set: updates },
 //         { new: true }
 //       );
-  
+
 //       if (!stats) return res.status(404).json({ message: 'Stats not found.' });
 //       res.json(stats);
 //     } catch (err) {
@@ -102,7 +119,7 @@ export const saveActionData = async (req, res) => {
 };
 
 
-  // Update stats by game and week
+// Update stats by game and week
 export const updateStatsByGameAndWeek = async (req, res) => {
   const { game_id, week } = req.params;
   const { abundance, scarcity, contempt } = req.body;
@@ -123,5 +140,25 @@ export const updateStatsByGameAndWeek = async (req, res) => {
   } catch (error) {
     console.error('Error updating stats:', error);
     res.status(500).json({ message: 'Error updating stats.', error: error.message });
+  }
+};
+
+export const getStatsByGameId = async (req, res) => {
+  try {
+    const { game_id } = req.params;
+
+    if (!game_id) {
+      return res.status(400).json({ message: 'Game ID is required.' });
+    }
+
+    const stats = await Stats.findOne({ game_id }).sort({ week: -1 }); // Get the latest stats entry
+    if (!stats) {
+      return res.status(404).json({ message: 'Stats not found for this game.' });
+    }
+
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error('Error fetching stats by game ID:', error);
+    res.status(500).json({ message: 'Error fetching stats.', error: error.message });
   }
 };

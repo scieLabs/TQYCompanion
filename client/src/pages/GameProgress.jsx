@@ -1,21 +1,26 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ActionModal from '../components/ActionModal.jsx';
 import GameStats from '../components/GameStats.jsx';
 import { getGameById, updateGame } from '../api/gameApi.js';
 import * as projectAPI from '../api/projectApi.js';
-import { getStatsByGameAndWeek, createStatsEntry, saveActionData } from '../api/statApi.js';
+import { getStatsByGameAndWeek, createStatsEntry, saveActionData, getStatsByGame } from '../api/statApi.js';
 import { getNextPrompt, createPrompt } from '../api/promptApi.js';
 import { createProject } from '../api/projectApi.js';
 import { useAuthContext } from '../contexts/authContext.jsx'; //adjust if needed
 import { handleApiError } from '../utils/errorHandler.js';
 import { useSeason } from '../contexts/seasonContext.jsx'; // Import the season context
+import GameHeader from '../components/GameHeader.jsx'; // Import the GameHeader component
+import GameSummary from '../components/GameSummary.jsx'; // Import the GameSummary component
+
 
 export default function GameProgress() {
   const { game_id, week } = useParams(); // Get the game title from the URL parameters
   const { user } = useAuthContext(); // get the logged-in user
   const { currentSeason, setCurrentSeason, seasonThemes = {} } = useSeason(); // Access season context //FIXME: removed currentSeason = 'Spring',
   const theme = seasonThemes[currentSeason] || { bodyBg: 'bg-white', bodyText: 'text-black' }; // Get the theme based on the current season
+
+  const [showGameSummary, setShowGameSummary] = useState(false);
 
   const [game, setGame] = useState(null);
   const [stats, setStats] = useState({ abundance: '', scarcity: '', contempt: 0 });
@@ -35,29 +40,94 @@ export default function GameProgress() {
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
 
+  const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
+  const [prompt, setPrompt] = useState(null);
+  const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
+  const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
+  const [loadingPrompt, setLoadingPrompt] = useState(false);
+  const navigate = useNavigate();
+  const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
+
+  const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+  
+  //function for fetching game data when entering via Continue
+  const initializeGameProgress = async () => {
+  try {
+    console.log('Initializing GameProgress...');
+    await fetchGameData(); // Fetch game data (game and stats)
+    await fetchPrompt(); // Fetch the current or next prompt
+  } catch (error) {
+    console.error('Error initializing GameProgress:', error);
+  }
+};
+
+const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.fromActiveGames) {
+    initializeGameProgress(); // Run the combined function only if coming from ActiveGames
+  }
+}, [location.state, game_id, currentWeek, currentSeason]);
+
+  useEffect(() => {
+    console.log('Current season updated:', currentSeason);
+  }, [currentSeason]);
+
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever game_id or currentWeek changes
+
+  useEffect(() => {
+    console.log('Updated ongoingProjects:', ongoingProjects);
+  }, [ongoingProjects]);
+
+  useEffect(() => {
+    console.log('Updated completedProjects:', completedProjects);
+  }, [completedProjects]);
+
+  // useEffect(() => {
+  //   // console.log('Game ID:', game_id);
+  //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
+  //   fetchGameData();
+  // }, [game_id, currentSeason, currentWeek]);
+
+
   const fetchProjects = async () => {
     try {
-      // console.log(`Fetching all projects for game_id: ${game_id}`);
+      console.log(`Fetching all projects for game_id: ${game_id}`);
+      console.log(`Fetching all projects for game_id: ${game_id}`);
       const response = await projectAPI.getProjectsByGame(game_id);
       // console.log('Response from backend:', response);
       const allProjects = response.data;
 
+      console.log('All projects:', allProjects);
       // console.log('All projects:', allProjects);
-
       // Sort projects into ongoing and completed
       const ongoing = allProjects.filter(
         (proj) => proj.project_weeks > 0 || proj.pp_weeks > 0
       );
+
+
       const completed = allProjects.filter(
         (proj) =>
-          proj.project_weeks === 0 &&
-          proj.pp_weeks === 0 &&
+          (proj.project_weeks === 0 || proj.pp_weeks === 0) &&
+          (proj.project_weeks === 0 || proj.pp_weeks === 0) &&
           (proj.project_resolve || proj.pp_resolve)
       );
+
+      // console.log('Ongoing projects:', ongoing);
+      // console.log('Completed projects:', completed);
+
+      // console.log('Ongoing projects:', ongoing);
+      // console.log('Completed projects:', completed);
 
       setProjects(allProjects);
       setOngoingProjects(ongoing);
       setCompletedProjects(completed);
+      console.log('Fetched projects:', { ongoing, completed });
+      console.log('Fetched projects:', { ongoing, completed });
     } catch (error) {
       console.error('Error fetching projects:', error);
       if (error.response?.status === 404) {
@@ -70,26 +140,6 @@ export default function GameProgress() {
       }
     }
   };
-
-  const [currentWeek, setCurrentWeek] = useState(parseInt(week, 10) || 1);
-  const [prompt, setPrompt] = useState(null);
-  const [shownPrompts, setShownPrompts] = useState([]); // To keep track of shown prompts
-  const [seasonPrompts, setSeasonPrompts] = useState([]); // To store current season's prompts
-  const [loadingPrompt, setLoadingPrompt] = useState(false);
-  const navigate = useNavigate();
-  const GAME_OVER_PROMPT_ID = '6809feda210f991dba3d9c70';
-
-  const validSeasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
-
-  useEffect(() => {
-    console.log('Current season updated:', currentSeason);
-  }, [currentSeason]);
-
-  // useEffect(() => {
-  //   // console.log('Game ID:', game_id);
-  //   console.log('useEffect triggered: game_id, currentSeason, currentWeek');
-  //   fetchGameData();
-  // }, [game_id, currentSeason, currentWeek]);
 
   const hasFetchedPrompt = useRef(false);
 
@@ -132,8 +182,21 @@ export default function GameProgress() {
     fetchInitialData();
   }, [game_id, currentSeason, currentWeek]);
 
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever currentWeek changes
+
+  useEffect(() => {
+    if (game_id) {
+      fetchProjects();
+    }
+  }, [game_id, currentWeek]); // Call fetchProjects whenever currentWeek changes
+
   const fetchGameData = async () => {
     try {
+      console.log('Game ID:', game_id);
       const gameResponse = await getGameById(game_id);
       const statsResponse = await getStatsByGameAndWeek(game_id, currentWeek);
 
@@ -204,13 +267,16 @@ export default function GameProgress() {
       if (prompt._id === GAME_OVER_PROMPT_ID) {
         // Save the "fate of the community" to the database
         const data = { end: formData.end }; // Assuming `formData.end` contains the epilogue
-        await updateGame(game_id, data);
+        await updateGame(game_id, { currentWeek, isActive: false }, data);
         console.log('Game Over data saved:', data);
 
-        // Navigate to the Game Summary page
-        navigate(`/${game_id}/summary`);
+        // Show the game summary modal
+        setShowGameSummary(true);
         return; // Exit early since the game is over
+      } else {
+        await updateGame(game_id, { currentWeek, isActive: true });
       }
+      
 
       // Save the updated projects to the database
       await Promise.all(
@@ -255,12 +321,14 @@ export default function GameProgress() {
         isDiscussion: false,
         isDiscovery: false,
         isProject: false,
+        isActive: true,
       });
       // Update the current week state
       setCurrentWeek(nextWeek);
       // fetchPrompt(currentSeason);
 
-      fetchGameData(); //refresh game state
+      await fetchGameData(); //refresh game state
+      await fetchGameData(); //refresh game state
 
       // Fetch the next prompt explicitly
       await fetchPrompt();
@@ -272,8 +340,32 @@ export default function GameProgress() {
     }
   };
 
+  // Function to fetch all stats for the game for when the game summary is shown
+const fetchAllStats = async () => {
+    try {
+        console.log('Fetching all stats for game_id:', game_id); // Debug game_id
+        const statsResponse = await getStatsByGame(game_id); // Fetch all stats
+        console.log('Stats response:', statsResponse); // Debug response
+
+        if (Array.isArray(statsResponse) && statsResponse.length > 0) {
+            setStats(statsResponse);
+        } else {
+            console.warn('No stats data available for this game.');
+        }
+    } catch (err) {
+        console.error('Error fetching all stats:', err);
+    }
+};
+
+  useEffect(() => {
+    if (showGameSummary) {
+      fetchAllStats();
+    }
+  }, [showGameSummary]);
 
   return (
+    <>
+    <GameHeader />
     <div className={`min-h-screen p-4 ${theme.bodyBg || 'bg-white'} ${theme.bodyText || 'text-black'}`}>
       <div className={`flex`}>
         <div className={`w-1/4 pr-4`}>
@@ -287,21 +379,23 @@ export default function GameProgress() {
             completedProjects={completedProjects}
             setOngoingProjects={setOngoingProjects}
             setCompletedProjects={setCompletedProjects}
+            fetchProjects={fetchProjects}
           />
         </div>
-        <div className={`w-3/4`}>
-          <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
-          {prompt && prompt._id && (
-            <div>
-              <div className="text-center mb-8">
-                <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
-                <p
-                className="mb-8 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: prompt.prompt }}
-                ></p>
-            </div>
 
-              <ActionModal 
+          <div className={`w-3/4`}>
+            <h2 className="text-2xl font-bold mb-6 text-center">Week {currentWeek}, {currentSeason}</h2>
+            {prompt && prompt._id && (
+              <div>
+                <div className="text-center mb-8">
+                  <h3 className="text-xl font-semibold">{prompt.prompt_title}</h3>
+                  <p
+                    className="mb-8 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: prompt.prompt }}
+                  ></p>
+                </div>
+
+              <ActionModal
                 prompt={prompt}
                 game_id={game_id}
                 stats={stats}
@@ -313,28 +407,36 @@ export default function GameProgress() {
                 isDiscussion={prompt?.isDiscussion || false}
                 isDiscovery={prompt?.isDiscovery || false}
                 isProject={prompt?.isProject || false}
-                />
-
-
-            <div className="text-center">
-              <button
-                className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
-                onClick={handleNextWeek}
-              >
-                {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
-              </button>
-              <GameSummary
-                game={game}
-                stats={stats}
-                projects={projects}
-                currentWeek={currentWeek}
-                loading={loading}
+                fetchProjects={fetchProjects}
+                setOngoingProjects={setOngoingProjects}
               />
-            </div>
+
+
+              <div className="text-center">
+                <button
+                  className={`btn mt-6 shadow-md border-none ${theme.nextWeekBtnBg} ${theme.nextWeekBtnText} ${theme.nextWeekBtnBgHover}`}
+                  onClick={handleNextWeek}
+                >
+                  {prompt._id.toString() === GAME_OVER_PROMPT_ID ? 'Game Over' : 'Next Week'}
+                </button>
+                {showGameSummary && (
+                  <GameSummary
+                    className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full"
+                    game={game}
+                    stats={stats}
+                    projects={projects}
+                    currentWeek={currentWeek}
+                    loading={loading}
+                    onClose={() => setShowGameSummary(false)}
+                  />
+                )}
+              </div>
             </div>
           )}
         </div>
       </div>
     </div>
+    
+    </>
   );
 }

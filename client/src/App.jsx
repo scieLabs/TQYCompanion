@@ -2,9 +2,12 @@ import './App.css';
 import './index.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Footer from './components/Footer.jsx';
+
 import LandingPage from './pages/LandingPage.jsx';
 import GameProgress from './pages/GameProgress.jsx';
 import CreateNewGame from './pages/NewGame.jsx';
+import ActiveGames from './pages/ActiveGames.jsx';
+
 import { SeasonProvider } from './contexts/seasonContext.jsx';
 import { AuthProvider } from './contexts/authContext.jsx';
 import ProtectedRoute from './layouts/authLayout.jsx'; // Import the ProtectedRoute function
@@ -16,7 +19,12 @@ function App() {
       <AuthProvider>
           <SeasonProvider>
             <Routes>
-              <Route path="/" element={<LandingPage />} />
+              <Route 
+                path="/" 
+                element={<LandingPage />} />
+              <Route 
+                path="/active" 
+                element={<ActiveGames />} />
               <Route
                 path="/new-game"
                 element={
@@ -34,15 +42,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              {/* TODO: Add the correct path for the summary page 
-              <Route
-                path="/game/:game_id/summary/"
-                element={
-                  <ProtectedRoute>
-                    <GameSummary />
-                  </ProtectedRoute>
-                }
-              />*/}
             </Routes>
             <Footer />
           </SeasonProvider>
